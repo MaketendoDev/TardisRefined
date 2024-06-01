@@ -206,4 +206,6 @@ public class GlobalConsoleBlock extends BaseEntityBlock {
 
         return InteractionResult.sidedSuccess(true); //Use InteractionResult.sidedSuccess(true) for client side. Stops hand swinging twice. We don't want to use InteractionResult.SUCCESS because the client calls SUCCESS, so the server side calling it too sends the hand swinging packet twice.
     }
+
+
 }
