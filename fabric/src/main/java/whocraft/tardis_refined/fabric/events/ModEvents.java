@@ -50,7 +50,7 @@ public class ModEvents {
             DimensionHandler.loadLevels(world);
 
             // We call this here to make sure blocks are registered
-            TRPointOfInterestTypes.registerBlockStates();
+         //TODO   TRPointOfInterestTypes.registerBlockStates();
 
         });
 
