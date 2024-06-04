@@ -60,7 +60,7 @@ public class TardisRefined {
 
         TRPointOfInterestTypes.POIS.registerToModBus();
         TRVillagerProfession.PROFESSIONS.registerToModBus();
-        TRPointOfInterestTypes.registerBlockStates();
+   //     TRPointOfInterestTypes.registerBlockStates();
 
         TRTagKeys.init();
         TardisNetwork.init();
