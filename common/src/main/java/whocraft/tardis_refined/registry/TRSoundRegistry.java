@@ -29,6 +29,7 @@ public class TRSoundRegistry {
 
     public static final RegistrySupplier<SoundEvent> CORRIDOR_TELEPORTER = setUpSound("corridor_teleporter");
     public static final RegistrySupplier<SoundEvent> CORRIDOR_TELEPORTER_SUCCESS = setUpSound("corridor_teleporter_success");
+    public static final RegistrySupplier<SoundEvent> CLOISTER_BELL = setUpSound("cloister_bell");
 
     // Hums
 

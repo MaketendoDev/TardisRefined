@@ -1,4 +1,4 @@
-package whocraft.tardis_refined.common.capability.upgrades;
+package whocraft.tardis_refined.common.capability.tardis.upgrades;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;

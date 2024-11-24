@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import whocraft.tardis_refined.api.event.EventResult;
 import whocraft.tardis_refined.api.event.TardisCommonEvents;
 import whocraft.tardis_refined.common.blockentity.console.GlobalConsoleBlockEntity;
-import whocraft.tardis_refined.common.capability.TardisLevelOperator;
+import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.entity.ControlEntity;
 import whocraft.tardis_refined.common.tardis.themes.ConsoleTheme;
 import whocraft.tardis_refined.patterns.sound.ConfiguredSound;

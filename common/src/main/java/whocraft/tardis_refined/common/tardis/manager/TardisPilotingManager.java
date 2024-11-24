@@ -22,14 +22,16 @@ import net.minecraft.world.phys.Vec3;
 import whocraft.tardis_refined.api.event.TardisCommonEvents;
 import whocraft.tardis_refined.common.block.console.GlobalConsoleBlock;
 import whocraft.tardis_refined.common.blockentity.console.GlobalConsoleBlockEntity;
-import whocraft.tardis_refined.common.capability.TardisLevelOperator;
-import whocraft.tardis_refined.common.capability.upgrades.IncrementUpgrade;
-import whocraft.tardis_refined.common.capability.upgrades.SpeedUpgrade;
-import whocraft.tardis_refined.common.capability.upgrades.Upgrade;
-import whocraft.tardis_refined.common.capability.upgrades.UpgradeHandler;
+import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
+import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
+import whocraft.tardis_refined.common.capability.tardis.upgrades.IncrementUpgrade;
+import whocraft.tardis_refined.common.capability.tardis.upgrades.SpeedUpgrade;
+import whocraft.tardis_refined.common.capability.tardis.upgrades.Upgrade;
+import whocraft.tardis_refined.common.capability.tardis.upgrades.UpgradeHandler;
 import whocraft.tardis_refined.common.tardis.TardisArchitectureHandler;
 import whocraft.tardis_refined.common.tardis.TardisNavLocation;
 import whocraft.tardis_refined.common.util.LevelHelper;
+import whocraft.tardis_refined.common.util.Platform;
 import whocraft.tardis_refined.common.util.PlayerUtil;
 import whocraft.tardis_refined.common.util.TardisHelper;
 import whocraft.tardis_refined.constants.ModMessages;
@@ -310,11 +312,6 @@ public class TardisPilotingManager extends TickableHandler {
     private void tickCrashRecovery() {
         ticksinCrashRecovery++;
 
-        int maxCooldownTicks = 12000; // 10 minutes in ticks
-        int percentage = (int) ((ticksinCrashRecovery / (float) maxCooldownTicks) * 100);
-
-        System.out.println(percentage + "%");
-
         if(ticksinCrashRecovery % 120 == 0) {
             TardisHelper.playCloisterBell(operator);
         }
@@ -568,6 +565,7 @@ public class TardisPilotingManager extends TickableHandler {
 
 
         if (this.canBeginFlight()) {
+
             this.autoLand = autoLand;
             this.isPassivelyRefuelling = false;
             this.flightDistance = 0;
@@ -592,6 +590,8 @@ public class TardisPilotingManager extends TickableHandler {
             operator.setDoorClosed(true);
             operator.getLevel().playSound(null, operator.getInternalDoor().getDoorPosition(), TRSoundRegistry.TARDIS_TAKEOFF.get(), SoundSource.AMBIENT, 10f, 1f);
             operator.getExteriorManager().playSoundAtShell(TRSoundRegistry.TARDIS_TAKEOFF.get(), SoundSource.BLOCKS, 1, 1);
+
+
             this.isInFlight = true;
             this.ticksInFlight = 0;
             this.ticksTakingOff = 1;
@@ -741,6 +741,19 @@ public class TardisPilotingManager extends TickableHandler {
         if (this.currentConsole != null) {
             operator.getFlightDanceManager().startFlightDance(this.currentConsole);
         }
+
+        Platform.getServer().getPlayerList().getPlayers().forEach(serverPlayer -> {
+            TardisPlayerInfo.get(serverPlayer).ifPresent(tardisPlayerInfo -> {
+                if (tardisPlayerInfo.isViewingTardis()) {
+                    System.out.println(UUID.fromString(operator.getLevelKey().location().getPath()));
+                    if (Objects.equals(tardisPlayerInfo.getViewedTardis().toString(), UUID.fromString(operator.getLevelKey().location().getPath()).toString())) {
+                        tardisPlayerInfo.setupPlayerForInspection(serverPlayer, operator, operator.getPilotingManager().isInFlight() ? operator.getPilotingManager().getTargetLocation() : operator.getPilotingManager().getCurrentLocation());
+
+                    }
+                }
+            });
+        });
+
         this.operator.tardisClientData().sync();
     }
     /** Update data to indicate we have completed the landing process.*/

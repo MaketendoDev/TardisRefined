@@ -1,4 +1,4 @@
-package whocraft.tardis_refined.common.capability.upgrades;
+package whocraft.tardis_refined.common.capability.tardis.upgrades;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -9,7 +9,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 import whocraft.tardis_refined.api.event.TardisCommonEvents;
-import whocraft.tardis_refined.common.capability.TardisLevelOperator;
+import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.registry.TRUpgrades;
 
 import java.util.ArrayList;

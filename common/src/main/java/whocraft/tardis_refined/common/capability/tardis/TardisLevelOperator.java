@@ -1,4 +1,4 @@
-package whocraft.tardis_refined.common.capability;
+package whocraft.tardis_refined.common.capability.tardis;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.core.BlockPos;
@@ -24,7 +24,7 @@ import whocraft.tardis_refined.common.block.shell.ShellBaseBlock;
 import whocraft.tardis_refined.common.blockentity.door.RootShellDoorBlockEntity;
 import whocraft.tardis_refined.common.blockentity.door.TardisInternalDoor;
 import whocraft.tardis_refined.common.blockentity.shell.GlobalShellBlockEntity;
-import whocraft.tardis_refined.common.capability.upgrades.UpgradeHandler;
+import whocraft.tardis_refined.common.capability.tardis.upgrades.UpgradeHandler;
 import whocraft.tardis_refined.common.hum.TardisHums;
 import whocraft.tardis_refined.common.blockentity.shell.ExteriorShell;
 import whocraft.tardis_refined.common.tardis.TardisArchitectureHandler;
@@ -386,8 +386,6 @@ public class TardisLevelOperator{
 
         //Place the exterior block
         targetLevel.setBlock(targetLocation, updatedBlockState, Block.UPDATE_ALL);
-
-        System.out.println(shellPattern.id());
 
         // Set TARDIS Id, so the block actually knows what it is
         if(targetLevel.getBlockEntity(targetLocation) instanceof GlobalShellBlockEntity globalShellBlockEntity){

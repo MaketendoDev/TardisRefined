@@ -9,6 +9,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.AnimationState;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import whocraft.tardis_refined.common.block.console.GlobalConsoleBlock;
-import whocraft.tardis_refined.common.capability.TardisLevelOperator;
+import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.entity.ControlEntity;
 import whocraft.tardis_refined.common.tardis.control.ControlSpecification;
 import whocraft.tardis_refined.common.tardis.manager.TardisInteriorManager;
@@ -140,10 +141,15 @@ public class GlobalConsoleBlockEntity extends BlockEntity implements BlockEntity
                 // Spawn a control!
                 ControlEntity controlEntity = new ControlEntity(getLevel());
 
+                controlEntity.setPosForDebug(control.offsetPosition());
+
                 Vec3 location = LevelHelper.centerPos(currentBlockPos, true).add(control.offsetPosition().x(), control.offsetPosition().y(), control.offsetPosition().z());
                 controlEntity.setPos(location.x(), location.y(), location.z());
 
+
                 controlEntity.assignControlData(consoleTheme, control, this.getBlockPos());
+
+
 
                 serverLevel.addFreshEntity(controlEntity);
                 controlEntityList.add(controlEntity);
@@ -184,9 +190,7 @@ public class GlobalConsoleBlockEntity extends BlockEntity implements BlockEntity
 
 
     public void killControls() {
-        controlEntityList.forEach(x -> {
-            x.discard();
-        });
+        controlEntityList.forEach(Entity::discard);
         controlEntityList.clear();
     }
 

@@ -3,9 +3,8 @@ package whocraft.tardis_refined.common.tardis.manager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import whocraft.tardis_refined.common.blockentity.console.GlobalConsoleBlockEntity;
-import whocraft.tardis_refined.common.capability.TardisLevelOperator;
+import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.entity.ControlEntity;
-import whocraft.tardis_refined.registry.TRControlRegistry;
 
 import java.util.ArrayList;
 import java.util.List;

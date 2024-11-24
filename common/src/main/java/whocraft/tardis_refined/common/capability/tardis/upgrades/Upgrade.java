@@ -1,4 +1,4 @@
-package whocraft.tardis_refined.common.capability.upgrades;
+package whocraft.tardis_refined.common.capability.tardis.upgrades;
 
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import whocraft.tardis_refined.common.capability.TardisLevelOperator;
+import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.registry.TRUpgrades;
 
 import java.util.ArrayList;

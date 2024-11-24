@@ -9,7 +9,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraftforge.common.data.LanguageProvider;
 import whocraft.tardis_refined.TardisRefined;
-import whocraft.tardis_refined.common.capability.upgrades.Upgrade;
+import whocraft.tardis_refined.common.capability.tardis.upgrades.Upgrade;
 import whocraft.tardis_refined.common.hum.HumEntry;
 import whocraft.tardis_refined.common.hum.TardisHums;
 import whocraft.tardis_refined.compat.create.ModCompatMessages;
@@ -53,6 +53,7 @@ public class LangProviderEnglish extends LanguageProvider {
         addSound(TRSoundRegistry.SCREWDRIVER_DISCARD.get(), "Screwdriver discard data");
         addSound(TRSoundRegistry.GRAVITY_TUNNEL.get(), "Gravity tunnel winds");
         addSound(TRSoundRegistry.LOW_FUEL.get(), "Low fuel warning");
+        addSound(TRSoundRegistry.CLOISTER_BELL.get(), "Cloister Bell");
 
         //Hum Sounds
         TardisHums.registerDefaultHums();

@@ -2,6 +2,7 @@ package whocraft.tardis_refined.client;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.sounds.SoundManager;
@@ -16,7 +17,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import whocraft.tardis_refined.client.sounds.*;
 import whocraft.tardis_refined.common.GravityUtil;
-import whocraft.tardis_refined.common.capability.TardisLevelOperator;
+import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
+import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.hum.HumEntry;
 import whocraft.tardis_refined.common.util.ClientHelper;
 import whocraft.tardis_refined.common.util.TardisHelper;
@@ -45,6 +47,12 @@ public class TardisClientLogic {
         }
 
         Player player = Minecraft.getInstance().player;
+
+        TardisPlayerInfo.get(player).ifPresent(tardisPlayerInfo -> {
+            if(tardisPlayerInfo.isViewingTardis()){
+                Minecraft.getInstance().options.setCameraType(CameraType.THIRD_PERSON_FRONT);
+            }
+        });
 
         if (player.level().dimensionTypeId() == TRDimensionTypes.TARDIS) {
 

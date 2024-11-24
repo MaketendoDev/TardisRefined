@@ -5,13 +5,15 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "EndDragonFightAccessor",
+    "MappedRegistryAccessor",
     "MinecraftServerStorageAccessor",
-    "PlayerEntityMixin",
-    "MappedRegistryAccessor"
+    "PlayerEntityMixin"
   ],
   "client": [
     "FogRendererMixin",
-    "MultiplayerGameModeMixin"
+    "LocalPlayerMixin",
+    "MultiplayerGameModeMixin",
+    "PlayerRenderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

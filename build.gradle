@@ -1,13 +1,29 @@
+
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "io.github.pacifistmc.forgix:Forgix:1.2.9"
+    }
+}
+
 plugins {
     id "architectury-plugin" version "3.4-SNAPSHOT"
     id "dev.architectury.loom" version "1.5+" apply false
-    id "io.github.pacifistmc.forgix" version "1.2.9"
     id "me.shedaniel.unified-publishing" version "0.1.+"
 }
+
+apply plugin: "io.github.pacifistmc.forgix"
 
 architectury {
     minecraft = rootProject.minecraft_version
 }
+
+
 
 forgix {
     group = "whocraft.tardis_refined"
@@ -84,9 +100,6 @@ allprojects {
     group = rootProject.maven_group
 
     repositories {
-        maven {
-            url "https://cursemaven.com"
-        }
 
         // mavens for Create Fabric and dependencies
         maven { url = "https://api.modrinth.com/maven" } // LazyDFU
@@ -107,6 +120,11 @@ allprojects {
         maven {
             name = "Fuzs Mod Resources"
             url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+        }
+
+
+        maven {
+            url "https://cursemaven.com"
         }
 
         maven { url 'https://jitpack.io' }

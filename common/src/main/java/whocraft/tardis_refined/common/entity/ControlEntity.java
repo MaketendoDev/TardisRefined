@@ -27,11 +27,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 import whocraft.tardis_refined.TardisRefined;
 import whocraft.tardis_refined.client.TardisClientData;
 import whocraft.tardis_refined.common.blockentity.console.GlobalConsoleBlockEntity;
-import whocraft.tardis_refined.common.capability.TardisLevelOperator;
-import whocraft.tardis_refined.common.capability.upgrades.UpgradeHandler;
+import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
+import whocraft.tardis_refined.common.capability.tardis.upgrades.UpgradeHandler;
 import whocraft.tardis_refined.common.tardis.control.Control;
 import whocraft.tardis_refined.common.tardis.control.ControlSpecification;
 import whocraft.tardis_refined.common.tardis.control.ship.MonitorControl;
@@ -57,6 +58,7 @@ public class ControlEntity extends Entity {
     private ConsoleTheme consoleTheme;
     private BlockPos consoleBlockPos;
     private FlightDanceManager flightDanceManager;
+    private Vector3f offset;
 
     public ControlEntity(EntityType<?> entityTypeIn, Level level) {
         super(entityTypeIn, level);
@@ -142,6 +144,7 @@ public class ControlEntity extends Entity {
 
     @Override
     public Component getName() {
+
 
         TardisClientData tardisClientData = TardisClientData.getInstance(level().dimension());
         if(tardisClientData.isInRecovery()){
@@ -551,5 +554,9 @@ public class ControlEntity extends Entity {
 
     public void setTotalControlHealth(int totalControlHealth) {
         this.totalControlHealth = totalControlHealth;
+    }
+
+    public void setPosForDebug(Vector3f vector3f) {
+        this.offset = vector3f;
     }
 }

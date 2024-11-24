@@ -1,11 +1,12 @@
-package whocraft.tardis_refined.common.capability.fabric;
+package whocraft.tardis_refined.common.capability.tardis.fabric;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentV3;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import whocraft.tardis_refined.TardisRefined;
-import whocraft.tardis_refined.common.capability.TardisLevelOperator;
+import whocraft.tardis_refined.common.capability.fabric.TRComponents;
+import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 
 import java.util.Objects;
 import java.util.Optional;
