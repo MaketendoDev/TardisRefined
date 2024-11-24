@@ -310,6 +310,11 @@ public class TardisPilotingManager extends TickableHandler {
     private void tickCrashRecovery() {
         ticksinCrashRecovery++;
 
+        int maxCooldownTicks = 12000; // 10 minutes in ticks
+        int percentage = (int) ((ticksinCrashRecovery / (float) maxCooldownTicks) * 100);
+
+        System.out.println(percentage + "%");
+
         if(ticksinCrashRecovery % 120 == 0) {
             TardisHelper.playCloisterBell(operator);
         }

@@ -10,10 +10,8 @@
 - tardis is damaged [#351](https://github.com/WhoCraft/TardisRefined/issues/351)
 - Diagonal Windows makes it impossible to craft the terraformer [#383](https://github.com/WhoCraft/TardisRefined/issues/383)
 - relogging causes Tardis Dance events to not occur [#387](https://github.com/WhoCraft/TardisRefined/issues/387)
-- TARDIS waypoint travel will travel to the saved coordinates but not the target dimension the coordinates were saved in  [#366](https://github.com/WhoCraft/TardisRefined/issues/366)
 
 ## Gameplay changes
 - Standing in a Crashed smoke of a crashed TARDIS will cause 0.5 damage to the player for the duration their standing in it
 - Recovery Progress of crashed TARDIS now displayed on controls until repair is complete
 - Recovery Progress of crashed TARDIS is now displayed on Key tooltip
-- Easter Egg
