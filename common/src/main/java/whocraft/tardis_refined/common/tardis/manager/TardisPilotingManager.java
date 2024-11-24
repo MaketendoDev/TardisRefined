@@ -101,8 +101,6 @@ public class TardisPilotingManager extends TickableHandler {
         this.canUseControls = true;
         ticksinCrashRecovery = 0;
         this.operator.getLevel().playSound(null, TardisArchitectureHandler.DESKTOP_CENTER_POS, TRSoundRegistry.TARDIS_SINGLE_FLY.get(), SoundSource.AMBIENT, 100f, 0.25f);
-
-
     }
 
     @Override
@@ -312,15 +310,9 @@ public class TardisPilotingManager extends TickableHandler {
     private void tickCrashRecovery() {
         ticksinCrashRecovery++;
 
-        int maxCooldownTicks = 12000; // 10 minutes in ticks
-        int percentage = (int) ((ticksinCrashRecovery / (float) maxCooldownTicks) * 100);
-
-        System.out.println(percentage + "%");
-
         if(ticksinCrashRecovery % 120 == 0) {
             TardisHelper.playCloisterBell(operator);
         }
-
         // After 10 minutes
         if (ticksinCrashRecovery >= TICKS_COOLDOWN_MAX) {
             endRecovery();
