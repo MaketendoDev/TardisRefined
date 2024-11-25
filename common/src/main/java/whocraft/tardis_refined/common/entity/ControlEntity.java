@@ -36,12 +36,12 @@ import whocraft.tardis_refined.common.tardis.control.ControlSpecification;
 import whocraft.tardis_refined.common.tardis.control.ship.MonitorControl;
 import whocraft.tardis_refined.common.tardis.manager.FlightDanceManager;
 import whocraft.tardis_refined.common.tardis.themes.ConsoleTheme;
-import whocraft.tardis_refined.constants.ModMessages;
-import whocraft.tardis_refined.patterns.sound.ConfiguredSound;
 import whocraft.tardis_refined.common.util.ClientHelper;
 import whocraft.tardis_refined.common.util.LevelHelper;
 import whocraft.tardis_refined.common.util.MiscHelper;
+import whocraft.tardis_refined.constants.ModMessages;
 import whocraft.tardis_refined.constants.NbtConstants;
+import whocraft.tardis_refined.patterns.sound.ConfiguredSound;
 import whocraft.tardis_refined.registry.TRControlRegistry;
 import whocraft.tardis_refined.registry.TRDimensionTypes;
 import whocraft.tardis_refined.registry.TREntityRegistry;
@@ -317,7 +317,7 @@ public class ControlEntity extends Entity {
         return getEntityData().get(TICKING_DOWN);
     }
     /** Restores the control alignment points to a higher value so that it won't cause the Tardis to crash*/
-    private void realignControl() {
+    public void realignControl() {
         int currentHealth = this.entityData.get(CONTROL_HEALTH);
         int nextHealth = currentHealth + 2;
 

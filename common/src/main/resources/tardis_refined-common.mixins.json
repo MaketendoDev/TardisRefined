@@ -7,7 +7,9 @@
     "EndDragonFightAccessor",
     "MappedRegistryAccessor",
     "MinecraftServerStorageAccessor",
-    "PlayerEntityMixin"
+    "PlayerEntityMixin",
+    "VillagerGoalPackagesMixin",
+    "VillagerMixin"
   ],
   "client": [
     "FogRendererMixin",

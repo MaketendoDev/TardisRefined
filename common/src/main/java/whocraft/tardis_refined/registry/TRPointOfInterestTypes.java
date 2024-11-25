@@ -22,7 +22,7 @@ public class TRPointOfInterestTypes {
     public static final DeferredRegistry<PoiType> POIS = DeferredRegistry.create(TardisRefined.MODID, Registries.POINT_OF_INTEREST_TYPE);
 
 
-    public static final RegistrySupplier<PoiType> CONSOLE_UNIT_POI = POIS.register("console_unit", () -> registerPointOfInterest(1, 1, TRBlockRegistry.GLOBAL_CONSOLE_BLOCK.get()));
+    public static final RegistrySupplier<PoiType> CONSOLE_UNIT_POI = POIS.register("console_unit", () -> registerPointOfInterest(6, 15, TRBlockRegistry.GLOBAL_CONSOLE_BLOCK.get()));
     public static final RegistrySupplier<PoiType> ASTRAL_MAP_POI = POIS.register("astral_map", () -> registerPointOfInterest(1, 1, TRBlockRegistry.ASTRAL_MAP.get()));
 
 
