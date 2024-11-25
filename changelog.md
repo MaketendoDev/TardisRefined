@@ -15,3 +15,6 @@
 - Standing in a Crashed smoke of a crashed TARDIS will cause 0.5 damage to the player for the duration their standing in it
 - Recovery Progress of crashed TARDIS now displayed on controls until repair is complete
 - Recovery Progress of crashed TARDIS is now displayed on Key tooltip
+- You can now view your TARDIS exterior via the Monitor
+- Holographic exteriors on consoles now spin according to throttle
+- Improved UI for Gravity Shaft

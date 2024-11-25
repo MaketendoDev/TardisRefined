@@ -2,19 +2,13 @@ package whocraft.tardis_refined.client.renderer.blockentity.console;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4f;
 import whocraft.tardis_refined.client.TardisClientData;
 import whocraft.tardis_refined.client.model.blockentity.console.ConsoleModelCollection;
 import whocraft.tardis_refined.client.model.blockentity.console.ConsoleUnit;
@@ -23,7 +17,6 @@ import whocraft.tardis_refined.client.screen.selections.ShellSelectionScreen;
 import whocraft.tardis_refined.common.block.console.GlobalConsoleBlock;
 import whocraft.tardis_refined.common.blockentity.console.GlobalConsoleBlockEntity;
 import whocraft.tardis_refined.common.tardis.themes.ConsoleTheme;
-import whocraft.tardis_refined.common.tardis.themes.ShellTheme;
 import whocraft.tardis_refined.patterns.ShellPattern;
 import whocraft.tardis_refined.patterns.ShellPatterns;
 
@@ -74,6 +67,8 @@ public class GlobalConsoleRenderer implements BlockEntityRenderer<GlobalConsoleB
     private void renderHoloShell(Vec3 offset, int rotation, GlobalConsoleBlockEntity blockEntity, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, Vec3 color) {
         if (blockEntity.getLevel().random.nextInt(20) != 0) {
             poseStack.pushPose();
+
+            // Fetch shell data
             TardisClientData reactions = TardisClientData.getInstance(blockEntity.getLevel().dimension());
             ResourceLocation shellTheme = reactions.getShellTheme();
             ResourceLocation shellPattern = reactions.getShellPattern();
@@ -82,12 +77,29 @@ public class GlobalConsoleRenderer implements BlockEntityRenderer<GlobalConsoleB
             var model = ShellModelCollection.getInstance().getShellEntry(shellTheme).getShellModel(pattern);
             model.setDoorPosition(false);
 
+            // Base rotation and positioning
             poseStack.mulPose(Axis.ZP.rotationDegrees(180F));
             poseStack.translate(offset.x, offset.y, offset.z);
-            poseStack.translate(0, blockEntity.getLevel().random.nextFloat() * 0.01, 0);
-            poseStack.scale(0.1f, 0.1f, 0.1f);
+
+            // Add subtle floating animation
             if (reactions.isFlying()) {
-                poseStack.mulPose(Axis.YP.rotationDegrees(((blockEntity.getLevel().getGameTime() % 360)) * 25f));
+                float floatingOffset = (float) Math.sin(blockEntity.getLevel().getGameTime() / 15.0) * 0.05f;
+                poseStack.translate(0, floatingOffset, 0);
+            }
+
+            // Random subtle jitter
+            poseStack.translate(
+                    blockEntity.getLevel().random.nextFloat() * 0.005f - 0.0025f,
+                    blockEntity.getLevel().random.nextFloat() * 0.005f - 0.0025f,
+                    blockEntity.getLevel().random.nextFloat() * 0.005f - 0.0025f
+            );
+
+            float scaleModifier = 0.1f + (float) Math.sin(blockEntity.getLevel().getGameTime() / 20.0) * 0.005f;
+            poseStack.scale(scaleModifier, scaleModifier, scaleModifier);
+
+            // Add rotation effect
+            if (reactions.isFlying()) {
+                poseStack.mulPose(Axis.YP.rotationDegrees((blockEntity.getLevel().getGameTime() % 360) * (reactions.getThrottleStage() * 5L)));
             } else {
                 poseStack.mulPose(Axis.YP.rotationDegrees(rotation % 360));
             }
@@ -96,11 +108,33 @@ public class GlobalConsoleRenderer implements BlockEntityRenderer<GlobalConsoleB
                 ShellSelectionScreen.generateDummyGlobalShell();
             }
 
-            model.renderShell(ShellSelectionScreen.globalShellBlockEntity, false, true, poseStack, bufferSource.getBuffer(RenderType.entityTranslucent(pattern.exteriorDoorTexture().texture())), packedLight, OverlayTexture.NO_OVERLAY, (float) color.x, (float) color.y, (float) color.z, 0.25f);
+            // Dynamic flickering alpha for a hologram effect
+            float flickerAlpha = 0.2f + blockEntity.getLevel().random.nextFloat() * 0.1f;
+
+            boolean recoveryOrCrashing = reactions.isCrashing() || reactions.isInRecovery();
+
+            float time = blockEntity.getLevel().getGameTime() / 100.0f;
+            float red = recoveryOrCrashing ? 0.5f + (float) Math.sin(time) * 0.5f : (float) color.x;
+            float green = recoveryOrCrashing ? 0.5f + (float) Math.sin(time + Math.PI / 2) * 0.5f : (float) color.y;
+            float blue = recoveryOrCrashing ? 0.5f + (float) Math.sin(time + Math.PI) * 0.5f : (float) color.z;
+
+            model.renderShell(
+                    ShellSelectionScreen.globalShellBlockEntity,
+                    false,
+                    true,
+                    poseStack,
+                    bufferSource.getBuffer(RenderType.entityTranslucent(pattern.exteriorDoorTexture().texture())),
+                    packedLight,
+                    OverlayTexture.NO_OVERLAY,
+                    red,
+                    green,
+                    blue,
+                    flickerAlpha
+            );
 
             poseStack.popPose();
-
         }
+
     }
 
     @Override

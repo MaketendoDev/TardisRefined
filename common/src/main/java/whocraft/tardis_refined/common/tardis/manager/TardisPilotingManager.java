@@ -745,7 +745,6 @@ public class TardisPilotingManager extends TickableHandler {
         Platform.getServer().getPlayerList().getPlayers().forEach(serverPlayer -> {
             TardisPlayerInfo.get(serverPlayer).ifPresent(tardisPlayerInfo -> {
                 if (tardisPlayerInfo.isViewingTardis()) {
-                    System.out.println(UUID.fromString(operator.getLevelKey().location().getPath()));
                     if (Objects.equals(tardisPlayerInfo.getViewedTardis().toString(), UUID.fromString(operator.getLevelKey().location().getPath()).toString())) {
                         tardisPlayerInfo.setupPlayerForInspection(serverPlayer, operator, operator.getPilotingManager().isInFlight() ? operator.getPilotingManager().getTargetLocation() : operator.getPilotingManager().getCurrentLocation());
 

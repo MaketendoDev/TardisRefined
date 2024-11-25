@@ -7,7 +7,8 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import whocraft.tardis_refined.TardisRefined;
-import whocraft.tardis_refined.client.GravityOverlay;
+import whocraft.tardis_refined.client.overlays.ExteriorViewOverlay;
+import whocraft.tardis_refined.client.overlays.GravityOverlay;
 import whocraft.tardis_refined.client.TardisClientLogic;
 
 @Mod.EventBusSubscriber(modid = TardisRefined.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
@@ -24,6 +25,7 @@ public class ClientForgeBus {
 
     @SubscribeEvent
     public static void onRenderOverlay(RenderGuiOverlayEvent.Post guiOverlayEvent) {
-        GravityOverlay.renderOverlay(guiOverlayEvent.getGuiGraphics().pose());
+        GravityOverlay.renderOverlay(guiOverlayEvent.getGuiGraphics());
+        ExteriorViewOverlay.renderOverlay(guiOverlayEvent.getGuiGraphics());
     }
 }

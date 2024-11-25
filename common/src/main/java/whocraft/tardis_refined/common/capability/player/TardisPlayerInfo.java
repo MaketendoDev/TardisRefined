@@ -7,6 +7,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import whocraft.tardis_refined.common.blockentity.door.TardisInternalDoor;
@@ -24,20 +25,12 @@ public class TardisPlayerInfo implements TardisPilot {
 
     private Player player;
     private UUID viewedTardis;
-    private GameType gameTypeBackup;
     private TardisNavLocation observationPosition;
 
     public TardisPlayerInfo(Player player) {
         this.player = player;
     }
 
-    public GameType getGameTypeBackup() {
-        return gameTypeBackup;
-    }
-
-    public void setGameTypeBackup(GameType gameTypeBackup) {
-        this.gameTypeBackup = gameTypeBackup;
-    }
 
     public void setPlayer(Player player) {
         this.player = player;
@@ -58,21 +51,35 @@ public class TardisPlayerInfo implements TardisPilot {
 
 
     @Override
+    public void updatePlayerAbilities(ServerPlayer player, Abilities abilities, boolean isWatcher) {
+
+        if(isWatcher) {
+            abilities.mayfly = false;
+            abilities.instabuild = false;
+            abilities.invulnerable = true;
+            abilities.flying = true;
+
+            player.setNoGravity(true);
+        } else {
+            player.gameMode.getGameModeForPlayer().updatePlayerAbilities(abilities);
+            player.setNoGravity(false);
+        }
+    }
+
+    @Override
     public void setupPlayerForInspection(ServerPlayer serverPlayer, TardisLevelOperator tardisLevelOperator, TardisNavLocation spectateTarget) {
 
         // Set the player's viewed TARDIS UUID
         UUID uuid = UUID.fromString(tardisLevelOperator.getLevelKey().location().getPath());
         setViewedTardis(uuid);
 
-        // Switch the player to spectator mode and teleport them to the TARDIS
-        setGameTypeBackup(serverPlayer.gameMode.getGameModeForPlayer());
-
         if (tardisLevelOperator.getPilotingManager().getCurrentLocation() != null) {
 
             TardisNavLocation sourceLocation = tardisLevelOperator.getPilotingManager().getCurrentLocation();
 
             TardisHelper.teleportEntityTardis(tardisLevelOperator, player, sourceLocation, spectateTarget, false);
-            serverPlayer.setGameMode(GameType.SPECTATOR);
+            updatePlayerAbilities(serverPlayer, serverPlayer.getAbilities(), true);
+            serverPlayer.onUpdateAbilities();
 
             syncToClients(null);
         }
@@ -94,8 +101,9 @@ public class TardisPlayerInfo implements TardisPilot {
 
         TardisHelper.teleportEntityTardis(tardisLevelOperator, serverPlayer, sourceLocation, targetLocation, true);
 
-        // Reset the player's game mode to their default (e.g., survival)
-        serverPlayer.setGameMode(gameTypeBackup);
+        updatePlayerAbilities(serverPlayer, serverPlayer.getAbilities(), false);
+        serverPlayer.onUpdateAbilities();
+
         // Clear the viewed TARDIS UUID
         setViewedTardis(null);
 
@@ -125,10 +133,6 @@ public class TardisPlayerInfo implements TardisPilot {
             tag.putUUID("ViewedTardis", viewedTardis);
         }
 
-        if(gameTypeBackup != null) {
-            tag.putInt("playerGameType", gameTypeBackup.getId());
-        }
-
         return tag;
     }
 
@@ -140,8 +144,6 @@ public class TardisPlayerInfo implements TardisPilot {
         } else {
             this.viewedTardis = null;
         }
-
-        gameTypeBackup = GameType.byId(tag.getInt("playerGameType"));
 
     }
 

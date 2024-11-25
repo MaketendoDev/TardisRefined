@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import whocraft.tardis_refined.client.TRKeybinds;
 import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
 import whocraft.tardis_refined.common.network.messages.player.ExitTardisViewMessage;
 
@@ -35,7 +36,7 @@ public class LocalPlayerMixin {
     private static void blockMovement(Input moveType) {
         // Set all movement-related fields to false or 0.0F to block movement
 
-        if(moveType.jumping){
+        if(TRKeybinds.EXIT_EXTERIOR_VIEW.isDown()){
             new ExitTardisViewMessage().send();
             return;
         }

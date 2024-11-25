@@ -24,6 +24,7 @@ import whocraft.tardis_refined.common.block.shell.ShellBaseBlock;
 import whocraft.tardis_refined.common.blockentity.door.RootShellDoorBlockEntity;
 import whocraft.tardis_refined.common.blockentity.door.TardisInternalDoor;
 import whocraft.tardis_refined.common.blockentity.shell.GlobalShellBlockEntity;
+import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
 import whocraft.tardis_refined.common.capability.tardis.upgrades.UpgradeHandler;
 import whocraft.tardis_refined.common.hum.TardisHums;
 import whocraft.tardis_refined.common.blockentity.shell.ExteriorShell;
@@ -200,24 +201,34 @@ public class TardisLevelOperator{
      * Moves the entity into the TARDIS. If the TARDIS has no door established, the entity is sent to 0,100,0.
      **/
     public boolean enterTardis(Entity entity, BlockPos externalShellPos, ServerLevel shellLevel, Direction shellDirection) {
-
-        if (this.level instanceof ServerLevel targetServerLevel) {
-
-            BlockPos targetPosition = internalDoor != null ? internalDoor.getTeleportPosition() : TardisArchitectureHandler.DESKTOP_CENTER_POS.above();
-            Direction doorDirection = internalDoor != null ? internalDoor.getTeleportRotation() : entity.getDirection();
-
-            TardisNavLocation sourceLocation = new TardisNavLocation(externalShellPos, shellDirection, shellLevel);
-            TardisNavLocation targetLocation = new TardisNavLocation(targetPosition, doorDirection, targetServerLevel);
-
-            this.pilotingManager.setCurrentLocation(new TardisNavLocation(externalShellPos, shellDirection.getOpposite(), shellLevel));
-
-            TardisHelper.teleportEntityTardis(this, entity, sourceLocation, targetLocation, true);
-            return true;
+        if (!(this.level instanceof ServerLevel targetServerLevel)) {
+            return false;
         }
 
-        return false;
+        // Determine target position and direction
+        BlockPos targetPosition = internalDoor != null ? internalDoor.getTeleportPosition() : TardisArchitectureHandler.DESKTOP_CENTER_POS.above();
+        Direction targetDirection = internalDoor != null ? internalDoor.getTeleportRotation() : entity.getDirection();
 
+        // Define source and target locations
+        TardisNavLocation sourceLocation = new TardisNavLocation(externalShellPos, shellDirection, shellLevel);
+        TardisNavLocation targetLocation = new TardisNavLocation(targetPosition, targetDirection, targetServerLevel);
+
+        // Update current location
+        this.pilotingManager.setCurrentLocation(new TardisNavLocation(externalShellPos, shellDirection.getOpposite(), shellLevel));
+
+        // Handle teleportation
+        if (entity instanceof ServerPlayer serverPlayer) {
+            TardisPlayerInfo.get(serverPlayer).ifPresent(tardisPlayerInfo -> {
+                if (!tardisPlayerInfo.isViewingTardis()) {
+                    TardisHelper.teleportEntityTardis(this, entity, sourceLocation, targetLocation, true);
+                }
+            });
+        } else {
+            TardisHelper.teleportEntityTardis(this, entity, sourceLocation, targetLocation, true);
+        }
+        return true;
     }
+
     public boolean isTardisReady() {
         return !this.getInteriorManager().isGeneratingDesktop();
     }
