@@ -10,6 +10,7 @@
 - tardis is damaged [#351](https://github.com/WhoCraft/TardisRefined/issues/351)
 - Diagonal Windows makes it impossible to craft the terraformer [#383](https://github.com/WhoCraft/TardisRefined/issues/383)
 - relogging causes Tardis Dance events to not occur [#387](https://github.com/WhoCraft/TardisRefined/issues/387)
+- Console cannot be removed/changed with the console configurator outside of the tardis dimension  [#380](https://github.com/WhoCraft/TardisRefined/issues/380)
 
 ## Gameplay changes
 - Standing in a Crashed smoke of a crashed TARDIS will cause 0.5 damage to the player for the duration their standing in it

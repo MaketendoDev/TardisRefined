@@ -16,10 +16,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import whocraft.tardis_refined.ControlGroupCheckers;
-import whocraft.tardis_refined.client.overlays.ExteriorViewOverlay;
-import whocraft.tardis_refined.client.overlays.GravityOverlay;
 import whocraft.tardis_refined.client.TRItemColouring;
 import whocraft.tardis_refined.client.TardisClientLogic;
+import whocraft.tardis_refined.client.overlays.ExteriorViewOverlay;
+import whocraft.tardis_refined.client.overlays.GravityOverlay;
 import whocraft.tardis_refined.command.TardisRefinedCommand;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.dimension.DimensionHandler;
@@ -66,7 +66,7 @@ public class ModEvents {
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
             DimensionHandlerImpl.clear();
 
-            if(ModCompatChecker.immersivePortals()){
+            if (ModCompatChecker.immersivePortals()) {
                 ImmersivePortals.onServerStopping(server);
             }
         });
@@ -80,13 +80,13 @@ public class ModEvents {
         });
 
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
-            if (newPlayer != null){
+            if (newPlayer != null) {
                 TardisHelper.handlePlayerJoinWorldEvents(newPlayer);
             }
         });
 
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> {
-            if (player != null){
+            if (player != null) {
                 TardisHelper.handlePlayerJoinWorldEvents(player);
             }
         });
