@@ -36,6 +36,7 @@ import whocraft.tardis_refined.constants.ResourceConstants;
 import whocraft.tardis_refined.patterns.ConsolePattern;
 import whocraft.tardis_refined.patterns.ConsolePatterns;
 import whocraft.tardis_refined.registry.TRBlockRegistry;
+import whocraft.tardis_refined.registry.TRDimensionTypes;
 import whocraft.tardis_refined.registry.TRItemRegistry;
 import whocraft.tardis_refined.registry.TRSoundRegistry;
 
@@ -99,19 +100,32 @@ public class ConsoleConfigurationBlock extends BaseEntityBlock {
                 return InteractionResult.sidedSuccess(false); //Use InteractionResult.sidedSuccess(false) for non-client side. Stops hand swinging twice. We don't want to use InteractionResult.SUCCESS because the client calls SUCCESS, so the server side calling it too sends the hand swinging packet twice.
             }
 
+
+
+
             if (level instanceof ServerLevel serverLevel) {
-                TardisLevelOperator.get(serverLevel).ifPresent(operator -> {
-                    if (!operator.getPilotingManager().isInFlight()) {
-                        if (player.isShiftKeyDown()) { //If we are destroying the console block
-                            this.removeGlobalConsoleBlock(consolePos, level);
+                if (serverLevel.dimensionTypeId() == TRDimensionTypes.TARDIS) {
+                    TardisLevelOperator.get(serverLevel).ifPresent(operator -> {
+                        if (!operator.getPilotingManager().isInFlight()) {
+                            if (player.isShiftKeyDown()) { //If we are destroying the console block
+                                this.removeGlobalConsoleBlock(consolePos, level);
+                            } else {
+                                this.changeConsoleTheme(level, blockPos, consolePos);
+                            }
                         } else {
-                            this.changeConsoleTheme(level, blockPos, consolePos);
+                            PlayerUtil.sendMessage(player, Component.translatable(ModMessages.CONSOLE_CONFIGURATION_NOT_IN_FLIGHT), true);
                         }
+                    });
+                } else {
+                    if (player.isShiftKeyDown()) { //If we are destroying the console block
+                        this.removeGlobalConsoleBlock(consolePos, level);
                     } else {
-                        PlayerUtil.sendMessage(player, Component.translatable(ModMessages.CONSOLE_CONFIGURATION_NOT_IN_FLIGHT), true);
+                        this.changeConsoleTheme(level, blockPos, consolePos);
                     }
-                });
+                }
             }
+
+
             return InteractionResult.sidedSuccess(false); //Use InteractionResult.sidedSuccess(false) for non-client side. Stops hand swinging twice. We don't want to use InteractionResult.SUCCESS because the client calls SUCCESS, so the server side calling it too sends the hand swinging packet twice.
         }
 

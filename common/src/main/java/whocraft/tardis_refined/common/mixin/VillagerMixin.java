@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
+import whocraft.tardis_refined.registry.TRVillagerProfession;
 
 @Mixin(Villager.class)
 public class VillagerMixin {
@@ -17,15 +18,14 @@ public class VillagerMixin {
         Villager villager = (Villager) (Object) this;
 
         if (villager.level() instanceof ServerLevel serverLevel) {
-
-
             TardisLevelOperator.get(serverLevel).ifPresent(tardisLevelOperator -> {
 
-
                 if (tardisLevelOperator.getPilotingManager().isInFlight()) {
-                    if (!villager.getBrain().isActive(Activity.WORK)) {
+                    if (villager.getVillagerData().getProfession() == TRVillagerProfession.PILOT.get() && !villager.getBrain().isActive(Activity.WORK)) {
                         villager.getBrain().setDefaultActivity(Activity.WORK);
                         villager.getBrain().setActiveActivityIfPossible(Activity.WORK);
+                    } else {
+                        villager.getVillagerData().setProfession(TRVillagerProfession.PILOT.get());
                     }
                 }
             });
