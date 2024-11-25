@@ -4,6 +4,7 @@ import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -15,9 +16,11 @@ import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.network.messages.player.SyncTardisPlayerInfoMessage;
 import whocraft.tardis_refined.common.tardis.TardisArchitectureHandler;
 import whocraft.tardis_refined.common.tardis.TardisNavLocation;
+import whocraft.tardis_refined.common.util.Platform;
 import whocraft.tardis_refined.common.util.TardisHelper;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,6 +29,7 @@ public class TardisPlayerInfo implements TardisPilot {
     private Player player;
     private UUID viewedTardis;
     private TardisNavLocation observationPosition;
+    private BlockPos playerPreviousPos = BlockPos.ZERO;
 
     public TardisPlayerInfo(Player player) {
         this.player = player;
@@ -71,6 +75,11 @@ public class TardisPlayerInfo implements TardisPilot {
 
         // Set the player's viewed TARDIS UUID
         UUID uuid = UUID.fromString(tardisLevelOperator.getLevelKey().location().getPath());
+
+        if(!isViewingTardis()) {
+            setPlayerPreviousPos(player.blockPosition());
+        }
+
         setViewedTardis(uuid);
 
         if (tardisLevelOperator.getPilotingManager().getCurrentLocation() != null) {
@@ -80,11 +89,31 @@ public class TardisPlayerInfo implements TardisPilot {
             TardisHelper.teleportEntityTardis(tardisLevelOperator, player, sourceLocation, spectateTarget, false);
             updatePlayerAbilities(serverPlayer, serverPlayer.getAbilities(), true);
             serverPlayer.onUpdateAbilities();
-
             syncToClients(null);
         }
 
 
+    }
+
+    public static void updateTardisForAllPlayers(TardisLevelOperator tardisLevelOperator, TardisNavLocation tardisNavLocation){
+        if(Platform.getServer() == null) return;
+        Platform.getServer().getPlayerList().getPlayers().forEach(serverPlayer -> {
+            TardisPlayerInfo.get(serverPlayer).ifPresent(tardisPlayerInfo -> {
+                if (tardisPlayerInfo.isViewingTardis()) {
+                    if (Objects.equals(tardisPlayerInfo.getViewedTardis().toString(), UUID.fromString(tardisLevelOperator.getLevelKey().location().getPath()).toString())) {
+                        tardisPlayerInfo.setupPlayerForInspection(serverPlayer, tardisLevelOperator, tardisNavLocation);
+                    }
+                }
+            });
+        });
+    }
+
+    public BlockPos getPlayerPreviousPos() {
+        return playerPreviousPos;
+    }
+
+    public void setPlayerPreviousPos(BlockPos playerPreviousPos) {
+        this.playerPreviousPos = playerPreviousPos;
     }
 
     @Override
@@ -92,7 +121,7 @@ public class TardisPlayerInfo implements TardisPilot {
 
         TardisInternalDoor internalDoor = tardisLevelOperator.getInternalDoor();
 
-        BlockPos targetPosition = internalDoor != null ? internalDoor.getTeleportPosition() : TardisArchitectureHandler.DESKTOP_CENTER_POS.above();
+        BlockPos targetPosition = getPlayerPreviousPos();
         Direction doorDirection = internalDoor != null ? internalDoor.getTeleportRotation() : serverPlayer.getDirection();
         ServerLevel tardisDimensionLevel = serverPlayer.server.getLevel(tardisLevelOperator.getLevelKey());
 
@@ -133,11 +162,18 @@ public class TardisPlayerInfo implements TardisPilot {
             tag.putUUID("ViewedTardis", viewedTardis);
         }
 
+        CompoundTag playerPos = NbtUtils.writeBlockPos(playerPreviousPos);
+        tag.put("PlayerPos", playerPos);
+
         return tag;
     }
 
     @Override
     public void loadData(CompoundTag tag) {
+
+        if(tag.contains("PlayerPos")){
+            playerPreviousPos = NbtUtils.readBlockPos(tag.getCompound("PlayerPos"));
+        }
 
         if (tag.hasUUID("ViewedTardis")) {
             this.viewedTardis = tag.getUUID("ViewedTardis");

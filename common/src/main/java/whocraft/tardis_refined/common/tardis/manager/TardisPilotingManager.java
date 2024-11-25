@@ -586,6 +586,9 @@ public class TardisPilotingManager extends TickableHandler {
             }
 
 
+            TardisPlayerInfo.updateTardisForAllPlayers(operator, targetPosition);
+
+
 
             operator.setDoorClosed(true);
             operator.getLevel().playSound(null, operator.getInternalDoor().getDoorPosition(), TRSoundRegistry.TARDIS_TAKEOFF.get(), SoundSource.AMBIENT, 10f, 1f);
@@ -674,6 +677,9 @@ public class TardisPilotingManager extends TickableHandler {
 
             exteriorManager.startLanding(operator, location);
 
+            TardisPlayerInfo.updateTardisForAllPlayers(operator, location);
+
+
             exteriorManager.playSoundAtShell(TRSoundRegistry.TARDIS_LAND.get(), SoundSource.BLOCKS, 1, 1);
 
             if (currentConsole != null) {
@@ -742,16 +748,8 @@ public class TardisPilotingManager extends TickableHandler {
             operator.getFlightDanceManager().startFlightDance(this.currentConsole);
         }
 
-        Platform.getServer().getPlayerList().getPlayers().forEach(serverPlayer -> {
-            TardisPlayerInfo.get(serverPlayer).ifPresent(tardisPlayerInfo -> {
-                if (tardisPlayerInfo.isViewingTardis()) {
-                    if (Objects.equals(tardisPlayerInfo.getViewedTardis().toString(), UUID.fromString(operator.getLevelKey().location().getPath()).toString())) {
-                        tardisPlayerInfo.setupPlayerForInspection(serverPlayer, operator, operator.getPilotingManager().isInFlight() ? operator.getPilotingManager().getTargetLocation() : operator.getPilotingManager().getCurrentLocation());
+        TardisPlayerInfo.updateTardisForAllPlayers(operator, lastKnown);
 
-                    }
-                }
-            });
-        });
 
         this.operator.tardisClientData().sync();
     }
@@ -767,6 +765,8 @@ public class TardisPilotingManager extends TickableHandler {
             this.operator.getLevel().playSound(null, this.currentConsoleBlockPos, TRSoundRegistry.LOW_FUEL.get(), SoundSource.AMBIENT, 1000, 1 );
         }
 
+        TardisPlayerInfo.updateTardisForAllPlayers(operator, getTargetLocation());
+        
         TardisCommonEvents.LAND.invoker().onLand(operator, getTargetLocation().getLevel(), getTargetLocation().getPosition());
         this.operator.tardisClientData().sync();
     }

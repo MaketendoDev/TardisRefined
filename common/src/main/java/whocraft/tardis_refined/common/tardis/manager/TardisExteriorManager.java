@@ -9,12 +9,16 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import whocraft.tardis_refined.common.block.shell.GlobalShellBlock;
+import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.blockentity.shell.ExteriorShell;
 import whocraft.tardis_refined.common.tardis.TardisNavLocation;
+import whocraft.tardis_refined.common.util.Platform;
 import whocraft.tardis_refined.constants.NbtConstants;
 
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * External Shell data.
@@ -159,6 +163,7 @@ public class TardisExteriorManager extends BaseHandler {
 
     /** Convenience method to place the exterior block when the Tardis is landing */
     public void placeExteriorBlockForLanding(TardisNavLocation location){
+        TardisPlayerInfo.updateTardisForAllPlayers(operator, location);
         this.operator.setOrUpdateExteriorBlock(location, Optional.empty());
     }
 

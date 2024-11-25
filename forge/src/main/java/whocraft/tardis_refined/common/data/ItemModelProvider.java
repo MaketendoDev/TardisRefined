@@ -55,7 +55,7 @@ public class ItemModelProvider extends net.minecraftforge.client.model.generator
         basicItem(TRItemRegistry.RAW_ZEITON.getId());
         basicItem(TRItemRegistry.ZEITON_NUGGET.getId());
 
-        basicItem(TRItemRegistry.MALLET.getId());
+       // basicItem(TRItemRegistry.MALLET.getId());
 
         basicItem(TRBlockRegistry.ZEITON_LANTERN.getId());
 

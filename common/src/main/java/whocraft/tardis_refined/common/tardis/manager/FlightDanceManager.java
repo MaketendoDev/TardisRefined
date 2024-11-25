@@ -2,9 +2,11 @@ package whocraft.tardis_refined.common.tardis.manager;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import whocraft.tardis_refined.common.block.console.GlobalConsoleBlock;
 import whocraft.tardis_refined.common.blockentity.console.GlobalConsoleBlockEntity;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.entity.ControlEntity;
+import whocraft.tardis_refined.registry.TRBlockRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,7 @@ public class FlightDanceManager extends TickableHandler {
     }
 
     public void startFlightDance(GlobalConsoleBlockEntity controllerConsole) {
+        if(controllerConsole == null) return;
         this.controlEntityList = getNonCriticalControls(controllerConsole);
         this.weAreDancing = true;
         this.console = controllerConsole;
@@ -96,15 +99,22 @@ public class FlightDanceManager extends TickableHandler {
     }
 
     private void triggerNextEvent() {
-        if (!controlEntityList.isEmpty()) {
-            int randomIndex = this.operator.getLevel().random.nextInt(controlEntityList.size());
-            ControlEntity randomControl = controlEntityList.get(randomIndex);
-            randomControl.setTickingDown(this);
-        } else {
-            if (console != null) {
-                this.controlEntityList = getNonCriticalControls(console);
+        if(controlEntityList.isEmpty()) {
+            GlobalConsoleBlockEntity console = operator.getPilotingManager().getCurrentConsole();
+            // Someone logged out during flight / a desync happened - we will just nicely end the flight
+            if(console == null){
+                stopDancing();
+                operator.getPilotingManager().endFlight(true);
+                return;
+            } else {
+                console.killControls(); // Just incase
+                console.spawnControlEntities();
+                controlEntityList.addAll(console.getControlEntityList());
+
             }
         }
+        ControlEntity randomControl = controlEntityList.get(this.operator.getLevel().random.nextInt(controlEntityList.size() - 1));
+        randomControl.setTickingDown(this);
     }
 
     public void updateDamageList() {

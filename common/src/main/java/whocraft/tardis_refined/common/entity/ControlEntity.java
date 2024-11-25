@@ -18,12 +18,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -47,6 +45,7 @@ import whocraft.tardis_refined.constants.NbtConstants;
 import whocraft.tardis_refined.registry.TRControlRegistry;
 import whocraft.tardis_refined.registry.TRDimensionTypes;
 import whocraft.tardis_refined.registry.TREntityRegistry;
+import whocraft.tardis_refined.registry.TRItemRegistry;
 
 public class ControlEntity extends Entity {
 
@@ -253,7 +252,23 @@ public class ControlEntity extends Entity {
                         return false;
                     }
                     if (this.entityData.get(TICKING_DOWN)) {
-                        this.realignControl();
+
+                        ItemStack itemStack = player.getMainHandItem();
+
+                        if(itemStack.is(TRItemRegistry.MALLET.get()) && !player.getCooldowns().isOnCooldown(TRItemRegistry.MALLET.get())){
+                            player.getCooldowns().addCooldown(TRItemRegistry.MALLET.get(), 600);
+                            itemStack.hurtAndBreak(15, player, (livingEntityx) -> {
+                                livingEntityx.broadcastBreakEvent(EquipmentSlot.MAINHAND);
+                            });
+
+                            getConsoleBlockEntity().getControlEntityList().forEach(controlEntity -> {
+                                controlEntity.realignControl();
+                                BlockPos blockPos = controlEntity.blockPosition();
+                                serverLevel.sendParticles(ParticleTypes.ENCHANT, blockPos.getX(), blockPos.getY() + 1.0, blockPos.getZ(), 120, 2.0, 1.0, 2.0, 0.005);
+                            });
+                        } else {
+                            this.realignControl();
+                        }
                         //Return early here because we want the player to re-align the control, but not actually activate the control's original function.
                         //e.g. If Randomiser control is re-aligned we shouldn't actually tell the Tardis to randomise its coordinates.
                         return true;
