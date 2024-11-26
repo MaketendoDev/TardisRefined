@@ -589,8 +589,7 @@ public class TardisPilotingManager extends TickableHandler {
             }
 
 
-            TardisPlayerInfo.updateTardisForAllPlayers(operator, targetPosition);
-
+            TardisPlayerInfo.updateTardisForAllPlayers(operator, currentLocation, false);
 
 
             operator.setDoorClosed(true);
@@ -601,7 +600,7 @@ public class TardisPilotingManager extends TickableHandler {
             this.isInFlight = true;
             this.ticksInFlight = 0;
             this.ticksTakingOff = 1;
-            this.operator.getExteriorManager().setIsTakingOff(true);
+            this.operator.getExteriorManager().setIsTakingOff(isTakingOff());
 
             this.operator.tardisClientData().sync();//Sync to client
             //Debug if the blockstate at the current position during takeoff is air. If not air, it means we have forgotten to actually remove the exterior block which could be the cause of the duplication issue
@@ -680,7 +679,7 @@ public class TardisPilotingManager extends TickableHandler {
 
             exteriorManager.startLanding(operator, location);
 
-            TardisPlayerInfo.updateTardisForAllPlayers(operator, location);
+            TardisPlayerInfo.updateTardisForAllPlayers(operator, location, false);
 
 
             exteriorManager.playSoundAtShell(TRSoundRegistry.TARDIS_LAND.get(), SoundSource.BLOCKS, 1, 1);
@@ -751,7 +750,7 @@ public class TardisPilotingManager extends TickableHandler {
             operator.getFlightDanceManager().startFlightDance(this.currentConsole);
         }
 
-        TardisPlayerInfo.updateTardisForAllPlayers(operator, lastKnown);
+        TardisPlayerInfo.updateTardisForAllPlayers(operator, lastKnown, true);
 
 
         this.operator.tardisClientData().sync();
@@ -768,8 +767,6 @@ public class TardisPilotingManager extends TickableHandler {
             this.operator.getLevel().playSound(null, this.currentConsoleBlockPos, TRSoundRegistry.LOW_FUEL.get(), SoundSource.AMBIENT, 1000, 1 );
         }
 
-        TardisPlayerInfo.updateTardisForAllPlayers(operator, getTargetLocation());
-        
         TardisCommonEvents.LAND.invoker().onLand(operator, getTargetLocation().getLevel(), getTargetLocation().getPosition());
         this.operator.tardisClientData().sync();
     }

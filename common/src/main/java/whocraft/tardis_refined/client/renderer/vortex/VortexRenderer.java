@@ -10,18 +10,21 @@ import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 import whocraft.tardis_refined.TardisRefined;
+import whocraft.tardis_refined.client.TardisClientData;
 import whocraft.tardis_refined.client.model.blockentity.shell.ShellModel;
 import whocraft.tardis_refined.client.model.blockentity.shell.ShellModelCollection;
-import whocraft.tardis_refined.client.overlays.VortexOverlay;
+import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
 import whocraft.tardis_refined.patterns.ShellPattern;
 import whocraft.tardis_refined.patterns.ShellPatterns;
 
@@ -89,12 +92,10 @@ public class VortexRenderer {
         if (SPEED < 1.25f) SPEED = 3;
         this.vortexType.sides = 9;
 
-        float width = guiGraphics.guiWidth();
-        float height = guiGraphics.guiHeight();
-
         pose.pushPose();
 
         rotate(pose, 90.0f, 0, 0.0f);
+
         pose.scale(1, this.vortexType.rows, 1);
         rotate(pose, 0, 360 * timing(5000), 0);
 
@@ -123,33 +124,53 @@ public class VortexRenderer {
             }
             tesselator.end();
         }
-
         pose.popPose();
-
-        VortexOverlay.update();
-        renderShell(guiGraphics, (int) (width / 2), (int) (height / 2), 25F);
 
     }
 
 
-    public static void renderShell(GuiGraphics guiGraphics, int x, int y, float scale) {
+    public static void renderShell(GuiGraphics guiGraphics, int x, int y, float scale, int throttle) {
+        TardisPlayerInfo.get(Minecraft.getInstance().player).ifPresent(tardisPlayerInfo -> {
+            TardisClientData tardisClientData = TardisClientData.getInstance(tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey());
+            ResourceLocation shellPattern = tardisClientData.getShellPattern();
+            ResourceLocation shellTheme = tardisClientData.getShellTheme();
 
-        ShellModel model = ShellModelCollection.getInstance().getShellEntry(globalShellBlockEntity.getShellTheme()).getShellModel(globalShellBlockEntity.pattern());
-        model.setDoorPosition(false);
-        Lighting.setupForEntityInInventory();
-        PoseStack pose = guiGraphics.pose();
-        pose.pushPose();
-        pose.translate((float) x, y, 100);
-        pose.scale(-scale, scale, scale);
-        pose.mulPose(Axis.XP.rotationDegrees(-15F));
-        pose.mulPose(Axis.YP.rotationDegrees((float) (System.currentTimeMillis() % 2160L / 6L)));
+            ShellPattern fullPattern = ShellPatterns.getPatternOrDefault(shellTheme, shellPattern);
 
-        VertexConsumer vertexConsumer = guiGraphics.bufferSource().getBuffer(model.renderType(model.getShellTexture(ShellPatterns.getPatternOrDefault(globalShellBlockEntity.getShellTheme(), ShellPatterns.DEFAULT.id()), false)));
-        model.renderShell(globalShellBlockEntity, false, false, pose, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
-        guiGraphics.flush();
-        pose.popPose();
-        Lighting.setupFor3DItems();
+            ShellModel model = ShellModelCollection.getInstance().getShellEntry(shellTheme).getShellModel(fullPattern);
+            model.setDoorPosition(false);
+            Lighting.setupForEntityInInventory();
+            PoseStack pose = guiGraphics.pose();
+            pose.pushPose();
+
+            // Position the shell and apply scale
+            pose.translate((float) x, y, 100);
+            pose.scale(-scale, scale, scale);
+
+            // Time-based calculations for loopable motion and rotation
+            long time = System.currentTimeMillis();
+            float timeFactor = (time % 4000L) / 4000.0f * (float) (2 * Math.PI);
+
+            // Chaotic but loopable rotations
+            float xRotation = (float) Math.sin(timeFactor * 2) * 15.0f; // Wobble on X-axis
+            float yRotation = ((timeFactor * 360 / (float) (2 * Math.PI)) % 360) * throttle; // Continuous spin on Y-axis
+            float zRotation = (float) Math.cos(timeFactor * 3) * 10.0f; // Wobble on Z-axis
+
+            // Apply rotations
+            pose.mulPose(Axis.XP.rotationDegrees(xRotation));
+            pose.mulPose(Axis.YP.rotationDegrees(yRotation));
+            pose.mulPose(Axis.ZP.rotationDegrees(zRotation));
+
+            VertexConsumer vertexConsumer = guiGraphics.bufferSource().getBuffer(model.renderType(model.getShellTexture(ShellPatterns.getPatternOrDefault(shellTheme, shellPattern), false)));
+            model.renderShell(globalShellBlockEntity, false, false, pose, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+
+            guiGraphics.flush();
+            pose.popPose();
+            Lighting.setupFor3DItems();
+        });
+
     }
+
 
     private void renderCylinder(PoseStack poseStack, int row) {
 
@@ -303,6 +324,8 @@ public class VortexRenderer {
 
             if (lightning && System.currentTimeMillis() % 5 == 0) if (lightning && Math.random() > 0.95f) {
                 lightning_a = 1;
+                assert Minecraft.getInstance().player != null;
+                Minecraft.getInstance().player.playSound(Math.random() < 0.5F ? SoundEvents.LIGHTNING_BOLT_THUNDER : SoundEvents.LIGHTNING_BOLT_IMPACT);
                 rndUV();
             }
 

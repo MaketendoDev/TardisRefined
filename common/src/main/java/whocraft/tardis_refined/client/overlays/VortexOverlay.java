@@ -14,10 +14,12 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import whocraft.tardis_refined.client.TardisClientData;
 import whocraft.tardis_refined.client.model.blockentity.shell.ShellModel;
 import whocraft.tardis_refined.client.model.blockentity.shell.ShellModelCollection;
 import whocraft.tardis_refined.client.renderer.vortex.VortexRenderer;
 import whocraft.tardis_refined.client.screen.selections.ShellSelectionScreen;
+import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
 
 import static whocraft.tardis_refined.client.renderer.vortex.VortexRenderer.renderShell;
 import static whocraft.tardis_refined.client.screen.selections.ShellSelectionScreen.globalShellBlockEntity;
@@ -62,31 +64,39 @@ public class VortexOverlay {
 
     public static void renderOverlay(GuiGraphics gg) {
 
-        Minecraft mc = Minecraft.getInstance();
-        PoseStack pose = gg.pose();
-        float width = gg.guiWidth();
-        float height = gg.guiHeight();
+        TardisPlayerInfo.get(Minecraft.getInstance().player).ifPresent(tardisPlayerInfo -> {
+            TardisClientData tardisClientData = TardisClientData.getInstance(tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey());
+            if(!tardisPlayerInfo.isViewingTardis()) return;
+            if(!tardisPlayerInfo.isRenderVortex()) return;
 
-       RenderSystem.backupProjectionMatrix();
+            Minecraft mc = Minecraft.getInstance();
+            PoseStack pose = gg.pose();
+            float width = gg.guiWidth();
+            float height = gg.guiHeight();
+
+            RenderSystem.backupProjectionMatrix();
 
 
-        pose.pushPose();
+            pose.pushPose();
 
-        pose.translate(0, 0, 11000);
+            pose.translate(0, 0, 11000);
 
-        Matrix4f perspective = new Matrix4f();
-        perspective.perspectiveOrigin(new Vector3f());
-        perspective.perspective((float) Math.toRadians(70), width / height, 0.1f, 100);
-        RenderSystem.setProjectionMatrix(perspective, VertexSorting.DISTANCE_TO_ORIGIN);
-        VORTEX.renderVortex(gg);
-        pose.popPose();
+            Matrix4f perspective = new Matrix4f();
+            perspective.perspectiveOrigin(new Vector3f());
+            perspective.perspective((float) Math.toRadians(70), width / height, 0.1f, 100);
+            RenderSystem.setProjectionMatrix(perspective, VertexSorting.DISTANCE_TO_ORIGIN);
+            pose.mulPose(Axis.XP.rotationDegrees(180F));
+            VORTEX.renderVortex(gg);
+            pose.popPose();
 
-        RenderSystem.restoreProjectionMatrix();
+            RenderSystem.restoreProjectionMatrix();
 
-        pose.pushPose();
-        VortexOverlay.update();
-        renderShell(gg, (int) (width / 2 + tardisOffsetX), (int) (height / 2 + tardisOffsetY), 25F);
-        pose.popPose();
+            pose.pushPose();
+            VortexOverlay.update();
+            renderShell(gg, (int) (width / 2 + tardisOffsetX), (int) (height / 2 + tardisOffsetY), 25F, tardisClientData.getThrottleStage());
+            pose.popPose();
+        });
+
     }
 
 }
