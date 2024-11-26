@@ -49,6 +49,7 @@ public class VortexRenderer {
         public boolean decals = true;
         public boolean lightning = false;
         public final ResourceLocation texture;
+        public final VortexGradientTint gradient = new VortexGradientTint(true).add(0, 0, 0.5f, 1).add(-1, 1, 0.5f, 0);
 
         VortexTypes(ResourceLocation texture) {
             this.texture = texture;
@@ -182,9 +183,9 @@ public class VortexRenderer {
             float bA = radiusFunc(oA);
             float bB = radiusFunc(oB);
             poseStack.pushPose();
-            vertexUVColor(poseStack, xA, length, zA, u, vA, bA, bA, bA, 1);
+            vertexUVColor(poseStack, xA, length, zA, u, vA, bA, bA, bA, 1, true);
             rotate(poseStack, 0, -this.vortexType.twist, 0);
-            vertexUVColor(poseStack, xB, 0, zB, u, vB, bB, bB, bB, 1);
+            vertexUVColor(poseStack, xB, 0, zB, u, vB, bB, bB, bB, 1, true);
             poseStack.popPose();
         }
     }
@@ -204,6 +205,11 @@ public class VortexRenderer {
         tesselator = Tesselator.getInstance();
         tesselator.getBuilder().begin(mode, DefaultVertexFormat.POSITION_TEX_COLOR);
         return tesselator;
+    }
+
+    private void vertexUVColor(@NotNull PoseStack pose, float x, float y, float z, float u, float v, float r, float g, float b, float a, boolean tint) {
+        float[] color = this.vortexType.gradient.getRGBf(y);
+        vertexUVColor(pose, x, y, z, u, v, r, g, b, a);
     }
 
     private static void vertexUVColor(@NotNull PoseStack pose, float x, float y, float z, float u, float v, float r, float g, float b, float a) {
@@ -347,6 +353,16 @@ public class VortexRenderer {
 
         public float[] getRGBf(float pos) {
             float r = 1, g = 1, b = 1;
+            float[] out = new float[]{r, g, b};
+            if (gradient_map.keySet().size() <= 0) return out;
+            if (gradient_map.keySet().size() == 1) {
+                for (float p : gradient_map.keySet()) {
+                    out = gradient_map.get(p);
+                }
+                return out;
+            }
+
+
             float first = 0, second = 0, smallest_dist = 9999, second_smallest_dist = 1000;
 
             for (float p : gradient_map.keySet()) {
@@ -359,8 +375,9 @@ public class VortexRenderer {
                 }
             }
 
-
-
+            r = Mth.lerp(smallest_dist / (smallest_dist + second_smallest_dist), gradient_map.get(first)[0], gradient_map.get(second)[0]);
+            g = Mth.lerp(smallest_dist / (smallest_dist + second_smallest_dist), gradient_map.get(first)[1], gradient_map.get(second)[1]);
+            b = Mth.lerp(smallest_dist / (smallest_dist + second_smallest_dist), gradient_map.get(first)[2], gradient_map.get(second)[2]);
             return new float[]{r, g, b};
         }
     }
