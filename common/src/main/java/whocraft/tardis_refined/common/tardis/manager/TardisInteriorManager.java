@@ -412,6 +412,14 @@ public class TardisInteriorManager extends TickableHandler {
         }
     }
 
+    public boolean isHasGeneratedCorridors() {
+        return hasGeneratedCorridors;
+    }
+
+    public void setHasGeneratedCorridors(boolean hasGeneratedCorridors) {
+        this.hasGeneratedCorridors = hasGeneratedCorridors;
+    }
+
     /** Prepares the Tardis for desktop generation but doesn't actually start it. Handles cooldowns etc.*/
     public void prepareDesktop(DesktopTheme theme) {
         this.preparedTheme = theme;

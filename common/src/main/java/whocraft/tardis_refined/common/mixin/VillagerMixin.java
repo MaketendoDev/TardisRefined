@@ -19,14 +19,9 @@ public class VillagerMixin {
 
         if (villager.level() instanceof ServerLevel serverLevel) {
             TardisLevelOperator.get(serverLevel).ifPresent(tardisLevelOperator -> {
-
-                if (tardisLevelOperator.getPilotingManager().isInFlight()) {
-                    if (villager.getVillagerData().getProfession() == TRVillagerProfession.PILOT.get() && !villager.getBrain().isActive(Activity.WORK)) {
-                        villager.getBrain().setDefaultActivity(Activity.WORK);
-                        villager.getBrain().setActiveActivityIfPossible(Activity.WORK);
-                    } else {
-                        villager.getVillagerData().setProfession(TRVillagerProfession.PILOT.get());
-                    }
+                if (!villager.getBrain().isActive(Activity.WORK)) {
+                    villager.getBrain().setDefaultActivity(Activity.WORK);
+                    villager.getBrain().setActiveActivityIfPossible(Activity.WORK);
                 }
             });
         }

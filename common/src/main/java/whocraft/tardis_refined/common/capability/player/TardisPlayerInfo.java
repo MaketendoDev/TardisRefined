@@ -1,6 +1,7 @@
 package whocraft.tardis_refined.common.capability.player;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -11,6 +12,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.phys.Vec3;
+import whocraft.tardis_refined.common.blockentity.console.GlobalConsoleBlockEntity;
 import whocraft.tardis_refined.common.blockentity.door.TardisInternalDoor;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.network.messages.player.SyncTardisPlayerInfoMessage;
@@ -62,7 +65,6 @@ public class TardisPlayerInfo implements TardisPilot {
             abilities.instabuild = false;
             abilities.invulnerable = true;
             abilities.flying = true;
-
             player.setNoGravity(true);
         } else {
             player.gameMode.getGameModeForPlayer().updatePlayerAbilities(abilities);
@@ -119,19 +121,21 @@ public class TardisPlayerInfo implements TardisPilot {
     @Override
     public void endPlayerForInspection(ServerPlayer serverPlayer, TardisLevelOperator tardisLevelOperator) {
 
-        TardisInternalDoor internalDoor = tardisLevelOperator.getInternalDoor();
 
         BlockPos targetPosition = getPlayerPreviousPos();
-        Direction doorDirection = internalDoor != null ? internalDoor.getTeleportRotation() : serverPlayer.getDirection();
         ServerLevel tardisDimensionLevel = serverPlayer.server.getLevel(tardisLevelOperator.getLevelKey());
 
-        TardisNavLocation targetLocation = new TardisNavLocation(targetPosition, doorDirection, tardisDimensionLevel);
+        TardisNavLocation console = tardisLevelOperator.getPilotingManager().getCurrentLocation();
+
+        TardisNavLocation targetLocation = new TardisNavLocation(targetPosition, Direction.NORTH, tardisDimensionLevel);
         TardisNavLocation sourceLocation = tardisLevelOperator.getPilotingManager().getCurrentLocation();
 
         TardisHelper.teleportEntityTardis(tardisLevelOperator, serverPlayer, sourceLocation, targetLocation, true);
 
         updatePlayerAbilities(serverPlayer, serverPlayer.getAbilities(), false);
         serverPlayer.onUpdateAbilities();
+
+        serverPlayer.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3(console.getPosition().getX(), console.getPosition().getY(), console.getPosition().getZ()));
 
         // Clear the viewed TARDIS UUID
         setViewedTardis(null);

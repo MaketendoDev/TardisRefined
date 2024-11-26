@@ -9,8 +9,8 @@
 - land pad dont work and crash on server [#377](https://github.com/WhoCraft/TardisRefined/issues/377)
 - tardis is damaged [#351](https://github.com/WhoCraft/TardisRefined/issues/351)
 - Diagonal Windows makes it impossible to craft the terraformer [#383](https://github.com/WhoCraft/TardisRefined/issues/383)
-- relogging causes Tardis Dance events to not occur [#387](https://github.com/WhoCraft/TardisRefined/issues/387)
-- Console cannot be removed/changed with the console configurator outside of the tardis dimension  [#380](https://github.com/WhoCraft/TardisRefined/issues/380)
+- relogging causes TARDIS Dance events to not occur [#387](https://github.com/WhoCraft/TardisRefined/issues/387)
+- Console cannot be removed/changed with the console configurator outside the TARDIS dimension  [#380](https://github.com/WhoCraft/TardisRefined/issues/380)
 
 ## Gameplay changes
 - Standing in a Crashed smoke of a crashed TARDIS will cause 0.5 damage to the player for the duration their standing in it
@@ -19,3 +19,4 @@
 - You can now view your TARDIS exterior via the Monitor
 - Holographic exteriors on consoles now spin according to throttle
 - Improved UI for Gravity Shaft
+- Speed up downwards descent for Gravity Shaft
