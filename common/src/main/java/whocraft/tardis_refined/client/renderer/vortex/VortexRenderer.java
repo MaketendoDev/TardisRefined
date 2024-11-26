@@ -16,7 +16,9 @@ import org.joml.Quaternionf;
 import whocraft.tardis_refined.TardisRefined;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Custom Time Vortex Renderer
@@ -280,6 +282,48 @@ public class VortexRenderer {
             poseStack.popPose();
             prev_tO = tO;
             lightning_a *= 0.9f;
+        }
+    }
+
+    private static class VortexGradientTint {
+        private Map<Float, float[]> gradient_map = new HashMap<>();
+        private boolean loop = false;
+
+        public VortexGradientTint(boolean loop) {
+            this.loop = loop;
+        }
+
+        /**
+         * Adds a color to the gradient map
+         *
+         * @param pos position in the gradient the color should go in. can be from -1 to 1
+         * @param r   RED 0 to 1
+         * @param g   GREEN 0 to 1
+         * @param b   BLUE 0 to 1
+         * @return The VortexGradient with the color added
+         */
+        public VortexGradientTint add(float pos, float r, float g, float b) {
+            this.gradient_map.put(pos, new float[]{r, g, b});
+            return this;
+        }
+
+        public float[] getRGBf(float pos) {
+            float r = 1, g = 1, b = 1;
+            float first = 0, second = 0, smallest_dist = 9999, second_smallest_dist = 1000;
+
+            for (float p : gradient_map.keySet()) {
+                float dist = Mth.abs(pos - p);
+                if (dist < smallest_dist) {
+                    second_smallest_dist = smallest_dist;
+                    smallest_dist = dist;
+                    second = first;
+                    first = p;
+                }
+            }
+
+
+
+            return new float[]{r, g, b};
         }
     }
 }
