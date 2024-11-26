@@ -20,6 +20,7 @@ import whocraft.tardis_refined.client.TRItemColouring;
 import whocraft.tardis_refined.client.TardisClientLogic;
 import whocraft.tardis_refined.client.overlays.ExteriorViewOverlay;
 import whocraft.tardis_refined.client.overlays.GravityOverlay;
+import whocraft.tardis_refined.client.overlays.VortexOverlay;
 import whocraft.tardis_refined.command.TardisRefinedCommand;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.dimension.DimensionHandler;
@@ -100,7 +101,7 @@ public class ModEvents {
 
         HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> ExteriorViewOverlay.renderOverlay(guiGraphics.get()));
         HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> GravityOverlay.renderOverlay(guiGraphics.get()));
-
+        HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> VortexOverlay.renderOverlay(guiGraphics.get()));
     }
 
 
