@@ -1,22 +1,34 @@
 package whocraft.tardis_refined.client.renderer.vortex;
 
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 import whocraft.tardis_refined.TardisRefined;
+import whocraft.tardis_refined.client.model.blockentity.shell.ShellModel;
+import whocraft.tardis_refined.client.model.blockentity.shell.ShellModelCollection;
+import whocraft.tardis_refined.client.overlays.VortexOverlay;
+import whocraft.tardis_refined.patterns.ShellPattern;
+import whocraft.tardis_refined.patterns.ShellPatterns;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static whocraft.tardis_refined.client.screen.selections.ShellSelectionScreen.globalShellBlockEntity;
 
 /**
  * Custom Time Vortex Renderer
@@ -68,11 +80,14 @@ public class VortexRenderer {
     /**
      * Renders the Time Vortex
      */
-    public void renderVortex(PoseStack pose) {
-
+    public void renderVortex(GuiGraphics guiGraphics) {
+        PoseStack pose = guiGraphics.pose();
         if (SPEED > 1) SPEED *= 0.9999999999f;
         if (SPEED < 1.25f) SPEED = 3;
         this.vortexType.sides = 9;
+
+        float width = guiGraphics.guiWidth();
+        float height = guiGraphics.guiHeight();
 
         pose.pushPose();
 
@@ -108,6 +123,29 @@ public class VortexRenderer {
 
         pose.popPose();
 
+        VortexOverlay.update();
+        renderShell(guiGraphics, (int) (width / 2), (int) (height / 2), 25F);
+
+    }
+
+
+    public static void renderShell(GuiGraphics guiGraphics, int x, int y, float scale) {
+
+        ShellModel model = ShellModelCollection.getInstance().getShellEntry(globalShellBlockEntity.getShellTheme()).getShellModel(globalShellBlockEntity.pattern());
+        model.setDoorPosition(false);
+        Lighting.setupForEntityInInventory();
+        PoseStack pose = guiGraphics.pose();
+        pose.pushPose();
+        pose.translate((float) x, y, 100);
+        pose.scale(-scale, scale, scale);
+        pose.mulPose(Axis.XP.rotationDegrees(-15F));
+        pose.mulPose(Axis.YP.rotationDegrees((float) (System.currentTimeMillis() % 2160L / 6L)));
+
+        VertexConsumer vertexConsumer = guiGraphics.bufferSource().getBuffer(model.renderType(model.getShellTexture(ShellPatterns.getPatternOrDefault(globalShellBlockEntity.getShellTheme(), ShellPatterns.DEFAULT.id()), false)));
+        model.renderShell(globalShellBlockEntity, false, false, pose, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        guiGraphics.flush();
+        pose.popPose();
+        Lighting.setupFor3DItems();
     }
 
     private void renderCylinder(PoseStack poseStack, int row) {
