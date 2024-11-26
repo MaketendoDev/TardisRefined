@@ -49,6 +49,9 @@ public class SoundProvider extends SoundDefinitionsProvider {
         add(TRSoundRegistry.ARTRON_PILLAR_ACTIVE.get(), basicSound("artron_pillar", new ResourceLocation(TardisRefined.MODID, "blocks/artron_pillar_active")));
         add(TRSoundRegistry.CORRIDOR_TELEPORTER.get(), basicSound("corridor_teleporter", new ResourceLocation(TardisRefined.MODID, "blocks/corridor_teleporter")));
         add(TRSoundRegistry.CORRIDOR_TELEPORTER_SUCCESS.get(), basicSound("corridor_teleporter_success", new ResourceLocation(TardisRefined.MODID, "blocks/corridor_teleporter_success")));
+        add(TRSoundRegistry.MALLET.get(), basicSound("mallet", new ResourceLocation(TardisRefined.MODID, "tools/mallet")));
+
+
         add(TRSoundRegistry.CLOISTER_BELL.get(),
                 basicSound("cloister_bell", SoundDefinition.Sound.sound(new ResourceLocation("block/bell/resonate"), SoundDefinition.SoundType.SOUND).pitch(0.85),
                         SoundDefinition.Sound.sound(new ResourceLocation("block/bell/resonate"), SoundDefinition.SoundType.SOUND).pitch(0.9)

@@ -42,10 +42,7 @@ import whocraft.tardis_refined.common.util.MiscHelper;
 import whocraft.tardis_refined.constants.ModMessages;
 import whocraft.tardis_refined.constants.NbtConstants;
 import whocraft.tardis_refined.patterns.sound.ConfiguredSound;
-import whocraft.tardis_refined.registry.TRControlRegistry;
-import whocraft.tardis_refined.registry.TRDimensionTypes;
-import whocraft.tardis_refined.registry.TREntityRegistry;
-import whocraft.tardis_refined.registry.TRItemRegistry;
+import whocraft.tardis_refined.registry.*;
 
 public class ControlEntity extends Entity {
 
@@ -257,6 +254,7 @@ public class ControlEntity extends Entity {
 
                         if(itemStack.is(TRItemRegistry.MALLET.get()) && !player.getCooldowns().isOnCooldown(TRItemRegistry.MALLET.get())){
                             player.getCooldowns().addCooldown(TRItemRegistry.MALLET.get(), 600);
+                            playSound(TRSoundRegistry.MALLET.get());
                             itemStack.hurtAndBreak(15, player, (livingEntityx) -> {
                                 livingEntityx.broadcastBreakEvent(EquipmentSlot.MAINHAND);
                             });

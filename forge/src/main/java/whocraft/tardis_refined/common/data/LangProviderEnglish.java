@@ -54,6 +54,7 @@ public class LangProviderEnglish extends LanguageProvider {
         addSound(TRSoundRegistry.GRAVITY_TUNNEL.get(), "Gravity tunnel winds");
         addSound(TRSoundRegistry.LOW_FUEL.get(), "Low fuel warning");
         addSound(TRSoundRegistry.CLOISTER_BELL.get(), "Cloister Bell");
+        addSound(TRSoundRegistry.MALLET.get(), "Mallet Hit");
 
         //Hum Sounds
         TardisHums.registerDefaultHums();

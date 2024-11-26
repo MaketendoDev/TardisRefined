@@ -62,7 +62,7 @@ public class FlyTardisAtPOI extends WorkAtPoi {
                     return;
                 }
 
-                double observePointOffset = 4;
+           /*     double observePointOffset = 4;
 
                 // Calculate villager position relative to the FACING direction
                 Vec3 offset = switch (facing) {
@@ -76,7 +76,7 @@ public class FlyTardisAtPOI extends WorkAtPoi {
                 Vec3 targetPosition = new Vec3(consolePos.getX(), villager.position().y, consolePos.getZ()).add(offset);
 
                 villager.getNavigation().moveTo(targetPosition.x, targetPosition.y, targetPosition.z, 1);
-
+*/
                 // Find the nearest control and perform actions
                 for (ControlEntity controlEntity : console.getControlEntityList()) {
                     if (controlEntity.isTickingDown() && villager.getRandom().nextBoolean()) {
