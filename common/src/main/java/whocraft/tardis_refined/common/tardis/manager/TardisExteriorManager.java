@@ -72,6 +72,8 @@ public class TardisExteriorManager extends BaseHandler {
 
     public void setIsTakingOff(boolean isTakingOff) {
         this.isTakingOff = isTakingOff;
+        operator.tardisClientData().setIsTakingOff(true);
+        operator.tardisClientData().sync();
     }
 
 
@@ -152,18 +154,19 @@ public class TardisExteriorManager extends BaseHandler {
 
         //Force load target chunk
         targetLevel.setChunkForced(chunkPos.x, chunkPos.z, true); //Set chunk to be force loaded to properly place block
+        this.isLanding = true;
+        operator.tardisClientData().setIsLanding(true);
+        operator.tardisClientData().sync();
 
         this.placeExteriorBlockForLanding(location);
 
         //Un-force load target chunk
         targetLevel.setChunkForced(chunkPos.x, chunkPos.z, false); //Set chunk to be not be force loaded after we place the block
 
-        this.isLanding = true;
     }
 
     /** Convenience method to place the exterior block when the Tardis is landing */
     public void placeExteriorBlockForLanding(TardisNavLocation location){
-        TardisPlayerInfo.updateTardisForAllPlayers(operator, location);
         this.operator.setOrUpdateExteriorBlock(location, Optional.empty());
     }
 

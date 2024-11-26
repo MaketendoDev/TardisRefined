@@ -17,6 +17,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import whocraft.tardis_refined.client.sounds.*;
 import whocraft.tardis_refined.common.GravityUtil;
+import whocraft.tardis_refined.common.capability.player.TardisPilot;
 import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.hum.HumEntry;
@@ -55,16 +56,26 @@ public class TardisClientLogic {
         });
 
         if (player.level().dimensionTypeId() == TRDimensionTypes.TARDIS) {
-
             ClientLevel tardisLevel = Minecraft.getInstance().level;
-
             createWorldAmbience(player);
             handleTardisLoopingSounds(clientData, player, tardisLevel);
             handleScreenShake(clientData, player);
             handleAestheticEffects(clientData, tardisLevel);
-
         }
 
+        handleVortexSounds(clientData, player);
+
+    }
+
+    private static void handleVortexSounds(TardisClientData clientData, Player player) {
+        SoundManager soundManager = Minecraft.getInstance().getSoundManager();
+
+        TardisPlayerInfo.get(player).ifPresent(tardisPlayerInfo -> {
+            if (clientData.isFlying() && tardisPlayerInfo.isRenderVortex() && !soundManager.isActive(TRSoundInstances.TARDIS_SINGLE_FLY)) {
+                TRSoundInstances.TARDIS_SINGLE_FLY.restartSoundPlaying(); //Explicity tell the LoopingSound to set its volume to a non-zero value so that the SoundEngine will play it again.
+                soundManager.play(TRSoundInstances.TARDIS_SINGLE_FLY.setPlayer(player).setLevel(Minecraft.getInstance().level));
+            }
+        });
     }
 
     /**
@@ -158,6 +169,8 @@ public class TardisClientLogic {
         boolean isThisTardis = clientData.getLevelKey() == targetLevel.dimension();
 
         SoundManager soundManager = Minecraft.getInstance().getSoundManager();
+
+
 
         if (isInArsArea(player.blockPosition())) {
             if (!soundManager.isActive(TRSoundInstances.ARS_HUMMING)) {

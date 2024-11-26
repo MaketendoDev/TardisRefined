@@ -13,7 +13,10 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import whocraft.tardis_refined.TardisRefined;
 import whocraft.tardis_refined.client.TRKeybinds;
+import whocraft.tardis_refined.client.TardisClientData;
 import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
+import whocraft.tardis_refined.common.tardis.control.flight.ThrottleControl;
+import whocraft.tardis_refined.common.tardis.manager.TardisPilotingManager;
 import whocraft.tardis_refined.constants.ModMessages;
 
 public class ExteriorViewOverlay {
@@ -28,39 +31,74 @@ public class ExteriorViewOverlay {
             PoseStack poseStack = guiGraphics.pose();
             poseStack.pushPose();
 
-            if(!tardisPlayerInfo.isViewingTardis()) return;
-            if(mc.getDebugOverlay().showDebugScreen()) return;
+            // Exit if the player is not viewing the TARDIS or the debug screen is active
+            if (!tardisPlayerInfo.isViewingTardis()) {
+                poseStack.popPose();
+                return;
+            }
+
+            TardisClientData tardisClientData = TardisClientData.getInstance(
+                    tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey()
+            );
+            int throttleStage = tardisClientData.getThrottleStage();
+            int maxThrottleStage = TardisPilotingManager.MAX_THROTTLE_STAGE;
+            int throttlePercentage = maxThrottleStage != 0
+                    ? (int) ((double) throttleStage / maxThrottleStage * 100)
+                    : 0;
 
             Font fontRenderer = mc.font;
-            int x = 10;
-            int y = 10;
+            int x = 10; // X position for the overlay
+            int y = 10; // Y position for the overlay
 
-            // Create the message with a keybind
+            // Create a translatable component for the exit keybind
             MutableComponent ascendKey = Component.translatable(TRKeybinds.EXIT_EXTERIOR_VIEW.getDefaultKey().getName());
             MutableComponent message = Component.translatable(ModMessages.EXIT_EXTERNAL_VIEW, ascendKey)
                     .withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA);
 
-            // Render a semi-transparent background for better text readability
-            guiGraphics.fill(x - 5, y - 5, x + fontRenderer.width(message.getString()) + 5, y + 15, 0x88000000);
+            // Display throttle percentage
+            MutableComponent throttleMessage = Component.literal("Throttle: " + throttlePercentage + "%")
+                    .withStyle(ChatFormatting.GREEN);
 
-            // Render the text with a shadow
-            MultiBufferSource.BufferSource renderImpl = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+            // Render a semi-transparent background for better readability
+            int width = Math.max(fontRenderer.width(message.getString()), fontRenderer.width(throttleMessage.getString()));
+            guiGraphics.fill(x - 5, y - 5, x + width + 5, y + 30, 0x88000000);
+
+            // Render the text with shadow
+            MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+
+            // Draw the main message
             fontRenderer.drawInBatch(
                     message.getString(),
                     x,
                     y,
                     ChatFormatting.WHITE.getColor(),
                     false,
-                    Transformation.identity().getMatrix(),
-                    renderImpl,
+                    poseStack.last().pose(),
+                    bufferSource,
                     Font.DisplayMode.NORMAL,
                     0,
                     15728880
             );
-            renderImpl.endBatch();
 
-            // Pop pose to reset transformations
+            // Draw the throttle percentage below the main message
+            fontRenderer.drawInBatch(
+                    throttleMessage.getString(),
+                    x,
+                    y + 15,
+                    ChatFormatting.WHITE.getColor(),
+                    false,
+                    poseStack.last().pose(),
+                    bufferSource,
+                    Font.DisplayMode.NORMAL,
+                    0,
+                    15728880
+            );
+
+            bufferSource.endBatch();
+
+            // Reset transformations
             poseStack.popPose();
         });
     }
+
 }

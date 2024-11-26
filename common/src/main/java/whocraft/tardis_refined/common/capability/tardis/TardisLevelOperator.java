@@ -177,6 +177,11 @@ public class TardisLevelOperator{
             tardisClientData.setTardisState(tardisState);
             tardisClientData.setRecoveryProgress(pilotingManager.getCrashRecoveryTicks());
 
+            //Needed now for flight viewer
+            tardisClientData.setFlying(pilotingManager.isInFlight());
+            tardisClientData.setIsLanding(exteriorManager.isLanding());
+            tardisClientData.setIsTakingOff(exteriorManager.isTakingOff());
+
             tardisClientData.sync();
         } else {
             tardisClientData.setRecoveryProgress(pilotingManager.getCrashRecoveryTicks());
