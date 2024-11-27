@@ -42,7 +42,7 @@ public class VortexOverlay {
         float width = gg.guiWidth();
         float height = gg.guiHeight();
 
-        double radius = 0.1;
+        double radius = 0.01;
         radius *= 0.5;
 
         float yRot = Objects.requireNonNull(mc.getCameraEntity()).getYRot();
@@ -76,8 +76,8 @@ public class VortexOverlay {
         velY *= 0.9;
 
         if (tardisX * tardisX + tardisY * tardisY > radius * radius) {
-            tardisX *= 0.9;
-            tardisY *= 0.9;
+            tardisX *= 0.8;
+            tardisY *= 0.8;
         }
         tardisX *= 0.999;
         tardisY *= 0.999;
