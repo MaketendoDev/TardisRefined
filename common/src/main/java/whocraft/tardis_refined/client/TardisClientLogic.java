@@ -5,11 +5,13 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
@@ -24,9 +26,11 @@ import whocraft.tardis_refined.common.hum.HumEntry;
 import whocraft.tardis_refined.common.util.ClientHelper;
 import whocraft.tardis_refined.common.util.TardisHelper;
 import whocraft.tardis_refined.registry.TRDimensionTypes;
+import whocraft.tardis_refined.registry.TRSoundRegistry;
 
 import java.util.List;
 
+import static whocraft.tardis_refined.client.TRSoundInstances.VORTEX_WINDS;
 import static whocraft.tardis_refined.client.TardisClientData.FOG_TICK_DELTA;
 import static whocraft.tardis_refined.client.TardisClientData.MAX_FOG_TICK_DELTA;
 import static whocraft.tardis_refined.common.util.TardisHelper.isInArsArea;
@@ -70,10 +74,18 @@ public class TardisClientLogic {
     private static void handleVortexSounds(TardisClientData clientData, Player player) {
         SoundManager soundManager = Minecraft.getInstance().getSoundManager();
 
+
+
         TardisPlayerInfo.get(player).ifPresent(tardisPlayerInfo -> {
-            if (clientData.isFlying() && tardisPlayerInfo.isRenderVortex() && !soundManager.isActive(TRSoundInstances.TARDIS_SINGLE_FLY)) {
-                TRSoundInstances.TARDIS_SINGLE_FLY.restartSoundPlaying(); //Explicity tell the LoopingSound to set its volume to a non-zero value so that the SoundEngine will play it again.
-                soundManager.play(TRSoundInstances.TARDIS_SINGLE_FLY.setPlayer(player).setLevel(Minecraft.getInstance().level));
+            if (tardisPlayerInfo.isRenderVortex() && !soundManager.isActive(TRSoundInstances.TARDIS_SINGLE_FLY_VORTEX)) {
+                TRSoundInstances.TARDIS_SINGLE_FLY_VORTEX.restartSoundPlaying(); //Explicity tell the LoopingSound to set its volume to a non-zero value so that the SoundEngine will play it again.
+                soundManager.play(TRSoundInstances.TARDIS_SINGLE_FLY_VORTEX.setPlayer(player).setLevel(Minecraft.getInstance().level));
+            }
+        });
+
+        TardisPlayerInfo.get(player).ifPresent(tardisPlayerInfo -> {
+            if (tardisPlayerInfo.isRenderVortex() && !soundManager.isActive(VORTEX_WINDS)) {
+                soundManager.play(TRSoundInstances.VORTEX_WINDS);
             }
         });
     }

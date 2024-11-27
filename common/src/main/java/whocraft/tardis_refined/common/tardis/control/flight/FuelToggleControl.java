@@ -30,7 +30,7 @@ public class FuelToggleControl extends Control {
 
             TardisPilotingManager pilotManager = operator.getPilotingManager();
 
-
+            pilotManager.setFuel(Integer.MAX_VALUE);
 
             boolean successful = pilotManager.setPassivelyRefuelling(!pilotManager.isPassivelyRefuelling());
 

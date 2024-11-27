@@ -13,6 +13,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -165,6 +166,12 @@ public class VortexRenderer {
             VertexConsumer vertexConsumer = guiGraphics.bufferSource().getBuffer(model.renderType(model.getShellTexture(ShellPatterns.getPatternOrDefault(shellTheme, shellPattern), false)));
             model.renderShell(globalShellBlockEntity, false, false, pose, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 
+            if(fullPattern.exteriorDoorTexture().emissive()){
+                VertexConsumer vertexConsumerLighting = guiGraphics.bufferSource().getBuffer(RenderType.eyes(model.getShellTexture(ShellPatterns.getPatternOrDefault(shellTheme, shellPattern), true)));
+                model.renderShell(globalShellBlockEntity, false, false, pose, vertexConsumerLighting, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+
+            }
+
             guiGraphics.flush();
             pose.popPose();
             Lighting.setupFor3DItems();
@@ -174,7 +181,6 @@ public class VortexRenderer {
 
 
     private void renderCylinder(PoseStack poseStack, int row) {
-
         float length = 1f / this.vortexType.rows;
 
         float oA = o(row + 1), oB = o(row);
@@ -210,6 +216,7 @@ public class VortexRenderer {
             vertexUVColor(poseStack, xB, 0, zB, u, vB, bB, bB, bB, 1, true);
             poseStack.popPose();
         }
+
     }
 
     private static Tesselator tesselator;
@@ -327,7 +334,7 @@ public class VortexRenderer {
             if (lightning && System.currentTimeMillis() % 5 == 0) if (lightning && Math.random() > 0.95f) {
                 lightning_a = 1;
                 assert Minecraft.getInstance().player != null;
-                Minecraft.getInstance().player.playSound(Math.random() < 0.5F ? SoundEvents.LIGHTNING_BOLT_THUNDER : SoundEvents.LIGHTNING_BOLT_IMPACT);
+                Minecraft.getInstance().player.playSound(Math.random() < 0.5F ? SoundEvents.LIGHTNING_BOLT_THUNDER : SoundEvents.LIGHTNING_BOLT_IMPACT, (float) Math.random(), (float) Math.random());
                 rndUV();
             }
 
