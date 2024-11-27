@@ -129,6 +129,15 @@ allprojects {
     }
 }
 
+def generatedResources = project(":forge").file("src/generated/resources")
+
+sourceSets {
+    main {
+        resources.srcDir generatedResources
+    }
+}
+
+
 tasks.mergeJars.dependsOn(tasks.build)
 
 tasks.register('publishMeEverywhere') {
