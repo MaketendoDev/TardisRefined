@@ -98,11 +98,12 @@ public class VortexOverlay {
                 Needs tweaking, but am not quite sure how to fix.
              */
 
-            if (tardisClientData.isFlying()) DEMAT += (System.currentTimeMillis() - LAST_TIME) / 12000.0f;
-            if (tardisClientData.isLanding()) DEMAT -= (System.currentTimeMillis() - LAST_TIME) / 12000.0f;
-            LAST_TIME = System.currentTimeMillis();
-
+            if (tardisClientData.isTakingOff() || tardisClientData.isFlying())
+                DEMAT += (System.currentTimeMillis() - LAST_TIME) / 12000.0f;
+            if (tardisClientData.isLanding() && !tardisClientData.isFlying())
+                DEMAT -= (System.currentTimeMillis() - LAST_TIME) / 12000.0f;
             VortexOverlay.update(gg);
+            LAST_TIME = System.currentTimeMillis();
 
             Minecraft mc = Minecraft.getInstance();
             PoseStack pose = gg.pose();
