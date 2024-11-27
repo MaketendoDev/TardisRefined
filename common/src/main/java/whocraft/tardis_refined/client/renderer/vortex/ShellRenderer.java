@@ -1,6 +1,7 @@
 package whocraft.tardis_refined.client.renderer.vortex;
 
 import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -20,7 +21,7 @@ import static whocraft.tardis_refined.client.screen.selections.ShellSelectionScr
 
 public class ShellRenderer {
 
-    public static void renderShell(GuiGraphics guiGraphics, float control, int throttle) {
+    public static void renderShell(GuiGraphics guiGraphics, float control, float alpha, int throttle) {
         TardisPlayerInfo.get(Minecraft.getInstance().player).ifPresent(tardisPlayerInfo -> {
 
             TardisClientData tardisClientData = TardisClientData.getInstance(tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey());
@@ -50,11 +51,11 @@ public class ShellRenderer {
             RenderHelper.rotateZYX(pose, xR * control, yR * control, zR * control);
 
             VertexConsumer vertexConsumer = guiGraphics.bufferSource().getBuffer(model.renderType(model.getShellTexture(ShellPatterns.getPatternOrDefault(shellTheme, shellPattern), false)));
-            model.renderShell(globalShellBlockEntity, false, false, pose, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 
+            model.renderShell(globalShellBlockEntity, false, false, pose, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, alpha);
             if (fullPattern.exteriorDoorTexture().emissive()) {
                 VertexConsumer vertexConsumerLighting = guiGraphics.bufferSource().getBuffer(RenderType.eyes(model.getShellTexture(ShellPatterns.getPatternOrDefault(shellTheme, shellPattern), true)));
-                model.renderShell(globalShellBlockEntity, false, false, pose, vertexConsumerLighting, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+                model.renderShell(globalShellBlockEntity, false, false, pose, vertexConsumerLighting, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, alpha);
             }
 
             guiGraphics.flush();

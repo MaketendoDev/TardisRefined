@@ -7,6 +7,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import whocraft.tardis_refined.client.TardisClientData;
@@ -27,6 +28,8 @@ public class VortexOverlay {
     private static double tardisY = 0.0D;
     private static double velX = 0.0D;
     private static double velY = 0.0D;
+    private static float DEMAT = 0.0f;
+    private static float IMMERSION = 0.0f;
 
     public static void update(GuiGraphics gg) {
         if (globalShellBlockEntity == null) {
@@ -45,18 +48,27 @@ public class VortexOverlay {
         float yRot = Objects.requireNonNull(mc.getCameraEntity()).getYRot();
 
         if (mc.screen == null) { // Ensure no screen (like inventory) is open
-            if (mc.options.keyUp.isDown())
-                velY += speed;
+            if (mc.options.keyUp.isDown()) velY += speed;
 
-            if (mc.options.keyDown.isDown())
-                velY -= speed;
+            if (mc.options.keyDown.isDown()) velY -= speed;
 
-            if (mc.options.keyLeft.isDown())
-                velX -= speed;
+            if (mc.options.keyLeft.isDown()) velX -= speed;
 
-            if (mc.options.keyRight.isDown())
-                velX += speed;
+            if (mc.options.keyRight.isDown()) velX += speed;
         }
+
+        if (DEMAT > 1) DEMAT = 1;
+        if (DEMAT < 0) DEMAT = 0;
+
+        if (DEMAT >= 1) {
+            IMMERSION += (System.currentTimeMillis() - LAST_TIME) / (1000.0f + (5000.0f * IMMERSION));
+        } else {
+            IMMERSION *= 0.9f;
+        }
+
+        if (IMMERSION > 1) IMMERSION = 1;
+        if (IMMERSION < 0) IMMERSION = 0;
+
 
         tardisX += velX;
         tardisY += velY;
@@ -72,13 +84,23 @@ public class VortexOverlay {
     }
 
 
+    private static long LAST_TIME = System.currentTimeMillis();
+
     public static void renderOverlay(GuiGraphics gg) {
 
         TardisPlayerInfo.get(Minecraft.getInstance().player).ifPresent(tardisPlayerInfo -> {
             /*Activation Logic*/
             TardisClientData tardisClientData = TardisClientData.getInstance(tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey());
-            //if (!tardisPlayerInfo.isViewingTardis()) return;
-            //if (!tardisPlayerInfo.isRenderVortex()) return;
+            if (!tardisPlayerInfo.isViewingTardis()) return;
+            if (!tardisPlayerInfo.isRenderVortex()) return;
+
+            /*
+                Needs tweaking, but am not quite sure how to fix.
+             */
+
+            if (tardisClientData.isFlying()) DEMAT += (System.currentTimeMillis() - LAST_TIME) / 12000.0f;
+            if (tardisClientData.isLanding()) DEMAT -= (System.currentTimeMillis() - LAST_TIME) / 12000.0f;
+            LAST_TIME = System.currentTimeMillis();
 
             VortexOverlay.update(gg);
 
@@ -87,21 +109,7 @@ public class VortexOverlay {
             float width = gg.guiWidth();
             float height = gg.guiHeight();
 
-            /*
-            THIS FLOAT CONTROLS SEVERAL THINGS.
-            from 0 to 1, the perspective will match third person while the vortex fades in. from 1 to 2 it will fade out some of the perspective calculations like pitch and yaw and fade in some of the animations for the Shell
-             */
-
-
-           /* long long_speed = (long) (6f * 1000L);
-            long time = System.currentTimeMillis() + (long) (1000L * 0);
-            float zzz = (time % long_speed) / (6f * 1000.0f);
-
-
-            float control = 1 + Mth.sin(zzz * Mth.DEG_TO_RAD * 360);*/
-
-            float control = 1;
-
+            float demat_transparency = Mth.cos(DEMAT * (Mth.PI) / (2f)) * (Mth.cos(16f * Mth.PI * DEMAT) * 0.5f + 0.5f) * (-DEMAT * 0.5f + 0.5f) - DEMAT * 0.5f + 0.5f;
 
             Camera camera = mc.gameRenderer.getMainCamera();
             Vec3 camPos = camera.getPosition().subtract(mc.player.position()).subtract(0, 1.62, 0);
@@ -116,11 +124,16 @@ public class VortexOverlay {
 
             pose.pushPose();
 
-            float mul = Math.max(control - 1, 0);
-            float mulinv = 1 - Math.max(control - 1, 0);
+            float mul = IMMERSION;
+            float mulinv = 1 - IMMERSION;
 
             float xRot = -mc.getCameraEntity().getXRot() * mulinv;
-            float yRot = mc.getCameraEntity().getYRot() * mulinv;
+            float yRot = mc.getCameraEntity().getYRot() % 360;
+
+            while (yRot > 180) yRot -= 360;
+            while (yRot < -180) yRot += 360;
+
+            yRot *= mulinv;
 
             pose.mulPose(Axis.XP.rotationDegrees(xRot));
             pose.mulPose(Axis.YP.rotationDegrees(yRot));
@@ -130,21 +143,19 @@ public class VortexOverlay {
             //Vortex
             pose.pushPose();
             pose.scale(100, 100, 100);
-            VORTEX.renderVortex(gg, control);
+
+            VORTEX.renderVortex(gg, 1 - demat_transparency);
             pose.popPose();
 
 
             //Box
             pose.translate(tardisX * mul, tardisY * mul, -5 * mul);
-            renderShell(gg, Math.max(control - 1, 0), tardisClientData.getThrottleStage());
+            renderShell(gg, IMMERSION, 1 - demat_transparency, tardisClientData.getThrottleStage());
 
             pose.popPose();
 
             //Restore Ortho view
             RenderSystem.restoreProjectionMatrix();
-
         });
-
     }
-
 }

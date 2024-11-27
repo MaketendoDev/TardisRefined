@@ -73,7 +73,7 @@ public class VortexRenderer {
     public void renderVortex(PoseStack pose, float opacity) {
         this.opacity = Math.min(opacity, 1);
         this.vortexType.rows = 12;
-        if (vortexType.movingGradient) this.vortexType.gradient.offset = time.getFloat();
+        if (vortexType.movingGradient) this.vortexType.gradient.offset = time.getFloat() * 2;
         this.time.update();
         this.time.speed = 0.5f;
         pose.pushPose();
@@ -237,9 +237,9 @@ public class VortexRenderer {
             }
 
             if (lightning && System.currentTimeMillis() % 5 == 0) if (lightning && Math.random() > 0.95f) {
-                lightning_a = 1;
+                lightning_a = 3;
                 assert Minecraft.getInstance().player != null;
-                Minecraft.getInstance().player.playSound(SoundEvents.LIGHTNING_BOLT_IMPACT, 1 - Mth.abs(tO * tO), (float) (Math.random() * (1 - Mth.abs(tO))));
+                Minecraft.getInstance().player.playSound(SoundEvents.LIGHTNING_BOLT_IMPACT, opacity * (1 - Mth.abs(tO * tO)), (float) (Math.random() * (1 - Mth.abs(tO))));
                 rndUV();
             }
 
@@ -251,6 +251,7 @@ public class VortexRenderer {
             float val = lightning ? 1 : radiusFunc(tO);
 
             float alpha = lightning ? lightning_a : val;
+            alpha = Math.min(alpha, 1);
             alpha *= opacity;
             poseStack.pushPose();
             RenderHelper.rotateZYX(poseStack, 0, -this.vortexType.twist, 0);
@@ -310,8 +311,8 @@ public class VortexRenderer {
             }
 
             float pos = pos_original + offset;
-            if (pos > 1) pos -= 2;
-            if (pos < -1) pos += 2;
+            while (pos > 1) pos -= 2;
+            while (pos < -1) pos += 2;
 
             float first = 0, second = 0, smallest_dist = 9999, second_smallest_dist = 1000;
 
@@ -330,6 +331,7 @@ public class VortexRenderer {
             r = Mth.lerp(smallest_dist / (smallest_dist + second_smallest_dist), gradient_map.get(first)[0], gradient_map.get(second)[0]);
             g = Mth.lerp(smallest_dist / (smallest_dist + second_smallest_dist), gradient_map.get(first)[1], gradient_map.get(second)[1]);
             b = Mth.lerp(smallest_dist / (smallest_dist + second_smallest_dist), gradient_map.get(first)[2], gradient_map.get(second)[2]);
+
             return new float[]{r, g, b};
         }
     }
