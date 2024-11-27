@@ -21,36 +21,49 @@ public class VortexOverlay {
 
     private static final VortexRenderer VORTEX = new VortexRenderer(VortexRenderer.VortexTypes.CLOUDS);
 
-    private static double tardisOffsetX = 0.0D;
+    private static double tardisX = 0.0D;
+    private static double tardisY = 0.0D;
+    private static double velX = 0.0D;
+    private static double velY = 0.0D;
 
-    private static double tardisOffsetY = 0.0D;
-
-    public static void update() {
-
-
-        if (globalShellBlockEntity != null) {
-            double speed = 2.0D;
-            Minecraft mc = Minecraft.getInstance();
-
-            double radius = (double) mc.getWindow().getHeight() / 20;
-
-            if (mc.screen == null) { // Ensure no screen (like inventory) is open
-                if (mc.options.keyUp.isDown() && tardisOffsetY > -radius) {
-                    tardisOffsetY -= speed;
-                }
-                if (mc.options.keyDown.isDown() && tardisOffsetY < radius) {
-                    tardisOffsetY += speed;
-                }
-                if (mc.options.keyLeft.isDown() && tardisOffsetX > -radius) {
-                    tardisOffsetX -= speed;
-                }
-                if (mc.options.keyRight.isDown() && tardisOffsetX < radius) {
-                    tardisOffsetX += speed;
-                }
-            }
-        } else {
+    public static void update(GuiGraphics gg) {
+        if (globalShellBlockEntity == null) {
             ShellSelectionScreen.generateDummyGlobalShell();
+            return;
         }
+
+        double speed = 0.1D;
+        Minecraft mc = Minecraft.getInstance();
+        float width = gg.guiWidth();
+        float height = gg.guiHeight();
+
+        double radius = Math.min(width, height) / 2;
+        radius *= 0.9;
+
+        if (mc.screen == null) { // Ensure no screen (like inventory) is open
+            if (mc.options.keyUp.isDown())
+                velY -= speed;
+
+            if (mc.options.keyDown.isDown())
+                velY += speed;
+
+            if (mc.options.keyLeft.isDown())
+                velX -= speed;
+
+            if (mc.options.keyRight.isDown())
+                velX += speed;
+        }
+
+        tardisX += velX;
+        tardisY += velY;
+        velX *= 0.9;
+        velY *= 0.9;
+
+        if (tardisX * tardisX + tardisY * tardisY > radius * radius) {
+            tardisX *= 0.9;
+            tardisY *= 0.9;
+        }
+
     }
 
 
@@ -61,6 +74,8 @@ public class VortexOverlay {
             TardisClientData tardisClientData = TardisClientData.getInstance(tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey());
             //if(!tardisPlayerInfo.isViewingTardis()) return;
             //if(!tardisPlayerInfo.isRenderVortex()) return;
+
+            VortexOverlay.update(gg);
 
             Minecraft mc = Minecraft.getInstance();
             PoseStack pose = gg.pose();
@@ -94,8 +109,6 @@ public class VortexOverlay {
             pose.popPose();
 
             //Box
-            VortexOverlay.update();
-
             renderShell(gg, 0, 0, 1, tardisClientData.getThrottleStage());
 
             pose.popPose();
