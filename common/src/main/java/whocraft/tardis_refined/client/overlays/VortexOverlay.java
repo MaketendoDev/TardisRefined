@@ -1,27 +1,20 @@
 package whocraft.tardis_refined.client.overlays;
 
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexSorting;
 import com.mojang.math.Axis;
-import net.minecraft.client.KeyboardHandler;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import whocraft.tardis_refined.client.TardisClientData;
-import whocraft.tardis_refined.client.model.blockentity.shell.ShellModel;
-import whocraft.tardis_refined.client.model.blockentity.shell.ShellModelCollection;
 import whocraft.tardis_refined.client.renderer.vortex.VortexRenderer;
 import whocraft.tardis_refined.client.screen.selections.ShellSelectionScreen;
 import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
 
-import static whocraft.tardis_refined.client.renderer.vortex.VortexRenderer.renderShell;
+import static whocraft.tardis_refined.client.renderer.vortex.ShellRenderer.renderShell;
 import static whocraft.tardis_refined.client.screen.selections.ShellSelectionScreen.globalShellBlockEntity;
 
 public class VortexOverlay {
@@ -61,42 +54,50 @@ public class VortexOverlay {
     }
 
 
-
     public static void renderOverlay(GuiGraphics gg) {
 
         TardisPlayerInfo.get(Minecraft.getInstance().player).ifPresent(tardisPlayerInfo -> {
             /*Activation Logic*/
             TardisClientData tardisClientData = TardisClientData.getInstance(tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey());
-            if(!tardisPlayerInfo.isViewingTardis()) return;
-            if(!tardisPlayerInfo.isRenderVortex()) return;
+            //if(!tardisPlayerInfo.isViewingTardis()) return;
+            //if(!tardisPlayerInfo.isRenderVortex()) return;
 
             Minecraft mc = Minecraft.getInstance();
             PoseStack pose = gg.pose();
             float width = gg.guiWidth();
             float height = gg.guiHeight();
 
+            Camera camera = mc.gameRenderer.getMainCamera();
+            Vec3 camPos = camera.getPosition().subtract(mc.player.position()).subtract(0, 1.62, 0);
+
             /*Perspective Rendering*/
             RenderSystem.backupProjectionMatrix();
 
             Matrix4f perspective = new Matrix4f();
-            perspective.perspectiveOrigin(new Vector3f());
-            perspective.perspective((float) Math.toRadians(70), width / height, 0.01f, 9999);
+            perspective.perspective((float) Math.toRadians(mc.options.fov().get()), width / height, 0.1f, 9999);
+            perspective.translate(0, 0, 11000);
             RenderSystem.setProjectionMatrix(perspective, VertexSorting.DISTANCE_TO_ORIGIN);
 
             //Vortex
             pose.pushPose();
-            pose.translate(0, 0, 11000);
-            pose.scale(10,10,10);
-            pose.mulPose(Axis.XP.rotationDegrees(00F));
-            VORTEX.renderVortex(gg);
+
+            float xRot = -mc.getCameraEntity().getXRot();
+            float yRot = mc.getCameraEntity().getYRot();
+
+            pose.mulPose(Axis.XP.rotationDegrees(xRot));
+            pose.mulPose(Axis.YP.rotationDegrees(yRot));
+            pose.translate(-camPos.x, -camPos.y, -camPos.z);
+
+            pose.pushPose();
+            pose.scale(100, 100, 100);
+            VORTEX.renderVortex(gg, 1);
             pose.popPose();
 
             //Box
-            pose.pushPose();
             VortexOverlay.update();
-            pose.translate(0, 0, 10990);
-            pose.scale(1,1,1);
+
             renderShell(gg, 0, 0, 1, tardisClientData.getThrottleStage());
+
             pose.popPose();
 
             //Restore Ortho view

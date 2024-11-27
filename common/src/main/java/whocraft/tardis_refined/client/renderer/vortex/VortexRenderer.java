@@ -1,40 +1,24 @@
 package whocraft.tardis_refined.client.renderer.vortex;
 
-import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
-import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Quaternionf;
 import whocraft.tardis_refined.TardisRefined;
-import whocraft.tardis_refined.client.TardisClientData;
-import whocraft.tardis_refined.client.model.blockentity.shell.ShellModel;
-import whocraft.tardis_refined.client.model.blockentity.shell.ShellModelCollection;
-import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
-import whocraft.tardis_refined.patterns.ShellPattern;
-import whocraft.tardis_refined.patterns.ShellPatterns;
+import whocraft.tardis_refined.client.renderer.RenderHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static whocraft.tardis_refined.client.screen.selections.ShellSelectionScreen.globalShellBlockEntity;
 
 /**
  * Custom Time Vortex Renderer
@@ -44,67 +28,53 @@ import static whocraft.tardis_refined.client.screen.selections.ShellSelectionScr
 @Environment(EnvType.CLIENT)
 public class VortexRenderer {
 
-    public enum VortexTypes {
-        CLOUDS(new ResourceLocation(TardisRefined.MODID, "textures/vortex/clouds.png"), true);
+    public VortexRenderer(VortexTypes type) {
+        this.vortexType = type;
+    }
 
+    public enum VortexTypes {
+        CLOUDS(new ResourceLocation(TardisRefined.MODID, "textures/vortex/clouds.png"), 9, 1, 10, true, true, new VortexGradientTint().add(1, 0, 0.5f, 1).add(-1, 1, 0.5f, 0));
 
         public int sides = 9, rows = 12;
         float twist = 10;
         public boolean decals = true;
         public boolean lightning = false;
         public final ResourceLocation texture;
-        public final VortexGradientTint gradient = new VortexGradientTint(true).add(0, 0, 0.5f, 1).add(-1, 1, 0.5f, 0);
+        public final VortexGradientTint gradient;
 
-        VortexTypes(ResourceLocation texture) {
-            this.texture = texture;
-        }
-
-        VortexTypes(ResourceLocation texture, boolean lightning) {
-            this.texture = texture;
-            this.lightning = lightning;
-        }
-
-        VortexTypes(ResourceLocation texture, int sides, int rows, float twist, boolean lightning, boolean decals) {
+        VortexTypes(ResourceLocation texture, int sides, int rows, float twist, boolean lightning, boolean decals, VortexGradientTint gradient) {
             this.texture = texture;
             this.lightning = lightning;
             this.sides = sides;
             this.rows = rows;
             this.twist = twist;
-            this.decals = decals;
+            this.decals = decals || lightning;
+            this.gradient = gradient;
         }
     }
 
     public static float SPEED = 1;
-
     private final VortexTypes vortexType;
-
-    public VortexRenderer(VortexTypes type) {
-        this.vortexType = type;
-    }
-
     private final List<VortexQuad> vortex_quads = new ArrayList<>();
+    private float opacity = 1;
 
     /**
      * Renders the Time Vortex
      */
-    public void renderVortex(GuiGraphics guiGraphics) {
-        PoseStack pose = guiGraphics.pose();
-        if (SPEED > 1) SPEED *= 0.9999999999f;
-        if (SPEED < 1.25f) SPEED = 3;
-        this.vortexType.sides = 9;
+    public void renderVortex(PoseStack pose, float opacity) {
+        this.opacity = opacity;
+        this.vortexType.gradient.offset = 0;
 
         pose.pushPose();
 
-        rotate(pose, 90.0f, 180, 0.0f);
-
+        RenderHelper.rotateZYX(pose, 90.0f, 180, 0.0f);
         pose.scale(1, this.vortexType.rows, 1);
-        rotate(pose, 0, 360 * timing(5000), 0);
 
         for (int row = -this.vortexType.rows; row < this.vortexType.rows; row++) {
             Tesselator tesselator = beginTextureColor(Mode.TRIANGLE_STRIP);
             pose.pushPose();
             pose.translate(0, o(row), 0);
-            rotate(pose, 0, row * this.vortexType.twist, 0);
+            RenderHelper.rotateZYX(pose, 0, row * this.vortexType.twist, 0);
 
             renderCylinder(pose, row);
 
@@ -126,59 +96,12 @@ public class VortexRenderer {
             tesselator.end();
         }
         pose.popPose();
-
     }
 
-
-    public static void renderShell(GuiGraphics guiGraphics, int x, int y, float scale, int throttle) {
-        TardisPlayerInfo.get(Minecraft.getInstance().player).ifPresent(tardisPlayerInfo -> {
-            TardisClientData tardisClientData = TardisClientData.getInstance(tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey());
-            ResourceLocation shellPattern = tardisClientData.getShellPattern();
-            ResourceLocation shellTheme = tardisClientData.getShellTheme();
-
-            ShellPattern fullPattern = ShellPatterns.getPatternOrDefault(shellTheme, shellPattern);
-
-            ShellModel model = ShellModelCollection.getInstance().getShellEntry(shellTheme).getShellModel(fullPattern);
-            model.setDoorPosition(false);
-            Lighting.setupFor3DItems();
-            PoseStack pose = guiGraphics.pose();
-            pose.pushPose();
-
-            // Position the shell and apply scale
-            pose.translate((float) x, y, 0);
-            pose.scale(scale, scale, scale);
-            rotate(pose,180,0,0);
-
-            // Time-based calculations for loopable motion and rotation
-            long time = System.currentTimeMillis();
-            float timeFactor = (time % 4000L) / 4000.0f * (float) (2 * Math.PI);
-
-            // Chaotic but loopable rotations
-            float xRotation = (float) Math.sin(timeFactor * 2) * 15.0f; // Wobble on X-axis
-            float yRotation = ((timeFactor * 360 / (float) (2 * Math.PI)) % 360) * throttle; // Continuous spin on Y-axis
-            float zRotation = (float) Math.cos(timeFactor * 3) * 10.0f; // Wobble on Z-axis
-
-            // Apply rotations
-            pose.mulPose(Axis.XP.rotationDegrees(xRotation));
-            pose.mulPose(Axis.YP.rotationDegrees(yRotation));
-            pose.mulPose(Axis.ZP.rotationDegrees(zRotation));
-
-            VertexConsumer vertexConsumer = guiGraphics.bufferSource().getBuffer(model.renderType(model.getShellTexture(ShellPatterns.getPatternOrDefault(shellTheme, shellPattern), false)));
-            model.renderShell(globalShellBlockEntity, false, false, pose, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
-
-            if(fullPattern.exteriorDoorTexture().emissive()){
-                VertexConsumer vertexConsumerLighting = guiGraphics.bufferSource().getBuffer(RenderType.eyes(model.getShellTexture(ShellPatterns.getPatternOrDefault(shellTheme, shellPattern), true)));
-                model.renderShell(globalShellBlockEntity, false, false, pose, vertexConsumerLighting, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
-
-            }
-
-            guiGraphics.flush();
-            pose.popPose();
-            Lighting.setupFor3DItems();
-        });
-
+    public void renderVortex(GuiGraphics guiGraphics, float opacity) {
+        PoseStack pose = guiGraphics.pose();
+        renderVortex(pose, opacity);
     }
-
 
     private void renderCylinder(PoseStack poseStack, int row) {
         float length = 1f / this.vortexType.rows;
@@ -210,49 +133,24 @@ public class VortexRenderer {
 
             float bA = radiusFunc(oA);
             float bB = radiusFunc(oB);
-            poseStack.pushPose();
-            vertexUVColor(poseStack, xA, length, zA, u, vA, bA, bA, bA, 1, true);
-            rotate(poseStack, 0, -this.vortexType.twist, 0);
-            vertexUVColor(poseStack, xB, 0, zB, u, vB, bB, bB, bB, 1, true);
-            poseStack.popPose();
+
+            vertexUVColor(poseStack, xA, length, zA, u, vA, bA, bA, bA, 1.0f, oA);
+            RenderHelper.rotateZYX(poseStack, 0, -this.vortexType.twist, 0);
+            vertexUVColor(poseStack, xB, 0, zB, u, vB, bB, bB, bB, 1, oB);
+            RenderHelper.rotateZYX(poseStack, 0, this.vortexType.twist, 0);
         }
 
     }
 
-    private static Tesselator tesselator;
-
     private Tesselator beginTextureColor(Mode mode) {
-        return beginTextureColor(this.vortexType.texture, mode);
+        return RenderHelper.beginTextureColor(this.vortexType.texture, mode, false);
     }
 
-    private static Tesselator beginTextureColor(ResourceLocation texture, Mode mode) {
-        RenderSystem.setShaderTexture(0, texture);
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-        RenderSystem.enableBlend();
-        RenderSystem.disableCull();
-        RenderSystem.enableDepthTest();
-        tesselator = Tesselator.getInstance();
-        tesselator.getBuilder().begin(mode, DefaultVertexFormat.POSITION_TEX_COLOR);
-        return tesselator;
+    private void vertexUVColor(@NotNull PoseStack pose, float x, float y, float z, float u, float v, float r, float g, float b, float a, float o) {
+        float[] color = this.vortexType.gradient.getRGBf(o);
+        RenderHelper.vertexUVColor(pose, x, y, z, u, v, r * color[0], g * color[1], b * color[2], a * this.opacity);
     }
 
-    private void vertexUVColor(@NotNull PoseStack pose, float x, float y, float z, float u, float v, float r, float g, float b, float a, boolean tint) {
-        float[] color = this.vortexType.gradient.getRGBf(y);
-        if (tint) vertexUVColor(pose, x, y, z, u, v, r * color[0], g * color[1], b * color[2], a);
-        else vertexUVColor(pose, x, y, z, u, v, r, g, b, a);
-    }
-
-    private static void vertexUVColor(@NotNull PoseStack pose, float x, float y, float z, float u, float v, float r, float g, float b, float a) {
-        tesselator.getBuilder().vertex(pose.last().pose(), x, y, z).uv(u, v).color(r, g, b, a).endVertex();
-    }
-
-    /**
-     * Will generate a float which will go from 0 to 1 within specified seconds
-     *
-     * @param speed  Speed at which the float will move
-     * @param offset Add an offset in seconds
-     * @return 0 to 1 float
-     */
     private static float timingWithOffset(float speed, float offset) {
         if (speed == 0) return 1;
         long long_speed = (long) (speed * 1000L);
@@ -284,11 +182,6 @@ public class VortexRenderer {
     private static float zWobble(float o) {
         float f = SPEED;//for debug purposes. will increase the speed at which the vortex will "Wobble"
         return (Mth.cos(o * 1 + timing((int) (1.256 * f)) * 2 * Mth.PI) + Mth.cos(o * 0.5f + timing((int) (1.271 * f)) * 2 * Mth.PI)) * 2 / SPEED;
-    }
-
-
-    private static void rotate(PoseStack poseStack, float x, float y, float z) {
-        poseStack.mulPose((new Quaternionf()).rotationZYX(Mth.DEG_TO_RAD * z, Mth.DEG_TO_RAD * y, Mth.DEG_TO_RAD * x));
     }
 
 
@@ -343,30 +236,36 @@ public class VortexRenderer {
 
             float x = xWobble(tO) * Mth.sin(tO), z = zWobble(tO) * Mth.sin(tO);
             float s = wobbleRadius(tO);
-            float bA = lightning ? 1 : radiusFunc(tO);
+            float val = lightning ? 1 : radiusFunc(tO);
 
-            float alpha = lightning ? lightning_a : bA;
+            float alpha = lightning ? lightning_a : val;
 
             poseStack.pushPose();
-            rotate(poseStack, 0, -this.vortexType.twist, 0);
-            rotate(poseStack, 0, tO * this.vortexType.rows * this.vortexType.twist, 0);
-            vertexUVColor(poseStack, x - s, tO, z + s, u0, v1, bA, bA, bA, alpha);
-            vertexUVColor(poseStack, x + s, tO, z + s, u1, v1, bA, bA, bA, alpha);
-            vertexUVColor(poseStack, x + s, tO, z - s, u1, v0, bA, bA, bA, alpha);
-            vertexUVColor(poseStack, x - s, tO, z - s, u0, v0, bA, bA, bA, alpha);
+            RenderHelper.rotateZYX(poseStack, 0, -this.vortexType.twist, 0);
+            RenderHelper.rotateZYX(poseStack, 0, tO * this.vortexType.rows * this.vortexType.twist, 0);
+            vertexUVColor(poseStack, x - s, tO, z + s, u0, v1, val, alpha, tO, !lightning);
+            vertexUVColor(poseStack, x + s, tO, z + s, u1, v1, val, alpha, tO, !lightning);
+            vertexUVColor(poseStack, x + s, tO, z - s, u1, v0, val, alpha, tO, !lightning);
+            vertexUVColor(poseStack, x - s, tO, z - s, u0, v0, val, alpha, tO, !lightning);
 
             poseStack.popPose();
             prev_tO = tO;
             lightning_a *= 0.9f;
         }
+
+        private void vertexUVColor(@NotNull PoseStack pose, float x, float y, float z, float u, float v, float val, float a, float o, boolean tint) {
+            float[] color = this.vortexType.gradient.getRGBf(o);
+            if (tint)
+                RenderHelper.vertexUVColor(pose, x, y, z, u, v, val * color[0], val * color[1], val * color[2], a);
+            else RenderHelper.vertexUVColor(pose, x, y, z, u, v, val, val, val, a);
+        }
     }
 
-    private static class VortexGradientTint {
-        private Map<Float, float[]> gradient_map = new HashMap<>();
-        private boolean loop = false;
+    public static class VortexGradientTint {
+        private final Map<Float, float[]> gradient_map = new HashMap<>();
+        public float offset = 0;
 
-        public VortexGradientTint(boolean loop) {
-            this.loop = loop;
+        public VortexGradientTint() {
         }
 
         /**
@@ -383,17 +282,20 @@ public class VortexRenderer {
             return this;
         }
 
-        public float[] getRGBf(float pos) {
+        public float[] getRGBf(float pos_original) {
             float r = 1, g = 1, b = 1;
             float[] out = new float[]{r, g, b};
-            if (gradient_map.keySet().size() <= 0) return out;
-            if (gradient_map.keySet().size() == 1) {
+            if (gradient_map.isEmpty()) return out;
+            if (gradient_map.size() == 1) {
                 for (float p : gradient_map.keySet()) {
                     out = gradient_map.get(p);
                 }
                 return out;
             }
 
+            float pos = pos_original + offset;
+            if (pos > 1) pos -= 2;
+            if (pos < -1) pos += 2;
 
             float first = 0, second = 0, smallest_dist = 9999, second_smallest_dist = 1000;
 
