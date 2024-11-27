@@ -7,12 +7,15 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import whocraft.tardis_refined.client.TardisClientData;
 import whocraft.tardis_refined.client.renderer.vortex.VortexRenderer;
 import whocraft.tardis_refined.client.screen.selections.ShellSelectionScreen;
 import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
+
+import java.util.Objects;
 
 import static whocraft.tardis_refined.client.renderer.vortex.ShellRenderer.renderShell;
 import static whocraft.tardis_refined.client.screen.selections.ShellSelectionScreen.globalShellBlockEntity;
@@ -37,21 +40,23 @@ public class VortexOverlay {
         float width = gg.guiWidth();
         float height = gg.guiHeight();
 
-        double radius = Math.min(width, height) / 2;
-        radius *= 0.9;
+        double radius = 0.1;
+        radius *= 0.5;
+
+        float yRot = Objects.requireNonNull(mc.getCameraEntity()).getYRot();
 
         if (mc.screen == null) { // Ensure no screen (like inventory) is open
             if (mc.options.keyUp.isDown())
-                velY -= speed;
-
-            if (mc.options.keyDown.isDown())
                 velY += speed;
 
+            if (mc.options.keyDown.isDown())
+                velY -= speed;
+
             if (mc.options.keyLeft.isDown())
-                velX -= speed;
+                velX -= speed * Mth.cos(yRot * Mth.DEG_TO_RAD);
 
             if (mc.options.keyRight.isDown())
-                velX += speed;
+                velX += speed * Mth.cos(yRot * Mth.DEG_TO_RAD);
         }
 
         tardisX += velX;
@@ -63,7 +68,8 @@ public class VortexOverlay {
             tardisX *= 0.9;
             tardisY *= 0.9;
         }
-
+        tardisX *= 0.999;
+        tardisY *= 0.999;
     }
 
 
@@ -82,6 +88,12 @@ public class VortexOverlay {
             float width = gg.guiWidth();
             float height = gg.guiHeight();
 
+            /*
+            THIS FLOAT CONTROLS SEVERAL THINGS.
+            from 0 to 1, the perspective will match third person while the vortex fades in. from 1 to 2 it will fade out some of the perspective calculations like pitch and yaw and fade in some of the animations for the Shell
+             */
+            float control = 0;
+
             Camera camera = mc.gameRenderer.getMainCamera();
             Vec3 camPos = camera.getPosition().subtract(mc.player.position()).subtract(0, 1.62, 0);
 
@@ -93,7 +105,6 @@ public class VortexOverlay {
             perspective.translate(0, 0, 11000);
             RenderSystem.setProjectionMatrix(perspective, VertexSorting.DISTANCE_TO_ORIGIN);
 
-            //Vortex
             pose.pushPose();
 
             float xRot = -mc.getCameraEntity().getXRot();
@@ -101,14 +112,18 @@ public class VortexOverlay {
 
             pose.mulPose(Axis.XP.rotationDegrees(xRot));
             pose.mulPose(Axis.YP.rotationDegrees(yRot));
+
             pose.translate(-camPos.x, -camPos.y, -camPos.z);
 
+            //Vortex
             pose.pushPose();
             pose.scale(100, 100, 100);
             VORTEX.renderVortex(gg, 1);
             pose.popPose();
 
+
             //Box
+            pose.translate(tardisX, tardisY, 0);
             renderShell(gg, 0, 0, 1, tardisClientData.getThrottleStage());
 
             pose.popPose();

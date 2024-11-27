@@ -33,7 +33,7 @@ public class VortexRenderer {
     }
 
     public enum VortexTypes {
-        CLOUDS(new ResourceLocation(TardisRefined.MODID, "textures/vortex/clouds.png"), 9, 1, 10, true, true, new VortexGradientTint().add(1, 0, 0.5f, 1).add(-1, 1, 0.5f, 0));
+        CLOUDS(new ResourceLocation(TardisRefined.MODID, "textures/vortex/clouds.png"), 9, 12, 10, true, true, new VortexGradientTint().add(0f, 0, 0.5f, 1).add(-1f, 1, 0.5f, 0).add(0f, 0.5f, 0.75f, 1f));
 
         public int sides = 9, rows = 12;
         float twist = 10;
@@ -62,9 +62,9 @@ public class VortexRenderer {
      * Renders the Time Vortex
      */
     public void renderVortex(PoseStack pose, float opacity) {
-        this.opacity = opacity;
+        this.opacity = Math.min(opacity, 1);
+        this.vortexType.rows = 12;
         this.vortexType.gradient.offset = 0;
-
         pose.pushPose();
 
         RenderHelper.rotateZYX(pose, 90.0f, 180, 0.0f);
