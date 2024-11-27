@@ -11,6 +11,7 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import whocraft.tardis_refined.common.block.device.ConsoleConfigurationBlock;
 import whocraft.tardis_refined.common.blockentity.console.GlobalConsoleBlockEntity;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
@@ -50,7 +51,7 @@ public class FlyTardisAtPOI extends WorkAtPoi {
                 Direction facing = consoleState.getValue(ConsoleConfigurationBlock.FACING);
                 double distanceToConsoleSqr = consolePos.distToCenterSqr(villager.position().x, villager.position().y, villager.position().z);
 
-                if (pilotManager.canEndFlight()) {
+                if (pilotManager.canEndFlight() && pilotManager.isInFlight() && !pilotManager.isLanding()) {
                     pilotManager.setThrottleStage(0);
                     pilotManager.setHandbrakeOn(true);
                     pilotManager.endFlight(true);
@@ -62,16 +63,7 @@ public class FlyTardisAtPOI extends WorkAtPoi {
                     return;
                 }
 
-                double observePointOffset = 4;
-
-                // Calculate villager position relative to the FACING direction
-                Vec3 offset = switch (facing) {
-                    case NORTH -> new Vec3(0, 0, -observePointOffset); // Stand 1.5 blocks away to the north
-                    case SOUTH -> new Vec3(0, 0, observePointOffset);  // Stand 1.5 blocks away to the south
-                    case WEST -> new Vec3(-observePointOffset, 0, 0);  // Stand 1.5 blocks away to the west
-                    case EAST -> new Vec3(observePointOffset, 0, 0);   // Stand 1.5 blocks away to the east
-                    default -> Vec3.ZERO;               // Default fallback
-                };
+                Vec3 offset = getOffset(facing);
 
                 Vec3 targetPosition = new Vec3(consolePos.getX(), villager.position().y, consolePos.getZ()).add(offset);
 
@@ -89,6 +81,20 @@ public class FlyTardisAtPOI extends WorkAtPoi {
         });
 
         super.useWorkstation(serverLevel, villager);
+    }
+
+    private static @NotNull Vec3 getOffset(Direction facing) {
+        double observePointOffset = 4;
+
+        // Calculate villager position relative to the FACING direction
+        Vec3 offset = switch (facing) {
+            case NORTH -> new Vec3(0, 0, -observePointOffset); // Stand 1.5 blocks away to the north
+            case SOUTH -> new Vec3(0, 0, observePointOffset);  // Stand 1.5 blocks away to the south
+            case WEST -> new Vec3(-observePointOffset, 0, 0);  // Stand 1.5 blocks away to the west
+            case EAST -> new Vec3(observePointOffset, 0, 0);   // Stand 1.5 blocks away to the east
+            default -> Vec3.ZERO;               // Default fallback
+        };
+        return offset;
     }
 
 
