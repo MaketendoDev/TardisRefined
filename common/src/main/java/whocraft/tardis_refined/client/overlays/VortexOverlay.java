@@ -77,8 +77,8 @@ public class VortexOverlay {
         TardisPlayerInfo.get(Minecraft.getInstance().player).ifPresent(tardisPlayerInfo -> {
             /*Activation Logic*/
             TardisClientData tardisClientData = TardisClientData.getInstance(tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey());
-            if (!tardisPlayerInfo.isViewingTardis()) return;
-            if (!tardisPlayerInfo.isRenderVortex()) return;
+            //if (!tardisPlayerInfo.isViewingTardis()) return;
+            //if (!tardisPlayerInfo.isRenderVortex()) return;
 
             VortexOverlay.update(gg);
 
@@ -100,7 +100,7 @@ public class VortexOverlay {
 
             float control = 1 + Mth.sin(zzz * Mth.DEG_TO_RAD * 360);*/
 
-            float control = 2;
+            float control = 1;
 
 
             Camera camera = mc.gameRenderer.getMainCamera();

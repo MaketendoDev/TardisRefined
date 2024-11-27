@@ -65,6 +65,8 @@ public class VortexRenderer {
         this.opacity = Math.min(opacity, 1);
         this.vortexType.rows = 12;
         this.vortexType.gradient.offset = 0;
+        this.time.update();
+        this.time.speed = 0.5f;
         pose.pushPose();
 
         RenderHelper.rotateZYX(pose, 90.0f, 180, 0.0f);
@@ -84,13 +86,13 @@ public class VortexRenderer {
 
         if (this.vortexType.decals) {
             Tesselator tesselator = beginTextureColor(Mode.QUADS);
-            for (int i = 0; i < 16 / (1 + time.speed); i++) {
+            for (int i = 0; i < 8; i++) {
                 pose.pushPose();
                 if (vortex_quads.size() < i + 1) {
                     vortex_quads.add(new VortexQuad(this.vortexType, this.time));
                     break;
                 }
-                vortex_quads.get(i).renderQuad(pose, (float) (i * 0.1f * time.speed * time.speed), this.opacity);
+                vortex_quads.get(i).renderQuad(pose, (float) (i * 0.1f), this.opacity);
                 pose.popPose();
             }
             tesselator.end();
@@ -152,10 +154,13 @@ public class VortexRenderer {
     }
 
     private static float timingWithOffset(float speed, float offset) {
-        if (speed == 0) return 1;
         long long_speed = (long) (speed * 1000L);
         long time = System.currentTimeMillis() + (long) (1000L * offset);
-        return (time % long_speed) / (speed * 1000.0f);
+        try {
+            return (time % long_speed) / (speed * 1000.0f);
+        } catch (Exception e) {
+            return 1;
+        }
     }
 
     private static float timing(float speed) {
@@ -175,11 +180,11 @@ public class VortexRenderer {
     }
 
     private static float xWobble(float o, float SPEED) {
-        return (Mth.sin(o * 1 + timing((int) (0.999 * SPEED)) * 2 * Mth.PI) + Mth.sin(o * 0.5f + timing((int) (1.778 * SPEED)) * 2 * Mth.PI)) * 2 / SPEED;
+        return (Mth.sin(o * 1 + timing(1.999f) * 2 * Mth.PI) + Mth.sin(o * 0.5f + timing(3.778f) * 2 * Mth.PI)) * SPEED * 2;
     }
 
     private static float zWobble(float o, float SPEED) {
-        return (Mth.cos(o * 1 + timing((int) (1.256 * SPEED)) * 2 * Mth.PI) + Mth.cos(o * 0.5f + timing((int) (1.271 * SPEED)) * 2 * Mth.PI)) * 2 / SPEED;
+        return (Mth.cos(o * 1 + timing(2.256f) * 2 * Mth.PI) + Mth.cos(o * 0.5f + timing(3.271f) * 2 * Mth.PI)) * SPEED * 2;
     }
 
 
@@ -214,11 +219,9 @@ public class VortexRenderer {
 
 
         public void renderQuad(PoseStack poseStack, float time_offset, float opacity) {
-
             if (!valid) rndQuad();
 
-            float tO = 1 - (time.getFloat(time_offset) * 2);
-
+            float tO = -(time.getFloat(time_offset) * 2) - 1f;
             if (tO > prev_tO || !valid) {
                 valid = false;
                 return;
@@ -227,7 +230,7 @@ public class VortexRenderer {
             if (lightning && System.currentTimeMillis() % 5 == 0) if (lightning && Math.random() > 0.95f) {
                 lightning_a = 1;
                 assert Minecraft.getInstance().player != null;
-                Minecraft.getInstance().player.playSound(Math.random() < 0.5F ? SoundEvents.LIGHTNING_BOLT_THUNDER : SoundEvents.LIGHTNING_BOLT_IMPACT, (float) Math.random(), (float) Math.random());
+                Minecraft.getInstance().player.playSound(SoundEvents.LIGHTNING_BOLT_IMPACT, 1 - Mth.abs(tO * tO), (float) (Math.random() * (1 - Mth.abs(tO))));
                 rndUV();
             }
 
