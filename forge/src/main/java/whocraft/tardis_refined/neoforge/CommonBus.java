@@ -31,12 +31,6 @@ public class CommonBus {
 
 
     @SubscribeEvent
-    public static void onServerStarted(ServerStartedEvent event) {
-        // We call this here to make sure blocks are registered
-        TRPointOfInterestTypes.registerBlockStates();
-    }
-
-    @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
 
         if (event.phase == TickEvent.Phase.END) {
