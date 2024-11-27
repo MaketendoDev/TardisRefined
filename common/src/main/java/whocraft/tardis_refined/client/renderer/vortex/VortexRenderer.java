@@ -139,13 +139,14 @@ public class VortexRenderer {
 
             ShellModel model = ShellModelCollection.getInstance().getShellEntry(shellTheme).getShellModel(fullPattern);
             model.setDoorPosition(false);
-            Lighting.setupForEntityInInventory();
+            Lighting.setupFor3DItems();
             PoseStack pose = guiGraphics.pose();
             pose.pushPose();
 
             // Position the shell and apply scale
-            pose.translate((float) x, y, 100);
-            pose.scale(-scale, scale, scale);
+            pose.translate((float) x, y, 0);
+            pose.scale(scale, scale, scale);
+            rotate(pose,180,0,0);
 
             // Time-based calculations for loopable motion and rotation
             long time = System.currentTimeMillis();
@@ -230,7 +231,8 @@ public class VortexRenderer {
 
     private void vertexUVColor(@NotNull PoseStack pose, float x, float y, float z, float u, float v, float r, float g, float b, float a, boolean tint) {
         float[] color = this.vortexType.gradient.getRGBf(y);
-        vertexUVColor(pose, x, y, z, u, v, r, g, b, a);
+        if (tint) vertexUVColor(pose, x, y, z, u, v, r * color[0], g * color[1], b * color[2], a);
+        else vertexUVColor(pose, x, y, z, u, v, r, g, b, a);
     }
 
     private static void vertexUVColor(@NotNull PoseStack pose, float x, float y, float z, float u, float v, float r, float g, float b, float a) {
