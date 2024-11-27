@@ -13,6 +13,7 @@ import whocraft.tardis_refined.client.TardisClientData;
 import whocraft.tardis_refined.client.model.blockentity.console.ConsoleModelCollection;
 import whocraft.tardis_refined.client.model.blockentity.console.ConsoleUnit;
 import whocraft.tardis_refined.client.model.blockentity.shell.ShellModelCollection;
+import whocraft.tardis_refined.client.renderer.RenderHelper;
 import whocraft.tardis_refined.client.screen.selections.ShellSelectionScreen;
 import whocraft.tardis_refined.common.block.console.GlobalConsoleBlock;
 import whocraft.tardis_refined.common.blockentity.console.GlobalConsoleBlockEntity;
@@ -99,7 +100,17 @@ public class GlobalConsoleRenderer implements BlockEntityRenderer<GlobalConsoleB
 
             // Add rotation effect
             if (reactions.isFlying()) {
-                poseStack.mulPose(Axis.YP.rotationDegrees((blockEntity.getLevel().getGameTime() % 360) * (reactions.getThrottleStage() * 5L)));
+                // Time-based calculations for loop able motion and rotation
+                long time = System.currentTimeMillis();
+                float timeFactor = (time % 4000L) / 4000.0f * (float) (2 * Math.PI);
+
+                // Chaotic but loop able rotations
+                float xR = (float) Math.sin(timeFactor * 2) * 15.0f; // Wobble on X-axis
+                float yR = ((timeFactor * 360 / (float) (2 * Math.PI)) % 360) * reactions.getThrottleStage(); // Continuous spin on Y-axis
+                float zR = (float) Math.cos(timeFactor * 3) * 10.0f; // Wobble on Z-axis
+                int control = 1;
+                RenderHelper.rotateZYX(poseStack, xR * control, yR * control, zR * control);
+
             } else {
                 poseStack.mulPose(Axis.YP.rotationDegrees(rotation % 360));
             }

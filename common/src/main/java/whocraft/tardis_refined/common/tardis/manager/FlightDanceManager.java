@@ -102,7 +102,7 @@ public class FlightDanceManager extends TickableHandler {
             // Someone logged out during flight / a desync happened - we will just nicely end the flight
             if(console == null){
                 stopDancing();
-                operator.getPilotingManager().endFlight(true);
+                operator.getPilotingManager().endFlight(true, false);
                 return;
             } else {
                 console.killControls(); // Just incase

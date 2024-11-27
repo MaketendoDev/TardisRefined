@@ -98,10 +98,9 @@ public class ModEvents {
         ColorProviderRegistry.ITEM.register(TRItemColouring.SCREWDRIVER_COLORS, TRItemRegistry.SCREWDRIVER.get());
 
         Supplier<GuiGraphics> guiGraphics = () -> new GuiGraphics(Minecraft.getInstance(), Minecraft.getInstance().renderBuffers().bufferSource());
-
+        HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> VortexOverlay.renderOverlay(guiGraphics.get()));
         HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> ExteriorViewOverlay.renderOverlay(guiGraphics.get()));
         HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> GravityOverlay.renderOverlay(guiGraphics.get()));
-        HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> VortexOverlay.renderOverlay(guiGraphics.get()));
     }
 
 
