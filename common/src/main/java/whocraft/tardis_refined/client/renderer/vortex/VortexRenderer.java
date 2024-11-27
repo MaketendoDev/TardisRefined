@@ -30,7 +30,9 @@ import whocraft.tardis_refined.patterns.ShellPattern;
 import whocraft.tardis_refined.patterns.ShellPatterns;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static whocraft.tardis_refined.client.screen.selections.ShellSelectionScreen.globalShellBlockEntity;
 
@@ -51,6 +53,7 @@ public class VortexRenderer {
         public boolean decals = true;
         public boolean lightning = false;
         public final ResourceLocation texture;
+        public final VortexGradientTint gradient = new VortexGradientTint(true).add(0, 0, 0.5f, 1).add(-1, 1, 0.5f, 0);
 
         VortexTypes(ResourceLocation texture) {
             this.texture = texture;
@@ -92,7 +95,7 @@ public class VortexRenderer {
 
         pose.pushPose();
 
-        rotate(pose, 90.0f, 0, 0.0f);
+        rotate(pose, 90.0f, 180, 0.0f);
 
         pose.scale(1, this.vortexType.rows, 1);
         rotate(pose, 0, 360 * timing(5000), 0);
@@ -137,13 +140,14 @@ public class VortexRenderer {
 
             ShellModel model = ShellModelCollection.getInstance().getShellEntry(shellTheme).getShellModel(fullPattern);
             model.setDoorPosition(false);
-            Lighting.setupForEntityInInventory();
+            Lighting.setupFor3DItems();
             PoseStack pose = guiGraphics.pose();
             pose.pushPose();
 
             // Position the shell and apply scale
-            pose.translate((float) x, y, 100);
-            pose.scale(-scale, scale, scale);
+            pose.translate((float) x, y, 0);
+            pose.scale(scale, scale, scale);
+            rotate(pose,180,0,0);
 
             // Time-based calculations for loopable motion and rotation
             long time = System.currentTimeMillis();
@@ -207,23 +211,9 @@ public class VortexRenderer {
             float bA = radiusFunc(oA);
             float bB = radiusFunc(oB);
             poseStack.pushPose();
-// Variables to track time and color components
-            float time = 0.0f;
-            float speed = 0.5f; // Adjust to control the speed of color cycling
-
-// In your render or update loop:
-            time += speed * ((float) Minecraft.getInstance().player.tickCount / 50L); // deltaTime is the time elapsed since the last frame
-
-// Calculate RGB values using a sine wave for smooth transitions
-            float red = (float) Math.sin(time) * 0.5f + 0.5f; // Normalize to range [0, 1]
-            float green = (float) Math.sin(time + 2 * Math.PI / 3) * 0.5f + 0.5f; // Phase shift for variation
-            float blue = (float) Math.sin(time + 4 * Math.PI / 3) * 0.5f + 0.5f; // Further phase shift
-            RenderSystem.setShaderColor(red, green, blue, 1);
-
-
-            vertexUVColor(poseStack, xA, length, zA, u, vA, bA, bA, bA, 1);
+            vertexUVColor(poseStack, xA, length, zA, u, vA, bA, bA, bA, 1, true);
             rotate(poseStack, 0, -this.vortexType.twist, 0);
-            vertexUVColor(poseStack, xB, 0, zB, u, vB, bB, bB, bB, 1);
+            vertexUVColor(poseStack, xB, 0, zB, u, vB, bB, bB, bB, 1, true);
             poseStack.popPose();
         }
 
@@ -244,6 +234,12 @@ public class VortexRenderer {
         tesselator = Tesselator.getInstance();
         tesselator.getBuilder().begin(mode, DefaultVertexFormat.POSITION_TEX_COLOR);
         return tesselator;
+    }
+
+    private void vertexUVColor(@NotNull PoseStack pose, float x, float y, float z, float u, float v, float r, float g, float b, float a, boolean tint) {
+        float[] color = this.vortexType.gradient.getRGBf(y);
+        if (tint) vertexUVColor(pose, x, y, z, u, v, r * color[0], g * color[1], b * color[2], a);
+        else vertexUVColor(pose, x, y, z, u, v, r, g, b, a);
     }
 
     private static void vertexUVColor(@NotNull PoseStack pose, float x, float y, float z, float u, float v, float r, float g, float b, float a) {
@@ -362,6 +358,59 @@ public class VortexRenderer {
             poseStack.popPose();
             prev_tO = tO;
             lightning_a *= 0.9f;
+        }
+    }
+
+    private static class VortexGradientTint {
+        private Map<Float, float[]> gradient_map = new HashMap<>();
+        private boolean loop = false;
+
+        public VortexGradientTint(boolean loop) {
+            this.loop = loop;
+        }
+
+        /**
+         * Adds a color to the gradient map
+         *
+         * @param pos position in the gradient the color should go in. can be from -1 to 1
+         * @param r   RED 0 to 1
+         * @param g   GREEN 0 to 1
+         * @param b   BLUE 0 to 1
+         * @return The VortexGradient with the color added
+         */
+        public VortexGradientTint add(float pos, float r, float g, float b) {
+            this.gradient_map.put(pos, new float[]{r, g, b});
+            return this;
+        }
+
+        public float[] getRGBf(float pos) {
+            float r = 1, g = 1, b = 1;
+            float[] out = new float[]{r, g, b};
+            if (gradient_map.keySet().size() <= 0) return out;
+            if (gradient_map.keySet().size() == 1) {
+                for (float p : gradient_map.keySet()) {
+                    out = gradient_map.get(p);
+                }
+                return out;
+            }
+
+
+            float first = 0, second = 0, smallest_dist = 9999, second_smallest_dist = 1000;
+
+            for (float p : gradient_map.keySet()) {
+                float dist = Mth.abs(pos - p);
+                if (dist < smallest_dist) {
+                    second_smallest_dist = smallest_dist;
+                    smallest_dist = dist;
+                    second = first;
+                    first = p;
+                }
+            }
+
+            r = Mth.lerp(smallest_dist / (smallest_dist + second_smallest_dist), gradient_map.get(first)[0], gradient_map.get(second)[0]);
+            g = Mth.lerp(smallest_dist / (smallest_dist + second_smallest_dist), gradient_map.get(first)[1], gradient_map.get(second)[1]);
+            b = Mth.lerp(smallest_dist / (smallest_dist + second_smallest_dist), gradient_map.get(first)[2], gradient_map.get(second)[2]);
+            return new float[]{r, g, b};
         }
     }
 }

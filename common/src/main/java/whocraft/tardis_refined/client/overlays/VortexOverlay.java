@@ -65,6 +65,7 @@ public class VortexOverlay {
     public static void renderOverlay(GuiGraphics gg) {
 
         TardisPlayerInfo.get(Minecraft.getInstance().player).ifPresent(tardisPlayerInfo -> {
+            /*Activation Logic*/
             TardisClientData tardisClientData = TardisClientData.getInstance(tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey());
             if(!tardisPlayerInfo.isViewingTardis()) return;
             if(!tardisPlayerInfo.isRenderVortex()) return;
@@ -74,27 +75,33 @@ public class VortexOverlay {
             float width = gg.guiWidth();
             float height = gg.guiHeight();
 
+            /*Perspective Rendering*/
             RenderSystem.backupProjectionMatrix();
-
-
-            pose.pushPose();
-
-            pose.translate(0, 0, 11000);
 
             Matrix4f perspective = new Matrix4f();
             perspective.perspectiveOrigin(new Vector3f());
-            perspective.perspective((float) Math.toRadians(70), width / height, 0.1f, 100);
+            perspective.perspective((float) Math.toRadians(70), width / height, 0.01f, 9999);
             RenderSystem.setProjectionMatrix(perspective, VertexSorting.DISTANCE_TO_ORIGIN);
-            pose.mulPose(Axis.XP.rotationDegrees(180F));
+
+            //Vortex
+            pose.pushPose();
+            pose.translate(0, 0, 11000);
+            pose.scale(10,10,10);
+            pose.mulPose(Axis.XP.rotationDegrees(00F));
             VORTEX.renderVortex(gg);
             pose.popPose();
 
-            RenderSystem.restoreProjectionMatrix();
-
+            //Box
             pose.pushPose();
             VortexOverlay.update();
-            renderShell(gg, (int) (width / 2 + tardisOffsetX), (int) (height / 2 + tardisOffsetY), 25F, tardisClientData.getThrottleStage());
+            pose.translate(0, 0, 10990);
+            pose.scale(1,1,1);
+            renderShell(gg, 0, 0, 1, tardisClientData.getThrottleStage());
             pose.popPose();
+
+            //Restore Ortho view
+            RenderSystem.restoreProjectionMatrix();
+
         });
 
     }
