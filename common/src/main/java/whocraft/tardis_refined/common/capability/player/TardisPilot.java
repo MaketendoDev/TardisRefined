@@ -24,5 +24,6 @@ public interface TardisPilot {
     void loadData(CompoundTag tag);
     Player getPlayer();
     void syncToClients(@Nullable ServerPlayer serverPlayerEntity);
+    void tick(TardisLevelOperator tardisLevelOperator, ServerPlayer serverPlayerEntity);
 
 }

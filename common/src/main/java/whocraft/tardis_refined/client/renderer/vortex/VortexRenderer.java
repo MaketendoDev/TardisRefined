@@ -239,7 +239,7 @@ public class VortexRenderer {
             if (lightning && System.currentTimeMillis() % 5 == 0) if (lightning && Math.random() > 0.95f) {
                 lightning_a = 3;
                 assert Minecraft.getInstance().player != null;
-                Minecraft.getInstance().player.playSound(SoundEvents.LIGHTNING_BOLT_IMPACT, opacity * (1 - Mth.abs(tO * tO)), (float) (Math.random() * (1 - Mth.abs(tO))));
+                Minecraft.getInstance().player.playSound(SoundEvents.LIGHTNING_BOLT_IMPACT, (opacity * (1 - Mth.abs(tO * tO))) * 0.5F, (float) (Math.random() * (1 - Mth.abs(tO))));
                 rndUV();
             }
 

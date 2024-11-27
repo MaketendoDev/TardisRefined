@@ -53,7 +53,16 @@ public class TardisClientData {
 
     private int tardisState = 0;
     private int recoveryTicks = 0;
+    private float journeyProgress = 0;
 
+
+    public float getJourneyProgress() {
+        return journeyProgress;
+    }
+
+    public void setJourneyProgress(float journeyProgress) {
+        this.journeyProgress = journeyProgress;
+    }
 
     //Not saved to disk, no real reason to be
     int nextAmbientNoiseCall = 40;
@@ -165,6 +174,7 @@ public class TardisClientData {
         compoundTag.putBoolean("flying", flying);
         compoundTag.putInt(NbtConstants.THROTTLE_STAGE, throttleStage);
         compoundTag.putInt("recoveryTicks", recoveryTicks);
+        compoundTag.putFloat("journeyProgress", journeyProgress);
         compoundTag.putBoolean(NbtConstants.HANDBRAKE_ENGAGED, isHandbrakeEngaged);
         compoundTag.putBoolean("isLanding", isLanding);
         compoundTag.putBoolean("isTakingOff", isTakingOff);
@@ -198,6 +208,7 @@ public class TardisClientData {
         flightShakeScale = compoundTag.getFloat("flightShakeScale");
         isOnCooldown = compoundTag.getBoolean("isOnCooldown");
         recoveryTicks = compoundTag.getInt("recoveryTicks");
+        journeyProgress = compoundTag.getFloat("journeyProgress");
         // Load shellTheme and shellPattern
         shellTheme = new ResourceLocation(compoundTag.getString("shellTheme"));
         shellPattern = new ResourceLocation(compoundTag.getString("shellPattern"));

@@ -32,7 +32,7 @@ public class ExteriorDisplayControl extends Control {
     private void sendPacket(ServerPlayer player, TardisLevelOperator tardisLevelOperator) {
         // new OpenShellSelectionScreen(tardisLevelOperator.getAestheticHandler().getShellTheme()).send(player);
         TardisPlayerInfo.get(player).ifPresent(tardisInfo ->
-                tardisInfo.setupPlayerForInspection(player, tardisLevelOperator, tardisLevelOperator.getPilotingManager().isTakingOff() ? tardisLevelOperator.getPilotingManager().getCurrentLocation() :tardisLevelOperator.getPilotingManager().getTargetLocation(), tardisLevelOperator.getPilotingManager().isInFlight())
+                tardisInfo.setupPlayerForInspection(player, tardisLevelOperator, tardisLevelOperator.getPilotingManager().isTakingOff() ? tardisLevelOperator.getPilotingManager().getCurrentLocation() :tardisLevelOperator.getPilotingManager().getTargetLocation(), !tardisLevelOperator.getPilotingManager().isTakingOff())
         );
     }
 

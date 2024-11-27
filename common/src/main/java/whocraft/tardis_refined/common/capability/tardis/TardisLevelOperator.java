@@ -33,6 +33,7 @@ import whocraft.tardis_refined.common.tardis.TardisDesktops;
 import whocraft.tardis_refined.common.tardis.TardisNavLocation;
 import whocraft.tardis_refined.common.tardis.manager.*;
 import whocraft.tardis_refined.common.tardis.themes.ShellTheme;
+import whocraft.tardis_refined.common.util.Platform;
 import whocraft.tardis_refined.common.util.TardisHelper;
 import whocraft.tardis_refined.compat.ModCompatChecker;
 import whocraft.tardis_refined.compat.portals.ImmersivePortals;
@@ -165,6 +166,12 @@ public class TardisLevelOperator{
         if (pilotingManager != null) {  pilotingManager.tick(level);}
         if (flightDanceManager != null) {  flightDanceManager.tick(level);}
 
+        // Update Viewing Players!
+        level.getServer().getPlayerList().getPlayers().forEach(serverPlayer -> {
+            TardisPlayerInfo.get(serverPlayer).ifPresent(tardisPlayerInfo -> {
+                tardisPlayerInfo.tick(this, serverPlayer);
+            });
+        });
         
         var shouldSync = level.getGameTime() % 40 == 0;
         if (shouldSync) {
@@ -181,6 +188,13 @@ public class TardisLevelOperator{
             tardisClientData.setFlying(pilotingManager.isInFlight());
             tardisClientData.setIsLanding(exteriorManager.isLanding());
             tardisClientData.setIsTakingOff(exteriorManager.isTakingOff());
+
+            float percentageCompleted = (getPilotingManager().getFlightPercentageCovered() * 100f);
+            if (percentageCompleted > 100) {
+                percentageCompleted = 100;
+            }
+
+            tardisClientData.setJourneyProgress(percentageCompleted);
 
             tardisClientData.sync();
         } else {

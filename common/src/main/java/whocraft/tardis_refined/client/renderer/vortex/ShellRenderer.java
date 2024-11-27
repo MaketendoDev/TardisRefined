@@ -52,9 +52,10 @@ public class ShellRenderer {
 
             VertexConsumer vertexConsumer = guiGraphics.bufferSource().getBuffer(model.renderType(model.getShellTexture(ShellPatterns.getPatternOrDefault(shellTheme, shellPattern), false)));
 
+            globalShellBlockEntity.setTardisId(tardisClientData.getLevelKey());
             model.renderShell(globalShellBlockEntity, false, false, pose, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, alpha);
             if (fullPattern.exteriorDoorTexture().emissive()) {
-                VertexConsumer vertexConsumerLighting = guiGraphics.bufferSource().getBuffer(RenderType.eyes(model.getShellTexture(ShellPatterns.getPatternOrDefault(shellTheme, shellPattern), true)));
+                VertexConsumer vertexConsumerLighting = guiGraphics.bufferSource().getBuffer(RenderType.entityTranslucentEmissive(model.getShellTexture(ShellPatterns.getPatternOrDefault(shellTheme, shellPattern), true)));
                 model.renderShell(globalShellBlockEntity, false, false, pose, vertexConsumerLighting, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, alpha);
             }
 

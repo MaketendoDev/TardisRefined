@@ -9,10 +9,8 @@ import net.minecraft.world.entity.ai.behavior.BlockPosTracker;
 import net.minecraft.world.entity.ai.behavior.WorkAtPoi;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import whocraft.tardis_refined.common.block.device.ConsoleConfigurationBlock;
 import whocraft.tardis_refined.common.blockentity.console.GlobalConsoleBlockEntity;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.entity.ControlEntity;
@@ -42,39 +40,30 @@ public class FlyTardisAtPOI extends WorkAtPoi {
 
             if (pilotManager.isInFlight()) {
                 BlockPos consolePos = console.getBlockPos();
-                BlockState consoleState = serverLevel.getBlockState(consolePos);
-
-                if (!consoleState.hasProperty(ConsoleConfigurationBlock.FACING)) {
-                    return; // Exit if FACING property is not available
-                }
-
-                Direction facing = consoleState.getValue(ConsoleConfigurationBlock.FACING);
                 double distanceToConsoleSqr = consolePos.distToCenterSqr(villager.position().x, villager.position().y, villager.position().z);
 
-                if (pilotManager.canEndFlight() && pilotManager.isInFlight() && !pilotManager.isLanding()) {
-                    pilotManager.setThrottleStage(0);
-                    pilotManager.setHandbrakeOn(true);
-                    pilotManager.endFlight(true, false);
+                // Ensure the villager is within 2 blocks and not closer than 1 block to the console
+                if (distanceToConsoleSqr > 4) { // More than 2 blocks away
+                    // Move villager closer to the console
+                    villager.moveTo(consolePos.getX() + 0.5, villager.position().y, consolePos.getZ() + 0.5);
+                } else if (distanceToConsoleSqr < 1) { // Less than 1 block away
+                    // Move villager slightly away from the console
+                    villager.moveTo(consolePos.getX() + 1, villager.position().y, consolePos.getZ() + 1);
                 }
 
-                // Ensure the villager is within a reasonable radius
-                if (distanceToConsoleSqr > 9) { // Too far from the console (3 blocks radius)
-                    villager.getNavigation().moveTo(consolePos.getX() + 0.5, villager.position().y, consolePos.getZ() + 0.5, 1);
-                    return;
-                }
-
-                Vec3 offset = getOffset(facing);
-
-                Vec3 targetPosition = new Vec3(consolePos.getX(), villager.position().y, consolePos.getZ()).add(offset);
-
-                villager.getNavigation().moveTo(targetPosition.x, targetPosition.y, targetPosition.z, 1);
-
-                // Find the nearest control and perform actions
                 for (ControlEntity controlEntity : console.getControlEntityList()) {
-                    if (controlEntity.isTickingDown() && villager.getRandom().nextBoolean()) {
-                        controlEntity.realignControl();
-                        villager.setUnhappyCounter(40);
-                        return;
+                    if (controlEntity.isTickingDown()) {
+
+                        // Adjust bounding box check to ensure proximity, but without intersecting
+                        if (controlEntity.level().random.nextBoolean()) {
+                            villager.getLookControl().setLookAt(controlEntity.getX(), controlEntity.getY(), controlEntity.getZ());
+                            for (int i = 0; i < 5; i++) {
+                                controlEntity.realignControl();
+                            }
+                            villager.setUnhappyCounter(40);
+                            System.out.println("Re-aligned: " + controlEntity.getCustomName().getString());
+                            return;
+                        }
                     }
                 }
             }
@@ -82,6 +71,8 @@ public class FlyTardisAtPOI extends WorkAtPoi {
 
         super.useWorkstation(serverLevel, villager);
     }
+
+
 
     private static @NotNull Vec3 getOffset(Direction facing) {
         double observePointOffset = 4;

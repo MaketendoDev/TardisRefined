@@ -40,6 +40,7 @@ public class ExteriorViewOverlay {
             TardisClientData tardisClientData = TardisClientData.getInstance(
                     tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey()
             );
+
             int throttleStage = tardisClientData.getThrottleStage();
             int maxThrottleStage = TardisPilotingManager.MAX_THROTTLE_STAGE;
             int throttlePercentage = maxThrottleStage != 0
@@ -59,14 +60,10 @@ public class ExteriorViewOverlay {
             MutableComponent throttleMessage = Component.literal("Throttle: " + throttlePercentage + "%")
                     .withStyle(ChatFormatting.GREEN);
 
-            // Render a semi-transparent background for better readability
-            int width = Math.max(fontRenderer.width(message.getString()), fontRenderer.width(throttleMessage.getString()));
-            guiGraphics.fill(x - 5, y - 5, x + width + 5, y + 30, 0x88000000);
 
-            // Render the text with shadow
             MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
 
-            // Draw the main message
+            // Render the text
             fontRenderer.drawInBatch(
                     message.getString(),
                     x,
@@ -80,7 +77,6 @@ public class ExteriorViewOverlay {
                     15728880
             );
 
-            // Draw the throttle percentage below the main message
             fontRenderer.drawInBatch(
                     throttleMessage.getString(),
                     x,
@@ -94,11 +90,56 @@ public class ExteriorViewOverlay {
                     15728880
             );
 
+            int backdropWidth = fontRenderer.width(message.getString());
+
+
+            // Only render journey progress if the TARDIS is flying
+            if (tardisClientData.isFlying()) {
+                float journeyProgress = tardisClientData.getJourneyProgress();
+                MutableComponent journeyMessage = Component.literal("Journey Progress: " + String.format("%.2f", journeyProgress) + "%")
+                        .withStyle(ChatFormatting.YELLOW);
+
+                 backdropWidth = Math.max(backdropWidth, fontRenderer.width(journeyMessage.getString()));
+
+                // Render a semi-transparent background for better readability
+                guiGraphics.fill(x - 5, y - 5, x + backdropWidth + 5, y + 30, 0x88000000);
+
+
+                // Render extended backdrop for journey progress
+                guiGraphics.fill(x - 5, y + 30, x + backdropWidth + 5, y + 60, 0x88000000);
+
+                fontRenderer.drawInBatch(
+                        journeyMessage.getString(),
+                        x,
+                        y + 30,
+                        ChatFormatting.WHITE.getColor(),
+                        false,
+                        poseStack.last().pose(),
+                        bufferSource,
+                        Font.DisplayMode.NORMAL,
+                        0,
+                        15728880
+                );
+
+                // Render the journey progress bar below the journey message
+                int progressBarX = x - 5;
+                int progressBarY = y + 42;
+                int progressBarWidth = backdropWidth + 10; // Match backdrop width
+                int progressWidth = (int) (progressBarWidth * journeyProgress / 100.0f);
+
+                // Background of the progress bar
+                guiGraphics.fill(progressBarX, progressBarY, progressBarX + progressBarWidth, progressBarY + 10, 0xFF555555); // Gray background
+                // Foreground of the progress bar
+                guiGraphics.fill(progressBarX, progressBarY, progressBarX + progressWidth, progressBarY + 10, 0xFF00FF00);   // Green progress
+            } else {
+                guiGraphics.fill(x - 5, y - 5, x + backdropWidth + 5, y + 30, 0x88000000);
+            }
             bufferSource.endBatch();
 
-            // Reset transformations
             poseStack.popPose();
         });
     }
+
+
 
 }

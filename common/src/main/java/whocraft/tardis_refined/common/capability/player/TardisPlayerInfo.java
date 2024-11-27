@@ -14,6 +14,7 @@ import net.minecraft.world.phys.Vec3;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.network.messages.player.SyncTardisPlayerInfoMessage;
 import whocraft.tardis_refined.common.tardis.TardisNavLocation;
+import whocraft.tardis_refined.common.tardis.manager.TardisPilotingManager;
 import whocraft.tardis_refined.common.util.Platform;
 import whocraft.tardis_refined.common.util.TardisHelper;
 
@@ -205,6 +206,14 @@ public class TardisPlayerInfo implements TardisPilot {
             message.sendToAll();
         } else {
             message.send(serverPlayerEntity);
+        }
+    }
+
+    @Override
+    public void tick(TardisLevelOperator tardisLevelOperator, ServerPlayer serverPlayerEntity) {
+        TardisPilotingManager pilotManger = tardisLevelOperator.getPilotingManager();
+        if(tardisLevelOperator.getLevelKey() == getPlayerPreviousPos().getDimensionKey()) {
+            setRenderVortex(pilotManger.isLanding() ||  pilotManger.isTakingOff() || pilotManger.isInFlight());
         }
     }
 }

@@ -119,6 +119,8 @@ public class GlobalConsoleRenderer implements BlockEntityRenderer<GlobalConsoleB
                 ShellSelectionScreen.generateDummyGlobalShell();
             }
 
+            ShellSelectionScreen.globalShellBlockEntity.setTardisId(reactions.getLevelKey());
+
             // Dynamic flickering alpha for a hologram effect
             float flickerAlpha = 0.2f + blockEntity.getLevel().random.nextFloat() * 0.1f;
 
@@ -129,6 +131,7 @@ public class GlobalConsoleRenderer implements BlockEntityRenderer<GlobalConsoleB
             float green = recoveryOrCrashing ? 0.5f + (float) Math.sin(time + Math.PI / 2) * 0.5f : (float) color.y;
             float blue = recoveryOrCrashing ? 0.5f + (float) Math.sin(time + Math.PI) * 0.5f : (float) color.z;
 
+            model.setIgnoreAnmationAlpha(!reactions.isTakingOff() && !reactions.isLanding());
             model.renderShell(
                     ShellSelectionScreen.globalShellBlockEntity,
                     false,
@@ -142,6 +145,7 @@ public class GlobalConsoleRenderer implements BlockEntityRenderer<GlobalConsoleB
                     blue,
                     flickerAlpha
             );
+            model.setIgnoreAnmationAlpha(false);
 
             poseStack.popPose();
         }
