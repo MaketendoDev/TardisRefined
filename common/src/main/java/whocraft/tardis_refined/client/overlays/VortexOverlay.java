@@ -53,10 +53,10 @@ public class VortexOverlay {
                 velY -= speed;
 
             if (mc.options.keyLeft.isDown())
-                velX -= speed * Mth.cos(yRot * Mth.DEG_TO_RAD);
+                velX -= speed;
 
             if (mc.options.keyRight.isDown())
-                velX += speed * Mth.cos(yRot * Mth.DEG_TO_RAD);
+                velX += speed;
         }
 
         tardisX += velX;
@@ -92,7 +92,14 @@ public class VortexOverlay {
             THIS FLOAT CONTROLS SEVERAL THINGS.
             from 0 to 1, the perspective will match third person while the vortex fades in. from 1 to 2 it will fade out some of the perspective calculations like pitch and yaw and fade in some of the animations for the Shell
              */
-            float control = 0;
+
+
+            long long_speed = (long) (6f * 1000L);
+            long time = System.currentTimeMillis() + (long) (1000L * 0);
+            float zzz = (time % long_speed) / (6f * 1000.0f);
+
+
+            float control = 1 + Mth.sin(zzz * Mth.DEG_TO_RAD * 360);
 
             Camera camera = mc.gameRenderer.getMainCamera();
             Vec3 camPos = camera.getPosition().subtract(mc.player.position()).subtract(0, 1.62, 0);
@@ -107,24 +114,27 @@ public class VortexOverlay {
 
             pose.pushPose();
 
-            float xRot = -mc.getCameraEntity().getXRot();
-            float yRot = mc.getCameraEntity().getYRot();
+            float mul = Math.max(control - 1, 0);
+            float mulinv = 1 - Math.max(control - 1, 0);
+
+            float xRot = -mc.getCameraEntity().getXRot() * mulinv;
+            float yRot = mc.getCameraEntity().getYRot() * mulinv;
 
             pose.mulPose(Axis.XP.rotationDegrees(xRot));
             pose.mulPose(Axis.YP.rotationDegrees(yRot));
 
-            pose.translate(-camPos.x, -camPos.y, -camPos.z);
+            pose.translate(-camPos.x * mulinv, -camPos.y * mulinv, -camPos.z * mulinv);
 
             //Vortex
             pose.pushPose();
             pose.scale(100, 100, 100);
-            VORTEX.renderVortex(gg, 1);
+            VORTEX.renderVortex(gg, control);
             pose.popPose();
 
 
             //Box
-            pose.translate(tardisX, tardisY, 0);
-            renderShell(gg, 0, 0, 1, tardisClientData.getThrottleStage());
+            pose.translate(tardisX * mul, tardisY * mul, -5 * mul);
+            renderShell(gg, Math.max(control - 1, 0), tardisClientData.getThrottleStage());
 
             pose.popPose();
 

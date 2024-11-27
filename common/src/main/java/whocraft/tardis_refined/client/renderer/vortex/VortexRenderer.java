@@ -90,7 +90,7 @@ public class VortexRenderer {
                     vortex_quads.add(new VortexQuad(this.vortexType));
                     break;
                 }
-                vortex_quads.get(i).renderQuad(pose, i * 0.1f * SPEED * SPEED);
+                vortex_quads.get(i).renderQuad(pose, i * 0.1f * SPEED * SPEED, this.opacity);
                 pose.popPose();
             }
             tesselator.end();
@@ -213,7 +213,7 @@ public class VortexRenderer {
         }
 
 
-        public void renderQuad(PoseStack poseStack, float time_offset) {
+        public void renderQuad(PoseStack poseStack, float time_offset, float opacity) {
 
             if (!valid) rndQuad();
 
@@ -239,7 +239,7 @@ public class VortexRenderer {
             float val = lightning ? 1 : radiusFunc(tO);
 
             float alpha = lightning ? lightning_a : val;
-
+            alpha *= opacity;
             poseStack.pushPose();
             RenderHelper.rotateZYX(poseStack, 0, -this.vortexType.twist, 0);
             RenderHelper.rotateZYX(poseStack, 0, tO * this.vortexType.rows * this.vortexType.twist, 0);

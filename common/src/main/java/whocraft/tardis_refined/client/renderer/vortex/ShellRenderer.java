@@ -20,7 +20,7 @@ import static whocraft.tardis_refined.client.screen.selections.ShellSelectionScr
 
 public class ShellRenderer {
 
-    public static void renderShell(GuiGraphics guiGraphics, int x, int y, float scale, int throttle) {
+    public static void renderShell(GuiGraphics guiGraphics, float control, int throttle) {
         TardisPlayerInfo.get(Minecraft.getInstance().player).ifPresent(tardisPlayerInfo -> {
 
             TardisClientData tardisClientData = TardisClientData.getInstance(tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey());
@@ -36,8 +36,6 @@ public class ShellRenderer {
             pose.pushPose();
 
             // Position the shell and apply scale
-            pose.translate((float) x, y, 0);
-            pose.scale(scale, scale, scale);
             RenderHelper.rotateZYX(pose, 180, 0, 0);
 
             // Time-based calculations for loop able motion and rotation
@@ -49,7 +47,7 @@ public class ShellRenderer {
             float yR = ((timeFactor * 360 / (float) (2 * Math.PI)) % 360) * throttle; // Continuous spin on Y-axis
             float zR = (float) Math.cos(timeFactor * 3) * 10.0f; // Wobble on Z-axis
 
-            RenderHelper.rotateZYX(pose, xR, yR, zR);
+            RenderHelper.rotateZYX(pose, xR * control, yR * control, zR * control);
 
             VertexConsumer vertexConsumer = guiGraphics.bufferSource().getBuffer(model.renderType(model.getShellTexture(ShellPatterns.getPatternOrDefault(shellTheme, shellPattern), false)));
             model.renderShell(globalShellBlockEntity, false, false, pose, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
