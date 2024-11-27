@@ -53,7 +53,7 @@ public class VortexRenderer {
         }
     }
 
-    public static float SPEED = 1;
+    private final RenderHelper.DynamicTimeKeep time = new RenderHelper.DynamicTimeKeep(2);
     private final VortexTypes vortexType;
     private final List<VortexQuad> vortex_quads = new ArrayList<>();
     private float opacity = 1;
@@ -84,13 +84,13 @@ public class VortexRenderer {
 
         if (this.vortexType.decals) {
             Tesselator tesselator = beginTextureColor(Mode.QUADS);
-            for (int i = 0; i < 16 / (1 + SPEED); i++) {
+            for (int i = 0; i < 16 / (1 + time.speed); i++) {
                 pose.pushPose();
                 if (vortex_quads.size() < i + 1) {
-                    vortex_quads.add(new VortexQuad(this.vortexType));
+                    vortex_quads.add(new VortexQuad(this.vortexType, this.time));
                     break;
                 }
-                vortex_quads.get(i).renderQuad(pose, i * 0.1f * SPEED * SPEED, this.opacity);
+                vortex_quads.get(i).renderQuad(pose, (float) (i * 0.1f * time.speed * time.speed), this.opacity);
                 pose.popPose();
             }
             tesselator.end();
@@ -116,17 +116,17 @@ public class VortexRenderer {
 
             float xA = radiusA * Mth.cos(angle);
             float zA = radiusA * Mth.sin(angle);
-            xA += xWobble(oA) * Mth.sin(oA);
-            zA += zWobble(oA) * Mth.sin(oA);
+            xA += xWobble(oA, (float) time.speed) * Mth.sin(oA);
+            zA += zWobble(oA, (float) time.speed) * Mth.sin(oA);
 
             float xB = radiusB * Mth.cos(angle);
             float zB = radiusB * Mth.sin(angle);
-            xB += xWobble(oB) * Mth.sin(oB);
-            zB += zWobble(oB) * Mth.sin(oB);
+            xB += xWobble(oB, (float) time.speed) * Mth.sin(oB);
+            zB += zWobble(oB, (float) time.speed) * Mth.sin(oB);
 
             float u = (float) s / this.vortexType.sides * 0.5f;
 
-            float timeOffset = timing(SPEED);
+            float timeOffset = time.getFloat();
             float uvOffset = length * row;
             float vA = length + uvOffset + timeOffset;
             float vB = 0.0f + uvOffset + timeOffset;
@@ -159,7 +159,7 @@ public class VortexRenderer {
     }
 
     private static float timing(float speed) {
-        return timingWithOffset(speed, 0);
+        return timingWithOffset(speed, 0.0f);
     }
 
     private float o(int row) {
@@ -174,14 +174,12 @@ public class VortexRenderer {
         return radiusFunc(o) * (1 + (0.05f) * Mth.sin(Mth.DEG_TO_RAD * 360 * (o + timing(687))) * Mth.sin(Mth.DEG_TO_RAD * 360 * (o + timing(9852))));
     }
 
-    private static float xWobble(float o) {
-        float f = SPEED;//for debug purposes. will increase the speed at which the vortex will "Wobble"
-        return (Mth.sin(o * 1 + timing((int) (0.999 * f)) * 2 * Mth.PI) + Mth.sin(o * 0.5f + timing((int) (1.778 * f)) * 2 * Mth.PI)) * 2 / SPEED;
+    private static float xWobble(float o, float SPEED) {
+        return (Mth.sin(o * 1 + timing((int) (0.999 * SPEED)) * 2 * Mth.PI) + Mth.sin(o * 0.5f + timing((int) (1.778 * SPEED)) * 2 * Mth.PI)) * 2 / SPEED;
     }
 
-    private static float zWobble(float o) {
-        float f = SPEED;//for debug purposes. will increase the speed at which the vortex will "Wobble"
-        return (Mth.cos(o * 1 + timing((int) (1.256 * f)) * 2 * Mth.PI) + Mth.cos(o * 0.5f + timing((int) (1.271 * f)) * 2 * Mth.PI)) * 2 / SPEED;
+    private static float zWobble(float o, float SPEED) {
+        return (Mth.cos(o * 1 + timing((int) (1.256 * SPEED)) * 2 * Mth.PI) + Mth.cos(o * 0.5f + timing((int) (1.271 * SPEED)) * 2 * Mth.PI)) * 2 / SPEED;
     }
 
 
@@ -195,9 +193,11 @@ public class VortexRenderer {
         private final float uvSize = 0.125f;
         float lightning_a;
         private final VortexTypes vortexType;
+        private final RenderHelper.DynamicTimeKeep time;
 
-        public VortexQuad(VortexTypes type) {
+        public VortexQuad(VortexTypes type, RenderHelper.DynamicTimeKeep time) {
             this.vortexType = type;
+            this.time = time;
         }
 
         private void rndQuad() {
@@ -217,7 +217,7 @@ public class VortexRenderer {
 
             if (!valid) rndQuad();
 
-            float tO = 1 - (timingWithOffset(SPEED * 2, time_offset) * 2);
+            float tO = 1 - (time.getFloat(time_offset) * 2);
 
             if (tO > prev_tO || !valid) {
                 valid = false;
@@ -234,7 +234,7 @@ public class VortexRenderer {
             float u0 = 0.5f + u, v0 = v + (lightning ? 0.5f : 0);
             float u1 = u0 + uvSize, v1 = v0 + uvSize;
 
-            float x = xWobble(tO) * Mth.sin(tO), z = zWobble(tO) * Mth.sin(tO);
+            float x = xWobble(tO, (float) time.speed) * Mth.sin(tO), z = zWobble(tO, (float) time.speed) * Mth.sin(tO);
             float s = wobbleRadius(tO);
             float val = lightning ? 1 : radiusFunc(tO);
 

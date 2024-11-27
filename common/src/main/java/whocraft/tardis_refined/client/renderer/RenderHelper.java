@@ -76,4 +76,52 @@ public class RenderHelper {
     public static void vertexUVColor(@NotNull PoseStack pose, float x, float y, float z, float u, float v, float r, float g, float b, float a) {
         tesselator.getBuilder().vertex(pose.last().pose(), x, y, z).uv(u, v).color(r, g, b, a).endVertex();
     }
+
+    public static class DynamicTimeKeep {
+        public double speed = 1f;
+        private long time = Long.MIN_VALUE;
+        private long last_time = System.currentTimeMillis();
+
+        public DynamicTimeKeep() {
+            this.last_time = System.currentTimeMillis();
+        }
+
+        public DynamicTimeKeep(double speed) {
+            this.speed = speed;
+            this.last_time = System.currentTimeMillis();
+        }
+
+        public void update() {
+            long diff = System.currentTimeMillis() - this.last_time;
+            diff *= speed;
+            this.time += diff;
+            this.last_time = System.currentTimeMillis();
+        }
+
+        public float getFloat() {
+            return (this.time % 1000L) / 1000.0f;
+        }
+
+        public double getDouble() {
+            return (this.time % 1000L) / 1000.0;
+        }
+
+        public float getFloat(float offset) {
+            long offsetTime = this.time + (long) (offset * 1000);
+            return (offsetTime % 1000L) / 1000.0f;
+        }
+
+        public double getDouble(double offset) {
+            long offsetTime = this.time + (long) (offset * 1000);
+            return (offsetTime % 1000L) / 1000.0f;
+        }
+
+        public void speedUp(double amount) {
+            this.speed += amount;
+        }
+
+        public void slowDown(double amount) {
+            this.speed -= amount;
+        }
+    }
 }
