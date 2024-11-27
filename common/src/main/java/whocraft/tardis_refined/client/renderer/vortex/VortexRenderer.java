@@ -32,8 +32,15 @@ public class VortexRenderer {
         this.vortexType = type;
     }
 
+    private static final VortexGradientTint CloudsGradient = new VortexGradientTint()
+            .add(1f, 0, 46, 128)
+            .add(0f, 8, 109, 196)
+            .add(-0.5f, 193, 111, 20)
+            .add(-1f, 234, 204, 77);
+
     public enum VortexTypes {
-        CLOUDS(new ResourceLocation(TardisRefined.MODID, "textures/vortex/clouds.png"), 9, 12, 10, true, true, new VortexGradientTint().add(0f, 0, 0.5f, 1).add(-1f, 1, 0.5f, 0).add(0f, 0.5f, 0.75f, 1f));
+
+        CLOUDS(new ResourceLocation(TardisRefined.MODID, "textures/vortex/clouds.png"), 9, 12, 10, true, true, CloudsGradient, false);
 
         public int sides = 9, rows = 12;
         float twist = 10;
@@ -41,8 +48,9 @@ public class VortexRenderer {
         public boolean lightning = false;
         public final ResourceLocation texture;
         public final VortexGradientTint gradient;
+        public boolean movingGradient = false;
 
-        VortexTypes(ResourceLocation texture, int sides, int rows, float twist, boolean lightning, boolean decals, VortexGradientTint gradient) {
+        VortexTypes(ResourceLocation texture, int sides, int rows, float twist, boolean lightning, boolean decals, VortexGradientTint gradient, boolean movingGradient) {
             this.texture = texture;
             this.lightning = lightning;
             this.sides = sides;
@@ -50,6 +58,7 @@ public class VortexRenderer {
             this.twist = twist;
             this.decals = decals || lightning;
             this.gradient = gradient;
+            this.movingGradient = movingGradient;
         }
     }
 
@@ -64,7 +73,7 @@ public class VortexRenderer {
     public void renderVortex(PoseStack pose, float opacity) {
         this.opacity = Math.min(opacity, 1);
         this.vortexType.rows = 12;
-        this.vortexType.gradient.offset = 0;
+        if (vortexType.movingGradient) this.vortexType.gradient.offset = time.getFloat();
         this.time.update();
         this.time.speed = 0.5f;
         pose.pushPose();
@@ -283,6 +292,10 @@ public class VortexRenderer {
         public VortexGradientTint add(float pos, float r, float g, float b) {
             this.gradient_map.put(pos, new float[]{r, g, b});
             return this;
+        }
+
+        public VortexGradientTint add(float pos, int r, int g, int b) {
+            return add(pos, r / 255.0f, g / 255.0f, b / 255.0f);
         }
 
         public float[] getRGBf(float pos_original) {
