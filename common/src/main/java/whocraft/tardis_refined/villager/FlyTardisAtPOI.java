@@ -54,7 +54,7 @@ public class FlyTardisAtPOI extends WorkAtPoi {
                 if (pilotManager.canEndFlight() && pilotManager.isInFlight() && !pilotManager.isLanding()) {
                     pilotManager.setThrottleStage(0);
                     pilotManager.setHandbrakeOn(true);
-                    pilotManager.endFlight(true);
+                    pilotManager.endFlight(true, false);
                 }
 
                 // Ensure the villager is within a reasonable radius

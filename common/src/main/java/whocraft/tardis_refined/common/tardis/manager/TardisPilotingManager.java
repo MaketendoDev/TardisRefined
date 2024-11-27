@@ -262,7 +262,7 @@ public class TardisPilotingManager extends TickableHandler {
 
             // Automatically trigger the ship to land for things such as landing pads.
             if (distanceCovered >= flightDistance && autoLand && !this.isLanding()) {
-                this.endFlight(false);
+                this.endFlight(false, false);
             }
         }
 
@@ -307,7 +307,7 @@ public class TardisPilotingManager extends TickableHandler {
         }
 
         if (isInFlight && this.canEndFlight() && !this.isLanding() && !this.isTakingOff() && (this.isHandbrakeOn || this.throttleStage == 0)) {
-            this.endFlight(false);
+            this.endFlight(false, false);
         }
     }
 
@@ -589,9 +589,6 @@ public class TardisPilotingManager extends TickableHandler {
             }
 
 
-            TardisPlayerInfo.updateTardisForAllPlayers(operator, currentLocation, false);
-
-
             operator.setDoorClosed(true);
             operator.getLevel().playSound(null, operator.getInternalDoor().getDoorPosition(), TRSoundRegistry.TARDIS_TAKEOFF.get(), SoundSource.AMBIENT, 10f, 1f);
             operator.getExteriorManager().playSoundAtShell(TRSoundRegistry.TARDIS_TAKEOFF.get(), SoundSource.BLOCKS, 1, 1);
@@ -662,7 +659,7 @@ public class TardisPilotingManager extends TickableHandler {
      * @param forceFlightEnd Ignores the required flight time conditions for the TARDIS to land and lands.
      * @return false if didn't end flight, true if flight was ended
      */
-    public boolean endFlight(boolean forceFlightEnd) {
+    public boolean endFlight(boolean forceFlightEnd, boolean isCrashing) {
         if (forceFlightEnd || this.canEndFlight()) {
             this.ticksInFlight = 0;
 
@@ -675,19 +672,19 @@ public class TardisPilotingManager extends TickableHandler {
             TardisNavLocation landingLocation = this.targetLocation;
             TardisNavLocation location = findClosestValidPosition(landingLocation);
 
-            currentLocation = location;
+            setTargetLocation(location);
+            setCurrentLocation(location);
+            // Added so it updates for everything else
 
             exteriorManager.startLanding(operator, location);
 
-            TardisPlayerInfo.updateTardisForAllPlayers(operator, location, false);
 
-
-            exteriorManager.playSoundAtShell(TRSoundRegistry.TARDIS_LAND.get(), SoundSource.BLOCKS, 1, 1);
+            exteriorManager.playSoundAtShell(isCrashing ? TRSoundRegistry.TARDIS_CRASH_LAND.get() : TRSoundRegistry.TARDIS_LAND.get(), SoundSource.BLOCKS, 1, 1);
 
             if (currentConsole != null) {
-                level.playSound(null, currentConsole.getBlockPos(), TRSoundRegistry.TARDIS_LAND.get(), SoundSource.AMBIENT, 10f, 1f);
+                level.playSound(null, currentConsole.getBlockPos(), isCrashing ? TRSoundRegistry.TARDIS_CRASH_LAND.get() : TRSoundRegistry.TARDIS_LAND.get(), SoundSource.AMBIENT, 10f, 1f);
             } else {
-                level.playSound(null, TardisArchitectureHandler.DESKTOP_CENTER_POS, TRSoundRegistry.TARDIS_LAND.get(), SoundSource.AMBIENT, 10f, 1f);
+                level.playSound(null, TardisArchitectureHandler.DESKTOP_CENTER_POS, isCrashing ? TRSoundRegistry.TARDIS_CRASH_LAND.get() : TRSoundRegistry.TARDIS_LAND.get(), SoundSource.AMBIENT, 10f, 1f);
             }
 
             int totalPoints = (int) (distanceCovered * 0.05f);
@@ -733,24 +730,22 @@ public class TardisPilotingManager extends TickableHandler {
             }
         }
 
-        this.endFlight(true);
+        this.endFlight(true, false);
     }
 
     /**
      * Start to remove the Tardis Shell block and set up fast return location data. This means we are no longer taking off.
      */
     public void enterTimeVortex() {
+        TardisNavLocation lastKnown = this.getCurrentLocation();
         operator.getExteriorManager().removeExteriorBlock();
         this.ticksTakingOff = 0;
         this.operator.getExteriorManager().setIsTakingOff(false);
-        TardisNavLocation lastKnown = this.getCurrentLocation();
         TardisCommonEvents.TAKE_OFF.invoker().onTakeOff(operator, lastKnown.getLevel(), lastKnown.getPosition());
 
         if (this.currentConsole != null) {
             operator.getFlightDanceManager().startFlightDance(this.currentConsole);
         }
-
-        TardisPlayerInfo.updateTardisForAllPlayers(operator, lastKnown, true);
 
 
         this.operator.tardisClientData().sync();
@@ -804,12 +799,13 @@ public class TardisPilotingManager extends TickableHandler {
         int z = (int) (currentPos.z + ((targetPos.z - currentPos.z) * progress));
 
         BlockPos landingLocation = new BlockPos(x, y, z);
-
         this.setTargetPosition(landingLocation);
-        TardisNavLocation landing = this.targetLocation;
-        TardisNavLocation location = findClosestValidPosition(landing);
-
-        tardisExteriorManager.startLanding(operator, location);
+        TardisNavLocation weWantToGoHere = this.targetLocation;
+        setTargetLocation(this.targetLocation);
+        TardisNavLocation safeLocation = findClosestValidPosition(weWantToGoHere);
+        setTargetLocation(safeLocation);
+        setCurrentLocation(safeLocation);
+        endFlight(true, true);
 
         tardisExteriorManager.playSoundAtShell(TRSoundRegistry.TARDIS_CRASH_LAND.get(), SoundSource.BLOCKS, 1, 1);
         tarisLevel.playSound(null, TardisArchitectureHandler.DESKTOP_CENTER_POS, TRSoundRegistry.TARDIS_CRASH_LAND.get(), SoundSource.BLOCKS, 10f, 1f);

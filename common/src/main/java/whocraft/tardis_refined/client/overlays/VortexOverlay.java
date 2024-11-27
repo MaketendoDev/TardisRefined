@@ -7,7 +7,6 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import whocraft.tardis_refined.client.TardisClientData;
@@ -78,8 +77,8 @@ public class VortexOverlay {
         TardisPlayerInfo.get(Minecraft.getInstance().player).ifPresent(tardisPlayerInfo -> {
             /*Activation Logic*/
             TardisClientData tardisClientData = TardisClientData.getInstance(tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey());
-            //if(!tardisPlayerInfo.isViewingTardis()) return;
-            //if(!tardisPlayerInfo.isRenderVortex()) return;
+            if (!tardisPlayerInfo.isViewingTardis()) return;
+            if (!tardisPlayerInfo.isRenderVortex()) return;
 
             VortexOverlay.update(gg);
 
@@ -94,12 +93,15 @@ public class VortexOverlay {
              */
 
 
-            long long_speed = (long) (6f * 1000L);
+           /* long long_speed = (long) (6f * 1000L);
             long time = System.currentTimeMillis() + (long) (1000L * 0);
             float zzz = (time % long_speed) / (6f * 1000.0f);
 
 
-            float control = 1 + Mth.sin(zzz * Mth.DEG_TO_RAD * 360);
+            float control = 1 + Mth.sin(zzz * Mth.DEG_TO_RAD * 360);*/
+
+            float control = 2;
+
 
             Camera camera = mc.gameRenderer.getMainCamera();
             Vec3 camPos = camera.getPosition().subtract(mc.player.position()).subtract(0, 1.62, 0);
