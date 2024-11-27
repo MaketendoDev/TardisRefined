@@ -65,32 +65,33 @@ public class VortexOverlay {
     public static void renderOverlay(GuiGraphics gg) {
 
         TardisPlayerInfo.get(Minecraft.getInstance().player).ifPresent(tardisPlayerInfo -> {
+            /*Activation Logic*/
             TardisClientData tardisClientData = TardisClientData.getInstance(tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey());
-            //if(!tardisPlayerInfo.isViewingTardis()) return;
-            //if(!tardisPlayerInfo.isRenderVortex()) return;
+            if(!tardisPlayerInfo.isViewingTardis()) return;
+            if(!tardisPlayerInfo.isRenderVortex()) return;
 
             Minecraft mc = Minecraft.getInstance();
             PoseStack pose = gg.pose();
             float width = gg.guiWidth();
             float height = gg.guiHeight();
-            RenderSystem.backupProjectionMatrix();
 
+            /*Perspective Rendering*/
+            RenderSystem.backupProjectionMatrix();
 
             Matrix4f perspective = new Matrix4f();
             perspective.perspectiveOrigin(new Vector3f());
             perspective.perspective((float) Math.toRadians(70), width / height, 0.01f, 9999);
             RenderSystem.setProjectionMatrix(perspective, VertexSorting.DISTANCE_TO_ORIGIN);
 
-
-
-
+            //Vortex
             pose.pushPose();
             pose.translate(0, 0, 11000);
             pose.scale(10,10,10);
-            pose.mulPose(Axis.XP.rotationDegrees(180F));
+            pose.mulPose(Axis.XP.rotationDegrees(00F));
             VORTEX.renderVortex(gg);
             pose.popPose();
 
+            //Box
             pose.pushPose();
             VortexOverlay.update();
             pose.translate(0, 0, 10990);
@@ -98,6 +99,7 @@ public class VortexOverlay {
             renderShell(gg, 0, 0, 1, tardisClientData.getThrottleStage());
             pose.popPose();
 
+            //Restore Ortho view
             RenderSystem.restoreProjectionMatrix();
 
         });

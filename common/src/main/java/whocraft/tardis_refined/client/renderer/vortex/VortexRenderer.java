@@ -95,7 +95,7 @@ public class VortexRenderer {
 
         pose.pushPose();
 
-        rotate(pose, 90.0f, 0, 0.0f);
+        rotate(pose, 90.0f, 180, 0.0f);
 
         pose.scale(1, this.vortexType.rows, 1);
         rotate(pose, 0, 360 * timing(5000), 0);
