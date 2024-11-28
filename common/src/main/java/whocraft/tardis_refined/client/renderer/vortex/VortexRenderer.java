@@ -72,7 +72,7 @@ public class VortexRenderer {
     }
 
     public final RenderHelper.DynamicTimeKeep time = new RenderHelper.DynamicTimeKeep(2);
-    public final VortexTypes vortexType;
+    public VortexTypes vortexType;
     private final List<VortexQuad> vortex_quads = new ArrayList<>();
     public float opacity = 1;
     public float lightning_strike = 0;
@@ -82,6 +82,7 @@ public class VortexRenderer {
      */
     public void renderVortex(PoseStack pose, float opacity) {
         this.opacity = Math.min(opacity, 1);
+
         if (vortexType.movingGradient) this.vortexType.gradient.offset = time.getFloat() * 2;
         this.time.speed = 0.5f;
         this.time.update();

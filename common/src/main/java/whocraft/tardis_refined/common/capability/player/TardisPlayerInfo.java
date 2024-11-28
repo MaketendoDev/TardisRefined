@@ -51,6 +51,7 @@ public class TardisPlayerInfo implements TardisPilot {
         if(isWatcher) {
             abilities.mayfly = false;
             abilities.instabuild = false;
+            abilities.mayBuild = false;
             abilities.invulnerable = true;
             abilities.flying = true;
             player.setNoGravity(true);
