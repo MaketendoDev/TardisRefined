@@ -52,7 +52,7 @@ public class ShellRenderer {
             RenderHelper.rotateZYX(pose, xR * control, yR * control, zR * control);
             pose.translate(0, 1.5, 0);
             VertexConsumer vertexConsumer = guiGraphics.bufferSource().getBuffer(model.renderType(model.getShellTexture(ShellPatterns.getPatternOrDefault(shellTheme, shellPattern), false)));
-
+            RenderSystem.enableBlend();
             globalShellBlockEntity.setTardisId(tardisClientData.getLevelKey());
             model.renderShell(globalShellBlockEntity, false, false, pose, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, alpha);
             if (fullPattern.exteriorDoorTexture().emissive()) {

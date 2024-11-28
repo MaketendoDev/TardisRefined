@@ -23,7 +23,7 @@ import static whocraft.tardis_refined.client.screen.selections.ShellSelectionScr
 
 public class VortexOverlay {
 
-    private static final VortexRenderer VORTEX = new VortexRenderer(VortexRenderer.VortexTypes.CLOUDS);
+    private static final VortexRenderer VORTEX = new VortexRenderer(VortexRenderer.VortexTypes.STARS);
 
     private static double tardisX = 0.0D;
     private static double tardisY = 0.0D;
@@ -38,13 +38,12 @@ public class VortexOverlay {
             return;
         }
 
-        double speed = 0.1D;
+        double speed = 0.01D;
         Minecraft mc = Minecraft.getInstance();
         float width = gg.guiWidth();
         float height = gg.guiHeight();
 
-        double radius = 0.01;
-        radius *= 0.5;
+        double radius = 5;
 
         float yRot = Objects.requireNonNull(mc.getCameraEntity()).getYRot();
 
@@ -70,17 +69,27 @@ public class VortexOverlay {
         if (IMMERSION > 1) IMMERSION = 1;
         if (IMMERSION < 0) IMMERSION = 0;
 
+
+        if (tardisX * tardisX + tardisY * tardisY > 1) {
+            try {
+                double f = Math.sqrt(tardisY * tardisY + tardisX * tardisX);
+                tardisX /= f;
+                tardisY /= f;
+            } finally {
+
+            }
+        }
+        if (velX > 1) velX = 1;
+        if (velX < -1) velX = -1;
+        if (velY > 1) velY = 1;
+        if (velY < -1) velY = -1;
+
         tardisX += velX;
         tardisY += velY;
         velX *= 0.9;
         velY *= 0.9;
-
-        if (tardisX * tardisX + tardisY * tardisY > radius * radius) {
-            tardisX *= 0.8;
-            tardisY *= 0.8;
-        }
-        tardisX *= 0.999;
-        tardisY *= 0.999;
+        tardisX *= 0.99;
+        tardisY *= 0.99;
     }
 
 
@@ -167,14 +176,17 @@ public class VortexOverlay {
             VORTEX.renderVortex(gg, 1 - demat_transparency);
             pose.popPose();
 
-
             //Box
-            pose.translate(tardisX * mul, tardisY * mul, -5 * mul);
+            pose.translate(4 * tardisX * mul, 4 * tardisY * mul, -5 * mul);
             pose.translate(0, 1.5, 0);
+            pose.mulPose(Axis.ZP.rotationDegrees((float) (mul * -450 * velX)));
             pose.mulPose(Axis.ZP.rotationDegrees(mul * VORTEX.lightning_strike * 90 * Mth.sin(VORTEX.lightning_strike)));
-            velX -= 0.001 * VORTEX.lightning_strike * 90 * Mth.sin(VORTEX.lightning_strike);
+            if (VORTEX.lightning_strike > 0.4)
+                velX -= (Math.random() > 0.5 ? 0.001 : -0.001) * VORTEX.lightning_strike * 90 * Mth.sin(VORTEX.lightning_strike);
+            if (VORTEX.lightning_strike > 0.4)
+                velY -= (Math.random() > 0.5 ? 0.001 : -0.001) * VORTEX.lightning_strike * 90 * Mth.sin(VORTEX.lightning_strike);
             pose.translate(0, -1.5, 0);
-            renderShell(gg, IMMERSION, 1 - demat_transparency, tardisClientData.getThrottleStage());
+            if (DEMAT > 0) renderShell(gg, IMMERSION, 1 - demat_transparency, tardisClientData.getThrottleStage());
 
             pose.popPose();
 

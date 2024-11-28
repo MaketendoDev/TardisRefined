@@ -8,7 +8,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -33,16 +32,24 @@ public class VortexRenderer {
         this.vortexType = type;
     }
 
-    private static final VortexGradientTint CloudsGradient = new VortexGradientTint()
+    private static final VortexGradientTint BlueOrngGradient = new VortexGradientTint()
             .add(1f, 0, 46, 128)
             .add(0f, 8, 109, 196)
             .add(-0.5f, 193, 111, 20)
             .add(-1f, 234, 204, 77);
 
+    private static final VortexGradientTint PastelGradient = new VortexGradientTint()
+            .add(1f, 223, 190, 223)
+            .add(0.5f, 243, 209, 215)
+            .add(0f, 247, 223, 209)
+            .add(-0.5f, 228, 190, 207)
+            .add(-1f, 223, 190, 223);
+
     public enum VortexTypes {
 
-        CLOUDS(new ResourceLocation(TardisRefined.MODID, "textures/vortex/clouds.png"), 9, 12, 10, true, true, CloudsGradient, false),
-        WAVES(new ResourceLocation(TardisRefined.MODID, "textures/vortex/waves.png"), 9, 12, 10, true, true, CloudsGradient, false);
+        CLOUDS(new ResourceLocation(TardisRefined.MODID, "textures/vortex/clouds.png"), 9, 12, 10, true, true, BlueOrngGradient, false),
+        WAVES(new ResourceLocation(TardisRefined.MODID, "textures/vortex/waves.png"), 9, 12, 20, true, true, BlueOrngGradient, false),
+        STARS(new ResourceLocation(TardisRefined.MODID, "textures/vortex/stars.png"), 9, 12, 5, true, true, PastelGradient, true);
 
         public int sides = 9, rows = 12;
         float twist = 10;
@@ -75,10 +82,9 @@ public class VortexRenderer {
      */
     public void renderVortex(PoseStack pose, float opacity) {
         this.opacity = Math.min(opacity, 1);
-        this.vortexType.rows = 12;
         if (vortexType.movingGradient) this.vortexType.gradient.offset = time.getFloat() * 2;
-        this.time.update();
         this.time.speed = 0.5f;
+        this.time.update();
         pose.pushPose();
 
         RenderHelper.rotateZYX(pose, 90.0f, 180, 0.0f);
