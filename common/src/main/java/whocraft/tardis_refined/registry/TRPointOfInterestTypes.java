@@ -13,6 +13,8 @@ import whocraft.tardis_refined.TardisRefined;
 
 public class TRPointOfInterestTypes {
 
+    private static boolean hasBeenRegistered = false;
+
     public static void init(){};
 
     public static final ResourceKey<PoiType> CONSOLE_UNIT = ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, new ResourceLocation(TardisRefined.MODID, "console_unit"));
@@ -38,10 +40,13 @@ public class TRPointOfInterestTypes {
     }
 
 
-    // Call this at Server starting
-    public static void registerBlockStates(){
-        PoiTypes.registerBlockStates(BuiltInRegistries.POINT_OF_INTEREST_TYPE.getHolderOrThrow(CONSOLE_UNIT), CONSOLE_UNIT_POI.get().matchingStates());
-        PoiTypes.registerBlockStates(BuiltInRegistries.POINT_OF_INTEREST_TYPE.getHolderOrThrow(ASTRAL_MAP), ASTRAL_MAP_POI.get().matchingStates());
+    // Call this at Server starting - ONLY ON FABRIC!!
+    public static void registerBlockStates() {
+        if (!hasBeenRegistered) {
+            PoiTypes.registerBlockStates(BuiltInRegistries.POINT_OF_INTEREST_TYPE.getHolderOrThrow(CONSOLE_UNIT), CONSOLE_UNIT_POI.get().matchingStates());
+            PoiTypes.registerBlockStates(BuiltInRegistries.POINT_OF_INTEREST_TYPE.getHolderOrThrow(ASTRAL_MAP), ASTRAL_MAP_POI.get().matchingStates());
+            hasBeenRegistered = true;
+        }
     }
 
 }

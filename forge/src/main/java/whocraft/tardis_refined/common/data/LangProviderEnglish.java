@@ -12,7 +12,6 @@ import whocraft.tardis_refined.TardisRefined;
 import whocraft.tardis_refined.common.capability.tardis.upgrades.Upgrade;
 import whocraft.tardis_refined.common.hum.HumEntry;
 import whocraft.tardis_refined.common.hum.TardisHums;
-import whocraft.tardis_refined.compat.create.ModCompatMessages;
 import whocraft.tardis_refined.registry.TRUpgrades;
 import whocraft.tardis_refined.common.tardis.control.Control;
 import whocraft.tardis_refined.common.tardis.themes.ShellTheme;
@@ -226,7 +225,7 @@ public class LangProviderEnglish extends LanguageProvider {
         add(ModMessages.UI_EJECT_CANNOT_IN_FLIGHT, "Cannot eject whilst in flight");
 
         /*Create GUI Compatibility*/
-        add(ModMessages.DOOR_STATUS, "Door: %s");
+       /* add(ModMessages.DOOR_STATUS, "Door: %s");
         add(ModMessages.LOCK_STATUS, "Locked: %s");
         add(ModMessages.POSITION, "Position: %s");
         add(ModMessages.DIRECTION, "Direction: %s");
@@ -236,7 +235,7 @@ public class LangProviderEnglish extends LanguageProvider {
         add(ModCompatMessages.createDisplaySource("destination"), "GPS Destination");
         add(ModCompatMessages.createDisplaySource("tardis_bigdata"), "Tardis Summary");
         add(ModCompatMessages.createDisplaySource("door"), "Door Status");
-        add(ModCompatMessages.createDisplaySource("locked"), "Lock Status");
+        add(ModCompatMessages.createDisplaySource("locked"), "Lock Status");*/
 
         /*Shell Themes*/
         addShell(ShellTheme.FACTORY.getId(), "Factory");

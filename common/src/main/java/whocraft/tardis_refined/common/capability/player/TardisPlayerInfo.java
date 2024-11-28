@@ -76,8 +76,9 @@ public class TardisPlayerInfo implements TardisPilot {
         if (spectateTarget != null) {
 
             TardisNavLocation sourceLocation = tardisLevelOperator.getPilotingManager().getCurrentLocation();
-
-            TardisHelper.teleportEntityTardis(tardisLevelOperator, player, sourceLocation, spectateTarget, false);
+            if(!spectateTarget.getPosition().equals(sourceLocation.getPosition()) || player.level().dimension() != spectateTarget.getDimensionKey()) {
+                TardisHelper.teleportEntityTardis(tardisLevelOperator, player, sourceLocation, spectateTarget, false);
+            }
             updatePlayerAbilities(serverPlayer, serverPlayer.getAbilities(), true);
             setRenderVortex(timeVortex);
             serverPlayer.onUpdateAbilities();
@@ -214,7 +215,10 @@ public class TardisPlayerInfo implements TardisPilot {
     public void tick(TardisLevelOperator tardisLevelOperator, ServerPlayer serverPlayerEntity) {
         TardisPilotingManager pilotManger = tardisLevelOperator.getPilotingManager();
         if(tardisLevelOperator.getLevelKey() == getPlayerPreviousPos().getDimensionKey()) {
-            setRenderVortex(pilotManger.isLanding() ||  pilotManger.isTakingOff() || pilotManger.isInFlight());
+            boolean showVortex = pilotManger.isLanding() ||  pilotManger.isTakingOff() || pilotManger.isInFlight();
+            TardisNavLocation tardisTeleportLocation = pilotManger.isTakingOff() ? pilotManger.getCurrentLocation() : pilotManger.getTargetLocation();
+            //updateTardisForAllPlayers(tardisLevelOperator, tardisTeleportLocation, showVortex);
+            setRenderVortex(showVortex);
         }
     }
 }
