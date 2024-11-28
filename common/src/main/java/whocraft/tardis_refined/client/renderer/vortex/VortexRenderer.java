@@ -40,7 +40,8 @@ public class VortexRenderer {
 
     public enum VortexTypes {
 
-        CLOUDS(new ResourceLocation(TardisRefined.MODID, "textures/vortex/clouds.png"), 9, 12, 10, true, true, CloudsGradient, false);
+        CLOUDS(new ResourceLocation(TardisRefined.MODID, "textures/vortex/clouds.png"), 9, 12, 10, true, true, CloudsGradient, false),
+        WAVES(new ResourceLocation(TardisRefined.MODID, "textures/vortex/waves.png"), 9, 12, 10, true, true, CloudsGradient, false);
 
         public int sides = 9, rows = 12;
         float twist = 10;

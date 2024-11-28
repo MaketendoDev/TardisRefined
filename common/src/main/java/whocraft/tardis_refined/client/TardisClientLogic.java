@@ -79,6 +79,7 @@ public class TardisClientLogic {
 
         TardisPlayerInfo.get(player).ifPresent(tardisPlayerInfo -> {
             if (tardisPlayerInfo.isRenderVortex() && !soundManager.isActive(VORTEX_WINDS)) {
+                TRSoundInstances.VORTEX_WINDS.restartSoundPlaying();
                 soundManager.play(TRSoundInstances.VORTEX_WINDS.setPlayer(player));
             }
         });
