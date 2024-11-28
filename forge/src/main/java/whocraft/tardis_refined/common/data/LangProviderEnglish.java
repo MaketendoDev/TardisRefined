@@ -127,6 +127,7 @@ public class LangProviderEnglish extends LanguageProvider {
         addControl(TRControlRegistry.GENERIC_NO_SHOW.get(), "Switch");
         addControl(TRControlRegistry.FUEL.get(), "Fuel");
         addControl(TRControlRegistry.READOUT.get(), "GPS");
+        addControl(TRControlRegistry.EXTERIOR_DISPLAY.get(), "Exterior Display");
 
         /*Messages*/
         add(ModMessages.MSG_EXTERIOR_COOLDOWN, "You must wait %s seconds");

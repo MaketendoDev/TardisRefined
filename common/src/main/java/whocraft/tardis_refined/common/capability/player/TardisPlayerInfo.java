@@ -4,6 +4,7 @@ import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -76,7 +77,8 @@ public class TardisPlayerInfo implements TardisPilot {
         if (spectateTarget != null) {
 
             TardisNavLocation sourceLocation = tardisLevelOperator.getPilotingManager().getCurrentLocation();
-            if(!spectateTarget.getPosition().equals(sourceLocation.getPosition()) || player.level().dimension() != spectateTarget.getDimensionKey()) {
+
+            if(spectateTarget.getPosition().distManhattan(new Vec3i((int) player.position().x, (int) player.position().y, (int) player.position().z)) > 3 || !player.level().dimension().location().toString().equals(spectateTarget.getDimensionKey().location().toString())) {
                 TardisHelper.teleportEntityTardis(tardisLevelOperator, player, sourceLocation, spectateTarget, false);
             }
             updatePlayerAbilities(serverPlayer, serverPlayer.getAbilities(), true);
@@ -127,6 +129,7 @@ public class TardisPlayerInfo implements TardisPilot {
         serverPlayer.onUpdateAbilities();
 
         serverPlayer.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3(console.getPosition().getX(), console.getPosition().getY(), console.getPosition().getZ()));
+        setPlayerPreviousPos(TardisNavLocation.ORIGIN);
         setRenderVortex(false);
         // Clear the viewed TARDIS UUID
         setViewedTardis(null);
@@ -216,8 +219,17 @@ public class TardisPlayerInfo implements TardisPilot {
         TardisPilotingManager pilotManger = tardisLevelOperator.getPilotingManager();
         if(tardisLevelOperator.getLevelKey() == getPlayerPreviousPos().getDimensionKey()) {
             boolean showVortex = pilotManger.isLanding() ||  pilotManger.isTakingOff() || pilotManger.isInFlight();
-            TardisNavLocation tardisTeleportLocation = pilotManger.isTakingOff() ? pilotManger.getCurrentLocation() : pilotManger.getTargetLocation();
-            //updateTardisForAllPlayers(tardisLevelOperator, tardisTeleportLocation, showVortex);
+
+            TardisNavLocation movePlayerToLocation = pilotManger.getCurrentLocation();
+
+            if(pilotManger.isInFlight()) {
+                if (pilotManger.isLanding()) {
+                    movePlayerToLocation = pilotManger.getTargetLocation();
+                } else if (pilotManger.isTakingOff()) {
+                    movePlayerToLocation = pilotManger.getCurrentLocation();
+                }
+            }
+            updateTardisForAllPlayers(tardisLevelOperator, movePlayerToLocation, showVortex);
             setRenderVortex(showVortex);
         }
     }
