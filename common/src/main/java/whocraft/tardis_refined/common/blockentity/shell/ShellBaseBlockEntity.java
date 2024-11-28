@@ -105,12 +105,13 @@ public abstract class ShellBaseBlockEntity extends BlockEntity implements Exteri
                 TardisRefined.LOGGER.error("Error in onAttemptEnter: null Tardis ID (Invalid block or not terraformed yet?) [" + externalShellPos.toShortString() + "]");
                 return;
             }
+
             ServerLevel interior = DimensionHandler.getOrCreateInterior(serverLevel, this.TARDIS_ID.location());
             TardisLevelOperator.get(interior).ifPresent(cap -> {
 
                 UpgradeHandler upgradeHandler = cap.getUpgradeHandler();
 
-                if (cap.isTardisReady() && (blockState.getValue(ShellBaseBlock.OPEN) || (cap.getPilotingManager().endFlight(false, false) && TRUpgrades.MATERIALIZE_AROUND.get().isUnlocked(upgradeHandler)))) {
+                if (cap.isTardisReady() && (blockState.getValue(ShellBaseBlock.OPEN) || (cap.getPilotingManager().isLanding() && TRUpgrades.MATERIALIZE_AROUND.get().isUnlocked(upgradeHandler)))) {
                     if (cap.getAestheticHandler().getShellTheme() != null) {
                         ResourceLocation theme = cap.getAestheticHandler().getShellTheme();
 

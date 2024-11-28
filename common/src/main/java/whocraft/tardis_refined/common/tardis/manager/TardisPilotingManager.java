@@ -672,9 +672,9 @@ public class TardisPilotingManager extends TickableHandler {
             TardisNavLocation landingLocation = this.targetLocation;
             TardisNavLocation location = findClosestValidPosition(landingLocation);
 
+            // Added so it updates for everything else
             setTargetLocation(location);
             setCurrentLocation(location);
-            // Added so it updates for everything else
 
             exteriorManager.startLanding(operator, location);
 
@@ -801,10 +801,10 @@ public class TardisPilotingManager extends TickableHandler {
         BlockPos landingLocation = new BlockPos(x, y, z);
         this.setTargetPosition(landingLocation);
         TardisNavLocation weWantToGoHere = this.targetLocation;
-        setTargetLocation(this.targetLocation);
         TardisNavLocation safeLocation = findClosestValidPosition(weWantToGoHere);
         setTargetLocation(safeLocation);
         setCurrentLocation(safeLocation);
+
         endFlight(true, true);
 
         tardisExteriorManager.playSoundAtShell(TRSoundRegistry.TARDIS_CRASH_LAND.get(), SoundSource.BLOCKS, 1, 1);
