@@ -102,7 +102,7 @@ public class VortexOverlay {
              */
 
             boolean takeoff = tardisClientData.isTakingOff() || tardisClientData.isFlying();
-            boolean land = tardisClientData.isLanding();
+            boolean land = tardisClientData.isLanding() || !tardisClientData.isFlying();
 
             //DEV TESTING
             //takeoff = mc.options.keyShift.isDown();
@@ -141,7 +141,7 @@ public class VortexOverlay {
             float yR = ((timeFactor * 360 / (float) (2 * Math.PI)) % 360) * tardisClientData.getThrottleStage();
 
             if (DEMAT > 0 && IMMERSION < 0.5 && tardisClientData.getThrottleStage() > 0)
-                mc.getCameraEntity().setYRot(mc.getCameraEntity().getYRot() - 1.5f*tardisClientData.getThrottleStage());
+                mc.getCameraEntity().setYRot(mc.getCameraEntity().getYRot() - 1.5f * tardisClientData.getThrottleStage());
 
             float mul = IMMERSION;
             float mulinv = 1 - IMMERSION;
