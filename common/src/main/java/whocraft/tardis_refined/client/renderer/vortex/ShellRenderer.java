@@ -48,8 +48,9 @@ public class ShellRenderer {
             float yR = ((timeFactor * 360 / (float) (2 * Math.PI)) % 360) * throttle; // Continuous spin on Y-axis
             float zR = (float) Math.cos(timeFactor * 3) * 10.0f; // Wobble on Z-axis
 
+            pose.translate(0, -1.5, 0);
             RenderHelper.rotateZYX(pose, xR * control, yR * control, zR * control);
-
+            pose.translate(0, 1.5, 0);
             VertexConsumer vertexConsumer = guiGraphics.bufferSource().getBuffer(model.renderType(model.getShellTexture(ShellPatterns.getPatternOrDefault(shellTheme, shellPattern), false)));
 
             globalShellBlockEntity.setTardisId(tardisClientData.getLevelKey());

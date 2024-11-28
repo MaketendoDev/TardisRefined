@@ -1,5 +1,6 @@
 package whocraft.tardis_refined.client.overlays;
 
+import com.mojang.blaze3d.platform.IconSet;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexSorting;
@@ -69,7 +70,6 @@ public class VortexOverlay {
         if (IMMERSION > 1) IMMERSION = 1;
         if (IMMERSION < 0) IMMERSION = 0;
 
-
         tardisX += velX;
         tardisY += velY;
         velX *= 0.9;
@@ -91,24 +91,35 @@ public class VortexOverlay {
         TardisPlayerInfo.get(Minecraft.getInstance().player).ifPresent(tardisPlayerInfo -> {
             /*Activation Logic*/
             TardisClientData tardisClientData = TardisClientData.getInstance(tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey());
-            if (!tardisPlayerInfo.isViewingTardis()) return;
-            if (!tardisPlayerInfo.isRenderVortex()) return;
-
-            /*
-                Needs tweaking, but am not quite sure how to fix.
-             */
-
-            if (tardisClientData.isTakingOff() || tardisClientData.isFlying())
-                DEMAT += (System.currentTimeMillis() - LAST_TIME) / 12000.0f;
-            if (tardisClientData.isLanding() && !tardisClientData.isFlying())
-                DEMAT -= (System.currentTimeMillis() - LAST_TIME) / 12000.0f;
-            VortexOverlay.update(gg);
-            LAST_TIME = System.currentTimeMillis();
 
             Minecraft mc = Minecraft.getInstance();
             PoseStack pose = gg.pose();
             float width = gg.guiWidth();
             float height = gg.guiHeight();
+
+            /*
+                Needs tweaking, but am not quite sure how to fix.
+             */
+
+            boolean takeoff = tardisClientData.isTakingOff() || tardisClientData.isFlying();
+            boolean land = tardisClientData.isLanding();
+
+            //DEV TESTING
+            //takeoff = mc.options.keyShift.isDown();
+            //land = !takeoff;
+
+            if (takeoff) {
+                DEMAT += (System.currentTimeMillis() - LAST_TIME) / 12000.0f;
+            }
+            if (land) {
+                DEMAT -= (System.currentTimeMillis() - LAST_TIME) / 12000.0f;
+            }
+
+            if (!tardisPlayerInfo.isViewingTardis()) return;
+            if (!tardisPlayerInfo.isRenderVortex()) return;
+
+            VortexOverlay.update(gg);
+
 
             float demat_transparency = Mth.cos(DEMAT * (Mth.PI) / (2f)) * (Mth.cos(16f * Mth.PI * DEMAT) * 0.5f + 0.5f) * (-DEMAT * 0.5f + 0.5f) - DEMAT * 0.5f + 0.5f;
 
@@ -125,8 +136,16 @@ public class VortexOverlay {
 
             pose.pushPose();
 
+            long time = System.currentTimeMillis();
+            float timeFactor = (time % 4000L) / 4000.0f * (float) (2 * Math.PI);
+            float yR = ((timeFactor * 360 / (float) (2 * Math.PI)) % 360) * tardisClientData.getThrottleStage();
+
+            if (DEMAT > 0 && IMMERSION < 0.5 && tardisClientData.getThrottleStage() > 0)
+                mc.getCameraEntity().setYRot(mc.getCameraEntity().getYRot() - 1.5f*tardisClientData.getThrottleStage());
+
             float mul = IMMERSION;
             float mulinv = 1 - IMMERSION;
+
 
             float xRot = -mc.getCameraEntity().getXRot() * mulinv;
             float yRot = mc.getCameraEntity().getYRot() % 360;
@@ -144,13 +163,17 @@ public class VortexOverlay {
             //Vortex
             pose.pushPose();
             pose.scale(100, 100, 100);
-
+            pose.mulPose(Axis.YP.rotationDegrees(yR * mulinv));
             VORTEX.renderVortex(gg, 1 - demat_transparency);
             pose.popPose();
 
 
             //Box
             pose.translate(tardisX * mul, tardisY * mul, -5 * mul);
+            pose.translate(0, 1.5, 0);
+            pose.mulPose(Axis.ZP.rotationDegrees(mul * VORTEX.lightning_strike * 90 * Mth.sin(VORTEX.lightning_strike)));
+            velX -= 0.001 * VORTEX.lightning_strike * 90 * Mth.sin(VORTEX.lightning_strike);
+            pose.translate(0, -1.5, 0);
             renderShell(gg, IMMERSION, 1 - demat_transparency, tardisClientData.getThrottleStage());
 
             pose.popPose();
@@ -158,5 +181,6 @@ public class VortexOverlay {
             //Restore Ortho view
             RenderSystem.restoreProjectionMatrix();
         });
+        LAST_TIME = System.currentTimeMillis();
     }
 }

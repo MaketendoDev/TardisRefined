@@ -8,6 +8,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -63,10 +64,11 @@ public class VortexRenderer {
         }
     }
 
-    private final RenderHelper.DynamicTimeKeep time = new RenderHelper.DynamicTimeKeep(2);
-    private final VortexTypes vortexType;
+    public final RenderHelper.DynamicTimeKeep time = new RenderHelper.DynamicTimeKeep(2);
+    public final VortexTypes vortexType;
     private final List<VortexQuad> vortex_quads = new ArrayList<>();
-    private float opacity = 1;
+    public float opacity = 1;
+    public float lightning_strike = 0;
 
     /**
      * Renders the Time Vortex
@@ -96,17 +98,20 @@ public class VortexRenderer {
 
         if (this.vortexType.decals) {
             Tesselator tesselator = beginTextureColor(Mode.QUADS);
-            for (int i = 0; i < 8; i++) {
+            for (int i = 0; i < this.vortexType.rows / 2f; i++) {
                 pose.pushPose();
                 if (vortex_quads.size() < i + 1) {
                     vortex_quads.add(new VortexQuad(this.vortexType, this.time));
                     break;
                 }
-                vortex_quads.get(i).renderQuad(pose, (float) (i * 0.1f), this.opacity);
+                vortex_quads.get(i).renderQuad(pose, (float) (i / (this.vortexType.rows / 2f)), this.opacity);
+                this.lightning_strike += vortex_quads.get(i).lightning_strike * vortex_quads.get(i).lightning_strike / (this.vortexType.rows / 2f);
                 pose.popPose();
             }
+            //this.lightning_strike /= this.vortexType.rows / 2f;
             tesselator.end();
         }
+        this.lightning_strike *= 0.9f;
         pose.popPose();
     }
 
@@ -206,7 +211,8 @@ public class VortexRenderer {
         private float prev_tO = -1;
         private float u = 0, v = 0;
         private final float uvSize = 0.125f;
-        float lightning_a;
+        private float lightning_a;
+        public float lightning_strike = 0;
         private final VortexTypes vortexType;
         private final RenderHelper.DynamicTimeKeep time;
 
@@ -231,7 +237,7 @@ public class VortexRenderer {
         public void renderQuad(PoseStack poseStack, float time_offset, float opacity) {
             if (!valid) rndQuad();
 
-            float tO = -(time.getFloat(time_offset) * 2) - 1f;
+            float tO = -(time.getFloat(time_offset) * 2) - 1;
             if (tO > prev_tO || !valid) {
                 valid = false;
                 return;
@@ -239,8 +245,9 @@ public class VortexRenderer {
 
             if (lightning && System.currentTimeMillis() % 5 == 0) if (lightning && Math.random() > 0.95f) {
                 lightning_a = 3;
+                if (tO > 0) lightning_strike = (opacity * (1 - Mth.abs(tO * tO)));
                 assert Minecraft.getInstance().player != null;
-                Minecraft.getInstance().player.playSound(SoundEvents.LIGHTNING_BOLT_IMPACT, (opacity * (1 - Mth.abs(tO * tO))) * 0.5F, (float) (Math.random() * (1 - Mth.abs(tO))));
+                Minecraft.getInstance().player.playSound(RAND.nextBoolean() ? SoundEvents.LIGHTNING_BOLT_IMPACT : SoundEvents.LIGHTNING_BOLT_THUNDER, (opacity * (1 - Mth.abs(tO * tO))) * 0.5F, (float) (Math.random() * (1 - Mth.abs(tO))));
                 rndUV();
             }
 
@@ -265,13 +272,16 @@ public class VortexRenderer {
             poseStack.popPose();
             prev_tO = tO;
             lightning_a *= 0.9f;
+            lightning_strike *= 0.9f;
+
         }
 
         private void vertexUVColor(@NotNull PoseStack pose, float x, float y, float z, float u, float v, float val, float a, float o, boolean tint) {
             float[] color = this.vortexType.gradient.getRGBf(o);
             if (tint)
                 RenderHelper.vertexUVColor(pose, x, y, z, u, v, val * color[0], val * color[1], val * color[2], a);
-            else RenderHelper.vertexUVColor(pose, x, y, z, u, v, val, val, val, a);
+            else
+                RenderHelper.vertexUVColor(pose, x, y, z, u, v, val, val, val, a);
         }
     }
 
