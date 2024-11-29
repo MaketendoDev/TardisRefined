@@ -17,9 +17,11 @@ import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
 import whocraft.tardis_refined.patterns.ShellPattern;
 import whocraft.tardis_refined.patterns.ShellPatterns;
 
+import static whocraft.tardis_refined.client.overlays.VortexOverlay.VORTEX;
 import static whocraft.tardis_refined.client.screen.selections.ShellSelectionScreen.globalShellBlockEntity;
 
 public class ShellRenderer {
+
 
     public static void renderShell(GuiGraphics guiGraphics, float control, float alpha, int throttle) {
         TardisPlayerInfo.get(Minecraft.getInstance().player).ifPresent(tardisPlayerInfo -> {
@@ -59,6 +61,12 @@ public class ShellRenderer {
             if (fullPattern.exteriorDoorTexture().emissive()) {
                 VertexConsumer vertexConsumerLighting = guiGraphics.bufferSource().getBuffer(RenderType.entityTranslucentEmissive(model.getShellTexture(ShellPatterns.getPatternOrDefault(shellTheme, shellPattern), true)));
                 model.renderShell(globalShellBlockEntity, false, false, pose, vertexConsumerLighting, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, alpha);
+            }
+
+
+            VertexConsumer lightning = guiGraphics.bufferSource().getBuffer(RenderType.entityGlint());
+            if(VORTEX.lightning_strike > 0.4){
+                model.renderShell(globalShellBlockEntity, false, false, pose, lightning, 15728880, OverlayTexture.NO_OVERLAY, 1, 1, 1, alpha);
             }
 
             guiGraphics.flush();

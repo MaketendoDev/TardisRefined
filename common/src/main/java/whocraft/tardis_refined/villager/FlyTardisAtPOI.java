@@ -50,9 +50,22 @@ public class FlyTardisAtPOI extends WorkAtPoi {
 
             if (pilotManager.isInFlight()) {
 
+
+
+            /*    if(pilotManager.canEndFlight()){
+                    pilotManager.setThrottleStage(0);
+                    pilotManager.setHandbrakeOn(true);
+                } else {
+                    if(pilotManager.getTargetLocation().getPosition().getX() != 45){
+                        pilotManager.getTargetLocation().setPosition(new BlockPos(45,45,45));
+                        pilotManager.setThrottleStage(4);
+                        pilotManager.setHandbrakeOn(false);
+                    }
+                }*/
+
                 for (ControlEntity controlEntity : console.getControlEntityList()) {
                     if (controlEntity.isTickingDown()) {
-
+                        rotateDirection();
                         // Adjust bounding box check to ensure proximity, but without intersecting
                         if (controlEntity.level().random.nextBoolean()) {
                             for (int i = 0; i < 5; i++) {

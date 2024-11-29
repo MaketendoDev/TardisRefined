@@ -43,8 +43,8 @@ public class GravityOverlay {
             int x = padding;
             int y = padding;
 
-            MutableComponent ascendKey = Component.translatable(mc.options.keyJump.getDefaultKey().getName());
-            MutableComponent descendKey = Component.translatable(mc.options.keyShift.getDefaultKey().getName());
+            Component ascendKey = mc.options.keyJump.key.getDisplayName();
+            Component descendKey = mc.options.keyShift.key.getDisplayName();
 
             // Get the translated strings for both keys
             String ascendKeyText = Component.translatable(ModMessages.ASCEND_KEY, ascendKey).getString();

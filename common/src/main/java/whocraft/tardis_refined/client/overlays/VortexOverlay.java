@@ -23,7 +23,7 @@ import static whocraft.tardis_refined.client.screen.selections.ShellSelectionScr
 
 public class VortexOverlay {
 
-    private static final VortexRenderer VORTEX = new VortexRenderer(VortexRenderer.VortexTypes.STARS);
+    public static final VortexRenderer VORTEX = new VortexRenderer(VortexRenderer.VortexTypes.STARS);
 
     private static double tardisX = 0.0D;
     private static double tardisY = 0.0D;

@@ -82,7 +82,6 @@ public class VortexRenderer {
      */
     public void renderVortex(PoseStack pose, float opacity) {
         this.opacity = Math.min(opacity, 1);
-
         if (vortexType.movingGradient) this.vortexType.gradient.offset = time.getFloat() * 2;
         this.time.speed = 0.5f;
         this.time.update();

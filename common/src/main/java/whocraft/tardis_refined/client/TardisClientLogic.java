@@ -5,7 +5,9 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
@@ -235,6 +237,20 @@ public class TardisClientLogic {
             Minecraft.getInstance().getMusicManager().stopPlaying();
         }
     }
+
+    @Environment(EnvType.CLIENT)
+    public static void handleClient() {
+        Minecraft.getInstance().options.setCameraType(CameraType.FIRST_PERSON);
+        TardisPlayerInfo.get(Minecraft.getInstance().player).ifPresent(tardisPlayerInfo -> {
+            LocalPlayer player = Minecraft.getInstance().player;
+            System.out.println(tardisPlayerInfo.getPlayerPreviousYaw());
+            System.out.println(tardisPlayerInfo.getPlayerPreviousRot());
+            player.setXRot(tardisPlayerInfo.getPlayerPreviousYaw());
+            player.setYHeadRot(tardisPlayerInfo.getPlayerPreviousRot());
+            player.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3(0, 128,0));
+        });
+    }
+
 
     private static void handleScreenShake(TardisClientData clientData, Player player){
         // Responsible for screen-shake. Not sure of a better solution at this point in time.

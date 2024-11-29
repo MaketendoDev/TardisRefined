@@ -272,7 +272,7 @@ public class LangProviderEnglish extends LanguageProvider {
         /*Overlay Messages*/
         add(ModMessages.ASCEND_KEY, "Ascend: %s");
         add(ModMessages.DESCEND_KEY, "Descend: %s");
-        add(ModMessages.EXIT_EXTERNAL_VIEW, "Exit External View: %s");
+        add(ModMessages.EXIT_EXTERNAL_VIEW, "Exit External View: ");
 
         /*Upgrades*/
         addUpgrade(TRUpgrades.CHAMELEON_CIRCUIT_SYSTEM.get(), "Chameleon Circuit", "Allows the TARDIS to change it's shape");
