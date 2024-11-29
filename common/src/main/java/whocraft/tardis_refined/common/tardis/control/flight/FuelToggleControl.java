@@ -62,6 +62,6 @@ public class FuelToggleControl extends Control {
             return Component.translatable(  ModMessages.FUEL_OFFLINE);
         }
 
-        return Component.translatable(  ModMessages.FUEL).append(String.valueOf((Math.round((operator.getPilotingManager().getFuelPercentage() * 100))))).append("%");
+        return Component.translatable(ModMessages.FUEL, String.valueOf((Math.round((operator.getPilotingManager().getFuelPercentage() * 100))))).append("%");
     }
 }

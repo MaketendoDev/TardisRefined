@@ -137,6 +137,9 @@ public class ModMessages {
 
     public static final String CMD_ARG_SHELL_INVALID = cmdArgInvalid("shell");
 
+    public static final String KEYBIND_EXIT_VIEW = keybind("exit_exterior_view");
+    public static final String KEYBIND_TOGGLE_INFO_EXTERIOR_VIEW = keybind("toggle_info_exterior_view");
+
 
 
     public static String message(String translationKey){
@@ -145,6 +148,11 @@ public class ModMessages {
 
     public static String ui(String translationKey){
         return "ui." + TardisRefined.MODID + "." + translationKey;
+    }
+
+
+    public static String keybind(String translationKey){
+        return "keybind." + TardisRefined.MODID + "." + translationKey;
     }
 
     public static String desktop(String translationKey) {

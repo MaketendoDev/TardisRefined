@@ -147,7 +147,7 @@ public class LangProviderEnglish extends LanguageProvider {
         add(ModMessages.NO_DESKTOP_NO_FUEL, "Not enough fuel to start the reconfiguration process");
         add(ModMessages.ASTRAL_MANIPULATOR_ENGAGED, "Please make your selection. Right click again to confirm");
         add(ModMessages.ROOT_PLANT_CUT_OPEN, "Roots cover the entrance");
-        add(ModMessages.FUEL, "Fuel: ");
+        add(ModMessages.FUEL, "Fuel: %s");
         add(ModMessages.FUEL_OFFLINE, "Fuel offline");
         add(ModMessages.WAYPOINT_LOADED, "Preloaded waypoint: %s");
         add(ModMessages.HANDBRAKE_ENGAGED, "Handbrake engaged");
@@ -272,7 +272,7 @@ public class LangProviderEnglish extends LanguageProvider {
         /*Overlay Messages*/
         add(ModMessages.ASCEND_KEY, "Ascend: %s");
         add(ModMessages.DESCEND_KEY, "Descend: %s");
-        add(ModMessages.EXIT_EXTERNAL_VIEW, "Exit External View: ");
+        add(ModMessages.EXIT_EXTERNAL_VIEW, "Exit Shell View: ");
 
         /*Upgrades*/
         addUpgrade(TRUpgrades.CHAMELEON_CIRCUIT_SYSTEM.get(), "Chameleon Circuit", "Allows the TARDIS to change it's shape");
@@ -297,6 +297,9 @@ public class LangProviderEnglish extends LanguageProvider {
         addUpgrade(TRUpgrades.SPEED_III.get(), "Speed III", "Flight speed is 25x faster");
         addUpgrade(TRUpgrades.SPEED_IV.get(), "Speed IV", "Flight speed is 50x faster");
 
+        /*Keybinds*/
+        add(ModMessages.KEYBIND_EXIT_VIEW, "Exit Shell View");
+        add(ModMessages.KEYBIND_TOGGLE_INFO_EXTERIOR_VIEW, "(Shell View) Toggle Info");
     }
 
 

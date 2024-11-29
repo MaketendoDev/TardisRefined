@@ -7,6 +7,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
@@ -16,14 +17,21 @@ import net.minecraft.util.Mth;
 import whocraft.tardis_refined.TardisRefined;
 import whocraft.tardis_refined.client.TRKeybinds;
 import whocraft.tardis_refined.client.TardisClientData;
+import whocraft.tardis_refined.client.renderer.RenderHelper;
 import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
 import whocraft.tardis_refined.common.tardis.manager.TardisPilotingManager;
 import whocraft.tardis_refined.constants.ModMessages;
 
+import java.util.UUID;
+
 public class ExteriorViewOverlay {
+
+    public static boolean shouldRender = true;
 
     public static void renderOverlay(GuiGraphics guiGraphics) {
         Minecraft mc = Minecraft.getInstance();
+
+        if(!shouldRender) {return;}
 
         TardisPlayerInfo.get(mc.player).ifPresent(tardisPlayerInfo -> {
             PoseStack poseStack = guiGraphics.pose();
@@ -67,10 +75,10 @@ public class ExteriorViewOverlay {
             MutableComponent throttleMessage = Component.literal("Throttle: " + throttlePercentage + "%")
                     .withStyle(ChatFormatting.WHITE);
 
-            renderPlayerHeads(guiGraphics, mc, x, y);
+            renderPlayerHeads(guiGraphics, mc, x, y + 45);
 
             // Display fuel percentage
-            MutableComponent fuelMessage = Component.literal("Fuel: " + fuelPercentage + "%")
+            MutableComponent fuelMessage = Component.translatable(ModMessages.FUEL, fuelPercentage).append("%")
                     .withStyle(ChatFormatting.WHITE);
 
             guiGraphics.drawString(mc.font, message.getString(), x, y, 0xFFFFFF, false); // White text
@@ -94,16 +102,10 @@ public class ExteriorViewOverlay {
         if (player != null) {
             // Render the player's face
             int faceX = x;
-            int faceY = y + 50; // Position below fuel
-            int faceSize = 8;
+            int faceY = y + 1; // Position below fuel
+            int faceSize = 10;
 
-            ResourceLocation skinTexture = player.getSkin().texture();
-
-            // Render player face
-            guiGraphics.blit(skinTexture, faceX, faceY, 8, 8, faceSize, faceSize, 64, 64);
-
-            // Render player hat layer
-            guiGraphics.blit(skinTexture, faceX, faceY, 40, 8, faceSize, faceSize, 64, 64);
+            RenderHelper.renderPlayerFace(guiGraphics, x, y, faceSize, player.getUUID());
 
             // Render the player's name
             String playerName = player.getName().getString();

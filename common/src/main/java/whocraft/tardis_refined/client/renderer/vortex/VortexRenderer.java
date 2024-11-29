@@ -38,6 +38,13 @@ public class VortexRenderer {
             .add(-0.5f, 193, 111, 20)
             .add(-1f, 234, 204, 77);
 
+    private static final VortexGradientTint ModernVortex = new VortexGradientTint()
+            .add(-1.0f, 238,164,107)
+            .add(-0.5f,199,92,159)
+            .add(0.0f, 238,164,107)
+            .add(0.5f,199,92,159)
+            .add(1.0f, 238,164,107);
+
     private static final VortexGradientTint PastelGradient = new VortexGradientTint()
             .add(1f, 223, 190, 223)
             .add(0.5f, 243, 209, 215)
@@ -49,7 +56,9 @@ public class VortexRenderer {
 
         CLOUDS(new ResourceLocation(TardisRefined.MODID, "textures/vortex/clouds.png"), 9, 12, 10, true, true, BlueOrngGradient, false),
         WAVES(new ResourceLocation(TardisRefined.MODID, "textures/vortex/waves.png"), 9, 12, 20, true, true, BlueOrngGradient, false),
-        STARS(new ResourceLocation(TardisRefined.MODID, "textures/vortex/stars.png"), 9, 12, 5, true, true, PastelGradient, true);
+        STARS(new ResourceLocation(TardisRefined.MODID, "textures/vortex/stars.png"), 9, 12, 5, true, true, PastelGradient, true),
+        FLOW(new ResourceLocation(TardisRefined.MODID, "textures/vortex/clouds.png"), 9, 12, 5, true, true, ModernVortex, true),
+        SPACE(new ResourceLocation(TardisRefined.MODID, "textures/vortex/stars_2.png"), 9, 12, 5, true, true, ModernVortex, false);
 
         public int sides = 9, rows = 12;
         float twist = 10;
