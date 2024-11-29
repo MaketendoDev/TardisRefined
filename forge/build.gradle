@@ -70,7 +70,7 @@ dependencies {
     //   modCompileOnly "curse.maven:jei-238222:${jei_version}"
 
     compileOnly "curse.maven:immersive-portals-355440:${immersive_portals_forge_version}"
-
+    modImplementation "curse.maven:curios-309927:4921744"
     // With ForgeGradle 5, use the runtimeOnly configuration
     //runtimeOnly("me.djtheredstoner:DevAuth-${dev_auth_module_forge}:${dev_auth_forge_version}")
 

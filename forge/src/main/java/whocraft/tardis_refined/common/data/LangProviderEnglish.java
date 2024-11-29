@@ -225,7 +225,12 @@ public class LangProviderEnglish extends LanguageProvider {
         add(ModMessages.UI_MONITOR_EJECT, "EMERGENCY EJECT");
         add(ModMessages.UI_EJECT_CANNOT_IN_FLIGHT, "Cannot eject whilst in flight");
 
+
+        add("curios.identifier.timelord_sight", "AR Glasses");
+
+
         /*Create GUI Compatibility*/
+
        /* add(ModMessages.DOOR_STATUS, "Door: %s");
         add(ModMessages.LOCK_STATUS, "Locked: %s");
         add(ModMessages.POSITION, "Position: %s");
