@@ -120,9 +120,9 @@ public class VortexOverlay {
             boolean land = tardisClientData.isLanding() || !tardisClientData.isFlying();
 
             //DEV TESTING
-            takeoff = mc.options.keyShift.isDown();
+       /*     takeoff = mc.options.keyShift.isDown();
             land = !takeoff;
-
+*/
             if (takeoff) {
                 DEMAT += (System.currentTimeMillis() - LAST_TIME) / 12000.0f;
             }
@@ -131,7 +131,7 @@ public class VortexOverlay {
             }
 
             if (!tardisPlayerInfo.isViewingTardis()) return;
-            //if (!tardisPlayerInfo.isRenderVortex()) return;
+            if (!tardisPlayerInfo.isRenderVortex()) return;
 
             VortexOverlay.update(gg);
 
