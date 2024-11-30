@@ -4,7 +4,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.EntityTypeTagsProvider;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
@@ -36,9 +35,9 @@ public class ProviderEntityTags extends EntityTypeTagsProvider {
         tag(TRTagKeys.TARDIS_TELEPORT_BLACKLIST).add(EntityType.WITHER);
 
         //Add Create Mod entities to blacklist
-        tag(TRTagKeys.TARDIS_TELEPORT_BLACKLIST).addOptionalTag(new ResourceLocation("create","contraption"));
-        tag(TRTagKeys.TARDIS_TELEPORT_BLACKLIST).addOptionalTag(new ResourceLocation("create","gantry_contraption"));
-        tag(TRTagKeys.TARDIS_TELEPORT_BLACKLIST).addOptionalTag(new ResourceLocation("create","crafting_blueprint"));
+        tag(TRTagKeys.TARDIS_TELEPORT_BLACKLIST).addOptionalTag(new ResourceLocation("create", "contraption"));
+        tag(TRTagKeys.TARDIS_TELEPORT_BLACKLIST).addOptionalTag(new ResourceLocation("create", "gantry_contraption"));
+        tag(TRTagKeys.TARDIS_TELEPORT_BLACKLIST).addOptionalTag(new ResourceLocation("create", "crafting_blueprint"));
 
     }
 }

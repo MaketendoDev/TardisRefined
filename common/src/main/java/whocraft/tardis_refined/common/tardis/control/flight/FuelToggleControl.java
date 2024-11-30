@@ -17,13 +17,14 @@ public class FuelToggleControl extends Control {
     public FuelToggleControl(ResourceLocation id) {
         super(id);
     }
-    public FuelToggleControl(ResourceLocation id, String langId){
+
+    public FuelToggleControl(ResourceLocation id, String langId) {
         super(id, langId);
     }
 
     @Override
     public boolean onRightClick(TardisLevelOperator operator, ConsoleTheme theme, ControlEntity controlEntity, Player player) {
-        if (!operator.getLevel().isClientSide()){
+        if (!operator.getLevel().isClientSide()) {
             if (operator.getTardisState() != TardisLevelOperator.STATE_EYE_OF_HARMONY) {
                 return false;
             }
@@ -59,7 +60,7 @@ public class FuelToggleControl extends Control {
 
         boolean offline = operator.getTardisState() != TardisLevelOperator.STATE_EYE_OF_HARMONY;
         if (offline) {
-            return Component.translatable(  ModMessages.FUEL_OFFLINE);
+            return Component.translatable(ModMessages.FUEL_OFFLINE);
         }
 
         return Component.translatable(ModMessages.FUEL, String.valueOf((Math.round((operator.getPilotingManager().getFuelPercentage() * 100))))).append("%");

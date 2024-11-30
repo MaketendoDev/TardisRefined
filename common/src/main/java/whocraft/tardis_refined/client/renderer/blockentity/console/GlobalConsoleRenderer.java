@@ -45,7 +45,7 @@ public class GlobalConsoleRenderer implements BlockEntityRenderer<GlobalConsoleB
         consoleModel.renderConsole(blockEntity, blockEntity.getLevel(), poseStack, bufferSource.getBuffer(RenderType.entityTranslucent(consoleModel.getTexture(blockEntity))), packedLight, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
 
         if (blockEntity != null && blockEntity.getBlockState().getValue(GlobalConsoleBlock.POWERED)) {
-            if(blockEntity.pattern() != null && blockEntity.pattern().patternTexture().emissive()) {
+            if (blockEntity.pattern() != null && blockEntity.pattern().patternTexture().emissive()) {
                 consoleModel.renderConsole(blockEntity, blockEntity.getLevel(), poseStack, bufferSource.getBuffer(RenderType.entityTranslucentEmissive(consoleModel.getTexture(blockEntity, true))), 15728640, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
             }
         }
@@ -54,7 +54,7 @@ public class GlobalConsoleRenderer implements BlockEntityRenderer<GlobalConsoleB
 
         if (blockEntity != null && blockEntity.getBlockState().getValue(GlobalConsoleBlock.POWERED)) {
             if (theme.toString().equals(ConsoleTheme.CRYSTAL.getId().toString())) {
-                renderHoloShell(crystalHolo,270, blockEntity, poseStack, bufferSource, packedLight, crystalHoloColor);
+                renderHoloShell(crystalHolo, 270, blockEntity, poseStack, bufferSource, packedLight, crystalHoloColor);
             }
 
             if (theme.toString().equals(ConsoleTheme.INITIATIVE.getId().toString())) {

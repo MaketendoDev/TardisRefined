@@ -43,16 +43,19 @@ import java.util.UUID;
 
 public abstract class ShellBaseBlockEntity extends BlockEntity implements ExteriorShell, BlockEntityTicker<ShellBaseBlockEntity> {
 
-    protected ResourceKey<Level> TARDIS_ID;
+    private final int DUPLICATION_CHECK_TIME = 1200; // A minute
     public AnimationState liveliness = new AnimationState();
+    protected ResourceKey<Level> TARDIS_ID;
 
     public ShellBaseBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
     }
+
     @Override
     public ResourceKey<Level> getTardisId() {
         return this.TARDIS_ID;
     }
+
     @Override
     public void setTardisId(ResourceKey<Level> levelKey) {
         this.TARDIS_ID = levelKey;
@@ -138,13 +141,11 @@ public abstract class ShellBaseBlockEntity extends BlockEntity implements Exteri
         return TardisDesktops.FACTORY_THEME;
     }
 
-    private final int DUPLICATION_CHECK_TIME = 1200; // A minute
-
     @Override
     public void tick(Level level, BlockPos blockPos, BlockState blockState, ShellBaseBlockEntity blockEntity) {
-        if(level.getGameTime() % DUPLICATION_CHECK_TIME == 0 && !level.isClientSide){
+        if (level.getGameTime() % DUPLICATION_CHECK_TIME == 0 && !level.isClientSide) {
             ResourceKey<Level> tardisId = getTardisId();
-            if(tardisId == null) return;
+            if (tardisId == null) return;
             ServerLevel tardisLevel = Platform.getServer().getLevel(tardisId);
             BlockPos myCurrentPosition = getBlockPos();
 
@@ -162,7 +163,7 @@ public abstract class ShellBaseBlockEntity extends BlockEntity implements Exteri
                     pilotingManager.setCurrentLocation(new TardisNavLocation(getBlockPos(), direction != null ? direction : Direction.NORTH, serverLevel));
                 }
 
-                if (!myCurrentPosition.equals(currentLocation) && !myCurrentPosition.equals(wantedDestination) ) {
+                if (!myCurrentPosition.equals(currentLocation) && !myCurrentPosition.equals(wantedDestination)) {
                     level.removeBlock(myCurrentPosition, false);
                 }
 
@@ -179,7 +180,7 @@ public abstract class ShellBaseBlockEntity extends BlockEntity implements Exteri
     public void setClosed(boolean closeDoor) {
         BlockPos blockPos = this.getBlockPos();
         BlockState blockState = this.getLevel().getBlockState(blockPos);
-        if (blockState.getBlock() instanceof ShellBaseBlock shellBaseBlock){
+        if (blockState.getBlock() instanceof ShellBaseBlock shellBaseBlock) {
             this.getLevel().setBlock(blockPos, blockState.setValue(ShellBaseBlock.OPEN, !closeDoor), Block.UPDATE_ALL);
             this.playDoorCloseSound(closeDoor);
             this.setChanged();
@@ -194,7 +195,7 @@ public abstract class ShellBaseBlockEntity extends BlockEntity implements Exteri
     @Override
     public void setLocked(boolean locked) {
         BlockState blockState = this.getLevel().getBlockState(this.getBlockPos());
-        if (blockState.getBlock() instanceof ShellBaseBlock shellBaseBlock){
+        if (blockState.getBlock() instanceof ShellBaseBlock shellBaseBlock) {
             this.getLevel().setBlock(this.getBlockPos(), blockState.setValue(ShellBaseBlock.LOCKED, locked), Block.UPDATE_ALL);
             this.playDoorLockedSound(locked);
             this.setChanged();
@@ -227,13 +228,13 @@ public abstract class ShellBaseBlockEntity extends BlockEntity implements Exteri
         return this.getBlockPos();
     }
 
-    public void playDoorCloseSound(boolean closeDoor){
+    public void playDoorCloseSound(boolean closeDoor) {
         Level currentLevel = getLevel();
         currentLevel.playSound(null, this.getBlockPos(), closeDoor ? SoundEvents.IRON_DOOR_CLOSE : SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 1, closeDoor ? 1.4F : 1F);
         this.setChanged();
     }
 
-    public void playDoorLockedSound(boolean lockDoor){
+    public void playDoorLockedSound(boolean lockDoor) {
         Level currentLevel = getLevel();
         currentLevel.playSound(null, this.getBlockPos(), lockDoor ? BlockSetType.IRON.doorClose() : BlockSetType.IRON.doorOpen(), SoundSource.BLOCKS, 1, lockDoor ? 1.4F : 1F);
     }

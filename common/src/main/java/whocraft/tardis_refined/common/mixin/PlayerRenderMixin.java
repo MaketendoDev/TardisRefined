@@ -19,11 +19,11 @@ public class PlayerRenderMixin {
     @Inject(method = "render(Lnet/minecraft/client/player/AbstractClientPlayer;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At("HEAD"), cancellable = true)
     private void render(AbstractClientPlayer abstractClientPlayer, float f, float g, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, CallbackInfo ci) {
 
-       TardisPlayerInfo.get(abstractClientPlayer).ifPresent(tardisPlayerInfo -> {
-           if (tardisPlayerInfo.isViewingTardis()) {
-               ci.cancel();
-           }
-       });
+        TardisPlayerInfo.get(abstractClientPlayer).ifPresent(tardisPlayerInfo -> {
+            if (tardisPlayerInfo.isViewingTardis()) {
+                ci.cancel();
+            }
+        });
 
     }
 

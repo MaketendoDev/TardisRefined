@@ -30,8 +30,10 @@ public class InternalDoorBlock extends BaseEntityBlock {
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty OPEN = BooleanProperty.create("open");
-    /** This is this door instance's understanding of if it is locked or not.
-     * <br> This is needed to account for when multiple internal doors are in a Tardis, and the player is locking a different door*/
+    /**
+     * This is this door instance's understanding of if it is locked or not.
+     * <br> This is needed to account for when multiple internal doors are in a Tardis, and the player is locking a different door
+     */
     public static final BooleanProperty LOCKED = BooleanProperty.create("locked");
     protected static final VoxelShape COLLISION = Block.box(0, 0, 0, 16, 32, 16);
     protected static BlockEntity blockEntity;
@@ -67,11 +69,11 @@ public class InternalDoorBlock extends BaseEntityBlock {
         return this.getDoorBlockEntity();
     }
 
-    public void setBlockEntity(BlockEntity blockEntity){
+    public void setBlockEntity(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
     }
 
-    public BlockEntity getDoorBlockEntity(){
+    public BlockEntity getDoorBlockEntity() {
         return this.blockEntity;
     }
 
@@ -96,12 +98,12 @@ public class InternalDoorBlock extends BaseEntityBlock {
     public void entityInside(BlockState blockState, Level level, BlockPos blockPos, Entity entity) {
 
         if (!level.isClientSide()) {
-            ServerLevel serverLevel = (ServerLevel)level;
+            ServerLevel serverLevel = (ServerLevel) level;
             if (serverLevel.getBlockEntity(blockPos) instanceof TardisInternalDoor door) {
 
                 if (TardisLevelOperator.get(serverLevel).isPresent()) {
                     AABB teleportAABB = this.getCollisionShape(blockState, level, blockPos, CollisionContext.of(entity)).bounds().move(blockPos);
-                    if (TRTeleporter.teleportIfCollided(serverLevel, blockPos, entity, teleportAABB)){
+                    if (TRTeleporter.teleportIfCollided(serverLevel, blockPos, entity, teleportAABB)) {
                         door.onAttemptEnter(blockState, serverLevel, blockPos, entity);
                     }
                 }

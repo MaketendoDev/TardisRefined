@@ -62,7 +62,6 @@ public class SoundProvider extends SoundDefinitionsProvider {
     }
 
 
-
     public SoundDefinition basicSound(String langKey, ResourceLocation... resourceLocation) {
         SoundDefinition soundDefinition = SoundDefinition.definition();
         for (ResourceLocation location : resourceLocation) {

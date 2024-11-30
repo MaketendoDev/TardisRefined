@@ -153,9 +153,9 @@ public class TardisHelper {
             BlockPos targetTeleportPos = destinationPos;
 
             /**If for some reason we are trying to enter the Tardis, but the destination dimension is not a Tardis dimension type, don't teleport
-            This can occur if the exterior shell we are entering has an invalid {@link whocraft.tardis_refined.common.blockentity.shell.ShellBaseBlockEntity#TARDIS_ID} which will occur for older releases due to a bug that was present until 2.0.2
+             This can occur if the exterior shell we are entering has an invalid {@link whocraft.tardis_refined.common.blockentity.shell.ShellBaseBlockEntity#TARDIS_ID} which will occur for older releases due to a bug that was present until 2.0.2
              */
-            if(enterTardis && destinationLevel.dimensionTypeId() != TRDimensionTypes.TARDIS){
+            if (enterTardis && destinationLevel.dimensionTypeId() != TRDimensionTypes.TARDIS) {
                 return false;
             }
 
@@ -199,7 +199,7 @@ public class TardisHelper {
 
         if (serverLevel.dimension() == Level.END) {
             if (serverLevel.getDragonFight() != null) {
-               return ((EndDragonFightAccessor) serverLevel.getDragonFight()).isDragonKilled();
+                return ((EndDragonFightAccessor) serverLevel.getDragonFight()).isDragonKilled();
             }
 
             return false; // Better safe than sorry.
@@ -208,17 +208,19 @@ public class TardisHelper {
         return false;
     }
 
-    /** Common logic that we should apply to players if they happen to teleport to, respawn, or login to a Tardis
-     * <br> Ejecting players that happen to login to a Tardis dimension whilst the Tardis is still generating a desktop, we don't want them to suffocate*/
-    public static void handlePlayerJoinWorldEvents(ServerPlayer serverPlayer){
-        if (serverPlayer != null){
-            if (serverPlayer.serverLevel() != null){
+    /**
+     * Common logic that we should apply to players if they happen to teleport to, respawn, or login to a Tardis
+     * <br> Ejecting players that happen to login to a Tardis dimension whilst the Tardis is still generating a desktop, we don't want them to suffocate
+     */
+    public static void handlePlayerJoinWorldEvents(ServerPlayer serverPlayer) {
+        if (serverPlayer != null) {
+            if (serverPlayer.serverLevel() != null) {
                 ServerLevel playerLevel = serverPlayer.serverLevel();
-                if(TardisLevelOperator.get(playerLevel).isPresent()){
+                if (TardisLevelOperator.get(playerLevel).isPresent()) {
                     TardisLevelOperator cap = TardisLevelOperator.get(playerLevel).get();
 
                     //Handle ejecting players if they login to a Tardis dimension where the Tardis is in progress of generating a desktop
-                    if (cap.getInteriorManager().isGeneratingDesktop()){
+                    if (cap.getInteriorManager().isGeneratingDesktop()) {
                         //Delay the force ejecting to account for the chunk not being fully loaded, which can happen in the player change dimension event.
                         playerLevel.getServer().tell(new TickTask(10, () ->
                                 cap.forceEjectPlayer(serverPlayer)

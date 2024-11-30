@@ -17,13 +17,21 @@ public interface TardisPilot {
     void setupPlayerForInspection(ServerPlayer serverPlayer, TardisLevelOperator tardisLevelOperator, TardisNavLocation spectateTarget, boolean timeVortex);
 
     void endPlayerForInspection(ServerPlayer serverPlayer, TardisLevelOperator tardisLevelOperator);
+
     UUID getViewedTardis();
+
     void setViewedTardis(UUID uuid);
+
     boolean isViewingTardis();
+
     CompoundTag saveData();
+
     void loadData(CompoundTag tag);
+
     Player getPlayer();
+
     void syncToClients(@Nullable ServerPlayer serverPlayerEntity);
+
     void tick(TardisLevelOperator tardisLevelOperator, ServerPlayer serverPlayerEntity);
 
 }

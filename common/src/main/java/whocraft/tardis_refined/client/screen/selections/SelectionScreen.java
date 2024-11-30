@@ -17,17 +17,14 @@ import java.awt.*;
 
 public class SelectionScreen extends Screen {
 
-    private SelectionScreenRun onSubmit;
-    private SelectionScreenRun onCancel;
-    private final Component title;
-
-    private ObjectSelectionList list;
-
-    public int noiseX, noiseY, age;
-    public double noiseAlpha;
-
     public static final ResourceLocation BUTTON_LOCATION = new ResourceLocation(TardisRefined.MODID, "save");
     public static final ResourceLocation BCK_LOCATION = new ResourceLocation(TardisRefined.MODID, "back");
+    private final Component title;
+    public int noiseX, noiseY, age;
+    public double noiseAlpha;
+    private SelectionScreenRun onSubmit;
+    private SelectionScreenRun onCancel;
+    private ObjectSelectionList list;
 
 
     public SelectionScreen(Component title) {

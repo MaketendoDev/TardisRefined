@@ -10,7 +10,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 import whocraft.tardis_refined.common.GravityUtil;
 import whocraft.tardis_refined.constants.ModMessages;
@@ -19,7 +18,7 @@ public class GravityOverlay {
 
     private static boolean isInShaft = false;
 
-    private static void checkOverlay(Player player){
+    private static void checkOverlay(Player player) {
         isInShaft = GravityUtil.isInGravityShaft(player);
     }
 

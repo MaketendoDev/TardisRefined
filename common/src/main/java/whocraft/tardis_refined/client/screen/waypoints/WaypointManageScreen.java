@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.SpriteIconButton;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -22,22 +21,18 @@ import whocraft.tardis_refined.common.util.MiscHelper;
 import whocraft.tardis_refined.constants.ModMessages;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static whocraft.tardis_refined.client.screen.selections.SelectionScreen.BUTTON_LOCATION;
 
 public class WaypointManageScreen extends Screen {
 
+    public static ResourceLocation MONITOR_TEXTURE = new ResourceLocation(TardisRefined.MODID, "textures/gui/monitor.png");
     private final CoordInputType coordInputType;
-
     protected int imageWidth = 256;
     protected int imageHeight = 173;
-    private int leftPos, topPos;
-
     protected EditBox waypointName;
-    public static ResourceLocation MONITOR_TEXTURE = new ResourceLocation(TardisRefined.MODID, "textures/gui/monitor.png");
+    private int leftPos, topPos;
     private TardisWaypoint preExistingWaypoint = null;
     private TardisNavLocation tardisNavLocation = TardisNavLocation.ORIGIN;
     private SpriteIconButton onSaveWaypoint;

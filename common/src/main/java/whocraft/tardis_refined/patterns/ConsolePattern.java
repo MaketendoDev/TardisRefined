@@ -39,15 +39,15 @@ public class ConsolePattern extends BasePattern {
         this.consoleSoundProfile = consoleSoundProfile;
     }
 
-    public PatternTexture patternTexture(){
+    public PatternTexture patternTexture() {
         return patternTexture;
     }
 
-    public ResourceLocation texture(){
+    public ResourceLocation texture() {
         return this.patternTexture.texture();
     }
 
-    public ResourceLocation emissiveTexture(){
+    public ResourceLocation emissiveTexture() {
         return this.patternTexture.emissiveTexture();
     }
 

@@ -44,16 +44,6 @@ public class KeyItem extends Item {
         super(properties);
     }
 
-    @Override
-    public Component getName(ItemStack itemStack) {
-
-        if (getKeychain(itemStack).size() >= 2) {
-            return Component.translatable(ModMessages.ITEM_KEYCHAIN);
-        }
-
-        return super.getName(itemStack);
-    }
-
     public static ItemStack addTardis(ItemStack itemStack, ResourceKey<Level> levelResourceKey) {
         // Get the tag of the itemStack object
         CompoundTag itemtag = itemStack.getOrCreateTag();
@@ -75,26 +65,6 @@ public class KeyItem extends Item {
 
         itemStack.setTag(itemtag);
         return itemStack;
-    }
-
-    @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
-
-        // Whistle Easter Egg: https://youtu.be/IqQsL79UpMs?t=526
-        if(player.getOffhandItem().is(Items.GOAT_HORN) && !level.isClientSide){
-            ArrayList<ResourceKey<Level>> keychain = KeyItem.getKeychain(player.getMainHandItem());
-            if(!keychain.isEmpty()) {
-                var tardisLevel = Platform.getServer().getLevel(keychain.get(0));
-                var operatorOptional = TardisLevelOperator.get(tardisLevel);
-                var pilotManager = operatorOptional.get().getPilotingManager();
-                if(!operatorOptional.get().getPilotingManager().isInRecovery()) {
-                    pilotManager.setTargetLocation(new TardisNavLocation(player.blockPosition(), player.getDirection().getOpposite(), (ServerLevel) player.level()));
-                    pilotManager.beginFlight(true, null);
-                }
-            }
-        }
-
-        return super.use(level, player, interactionHand);
     }
 
     public static void setKeychain(ItemStack itemStack, ArrayList<ResourceKey<Level>> levels) {
@@ -145,6 +115,36 @@ public class KeyItem extends Item {
         return keychain.contains(levelResourceKey);
     }
 
+    @Override
+    public Component getName(ItemStack itemStack) {
+
+        if (getKeychain(itemStack).size() >= 2) {
+            return Component.translatable(ModMessages.ITEM_KEYCHAIN);
+        }
+
+        return super.getName(itemStack);
+    }
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
+
+        // Whistle Easter Egg: https://youtu.be/IqQsL79UpMs?t=526
+        if (player.getOffhandItem().is(Items.GOAT_HORN) && !level.isClientSide) {
+            ArrayList<ResourceKey<Level>> keychain = KeyItem.getKeychain(player.getMainHandItem());
+            if (!keychain.isEmpty()) {
+                var tardisLevel = Platform.getServer().getLevel(keychain.get(0));
+                var operatorOptional = TardisLevelOperator.get(tardisLevel);
+                var pilotManager = operatorOptional.get().getPilotingManager();
+                if (!operatorOptional.get().getPilotingManager().isInRecovery()) {
+                    pilotManager.setTargetLocation(new TardisNavLocation(player.blockPosition(), player.getDirection().getOpposite(), (ServerLevel) player.level()));
+                    pilotManager.beginFlight(true, null);
+                }
+            }
+        }
+
+        return super.use(level, player, interactionHand);
+    }
+
     public boolean interactMonitor(ItemStack itemStack, Player player, ControlEntity control, InteractionHand interactionHand) {
 
         if (control.level() instanceof ServerLevel serverLevel) {
@@ -155,7 +155,9 @@ public class KeyItem extends Item {
                     setKeychain(itemStack, new ArrayList<>(List.of(serverLevel.dimension())));
 
 
-                    if (keychainContains(itemStack, tardis)) {return false;}
+                    if (keychainContains(itemStack, tardis)) {
+                        return false;
+                    }
 
                     player.setItemInHand(interactionHand, addTardis(itemStack, tardis));
                     PlayerUtil.sendMessage(player, Component.translatable(ModMessages.MSG_KEY_BOUND, tardis.location().getPath()), true);
@@ -181,7 +183,7 @@ public class KeyItem extends Item {
                     Collections.rotate(keychain.subList(0, keychain.size()), -1);
                     setKeychain(context.getItemInHand(), keychain);
                     context.getPlayer().displayClientMessage(Component.translatable(ModMessages.MSG_KEY_CYCLED, keychain.get(0).location().getPath()), true);
-                    context.getLevel().playSound(null, context.getPlayer().blockPosition(), SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS, 1,2);
+                    context.getLevel().playSound(null, context.getPlayer().blockPosition(), SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS, 1, 2);
                 }
             }
         }
@@ -205,7 +207,6 @@ public class KeyItem extends Item {
             }
 
 
-
             list.add(Component.translatable(ModMessages.TOOLTIP_TARDIS_LIST_TITLE));
 
             for (int i = 0; i < keychain.size(); i++) {
@@ -215,7 +216,7 @@ public class KeyItem extends Item {
 
 
             TardisClientData tardisClientData = TardisClientData.getInstance(mainTardisLevel);
-            if(tardisClientData.isInRecovery()){
+            if (tardisClientData.isInRecovery()) {
                 int cooldownTicks = tardisClientData.getRecoveryTicks();
                 int maxCooldownTicks = 12000; // 10 minutes in ticks
                 int percentage = (int) ((cooldownTicks / (float) maxCooldownTicks) * 100);

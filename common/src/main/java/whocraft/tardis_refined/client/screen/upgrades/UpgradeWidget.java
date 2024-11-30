@@ -27,19 +27,20 @@ public class UpgradeWidget {
 
 
     private static final int[] TEST_SPLIT_OFFSETS = new int[]{0, 10, -10, 25, -25};
+    private static final ResourceLocation TITLE_BOX_SPRITE = new ResourceLocation("advancements/title_box");
+    public final Upgrade upgradeEntry;
     private final UpgradeTab tab;
     private final UpgradeHandler upgradeHandler;
-    public final Upgrade upgradeEntry;
     private final FormattedCharSequence title;
     private final int width;
     private final List<FormattedCharSequence> description;
     private final Minecraft minecraft;
+    public double gridX, gridY;
+    public boolean fixedPosition = false;
     List<UpgradeWidget> parents = new LinkedList<>();
     List<UpgradeWidget> children = new LinkedList<>();
     private int x;
     private int y;
-    public double gridX, gridY;
-    public boolean fixedPosition = false;
 
     public UpgradeWidget(UpgradeTab tab, Minecraft mc, UpgradeHandler upgradeHandler, Upgrade upgradeEntry) {
         this.tab = tab;
@@ -59,6 +60,10 @@ public class UpgradeWidget {
         }
 
         this.width = l + 3 + 5;
+    }
+
+    private static float getMaxWidth(StringSplitter manager, List<FormattedText> text) {
+        return (float) text.stream().mapToDouble(manager::stringWidth).max().orElse(0.0);
     }
 
     public UpgradeWidget updatePosition(double x, double y, UpgradeTab tab) {
@@ -109,10 +114,6 @@ public class UpgradeWidget {
         return this;
     }
 
-    private static float getMaxWidth(StringSplitter manager, List<FormattedText> text) {
-        return (float) text.stream().mapToDouble(manager::stringWidth).max().orElse(0.0);
-    }
-
     private List<FormattedText> findOptimalLines(Component component, int maxWidth) {
         StringSplitter stringSplitter = this.minecraft.font.getSplitter();
         List<FormattedText> list = null;
@@ -148,7 +149,7 @@ public class UpgradeWidget {
     public void drawIcon(Minecraft mc, GuiGraphics guiGraphics, int x, int y) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-        boolean isUnlocked =this.upgradeEntry.isUnlocked(upgradeHandler);
+        boolean isUnlocked = this.upgradeEntry.isUnlocked(upgradeHandler);
 
         guiGraphics.blitSprite(UpgradesScreen.getFrame(upgradeEntry.getUpgradeType(), isUnlocked), x - 13, y - 13, 26, 26);
         this.drawDisplayIcon(mc, guiGraphics, x - 8, y - 8);
@@ -157,8 +158,6 @@ public class UpgradeWidget {
     public int getWidth() {
         return this.width;
     }
-
-    private static final ResourceLocation TITLE_BOX_SPRITE = new ResourceLocation("advancements/title_box");
 
     public void drawHover(GuiGraphics guiGraphics, int i, int j, float f, int k, int l) {
         boolean bl = k + i + this.x + this.width + 26 >= this.tab.getScreen().width;

@@ -1,8 +1,6 @@
 package whocraft.tardis_refined.common.dimension.neoforge;
 
 import com.google.common.collect.ImmutableList;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.MappedRegistry;
@@ -26,15 +24,9 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.WorldData;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.LevelEvent;
-import whocraft.tardis_refined.TardisRefined;
 import whocraft.tardis_refined.common.dimension.DimensionHandler;
 import whocraft.tardis_refined.common.network.messages.sync.SyncLevelListMessage;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.concurrent.Executor;
 import java.util.function.BiFunction;
 
@@ -67,8 +59,7 @@ public class DimensionHandlerImpl {
         if (dimensionRegistry instanceof MappedRegistry<LevelStem> writableRegistry) {
             writableRegistry.unfreeze(); //Must unfreeze registry to allow our dimension to persist. This Neoforge method is deprecated so we may need to use an Accessor Mixin in the future.
             writableRegistry.register(dimensionKey, dimension, Lifecycle.stable());
-        }
-        else {
+        } else {
             throw new IllegalStateException(String.format("Unable to register dimension %s -- dimension registry not writable", dimensionKey.location()));
         }
 

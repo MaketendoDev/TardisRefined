@@ -8,16 +8,18 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import whocraft.tardis_refined.TardisRefined;
 
-/** The recipe serialiser implementation.
+/**
+ * The recipe serialiser implementation.
  * <br> Making this allows vanilla to automatically add our recipe types onto its recipe packet entry and reload listener
- * */
+ */
 public class ManipulatorCraftingRecipeSerializer implements RecipeSerializer<ManipulatorCraftingRecipe> {
 
     public static ResourceLocation SERIALIZER_ID = new ResourceLocation(TardisRefined.MODID, "astral_manipulator");
 
-    public ManipulatorCraftingRecipeSerializer(){
+    public ManipulatorCraftingRecipeSerializer() {
 
     }
+
     @Override
     public Codec<ManipulatorCraftingRecipe> codec() {
         return ManipulatorCraftingRecipe.CODEC;

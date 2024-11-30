@@ -15,7 +15,6 @@ import java.util.List;
 
 public class CuriosTrinketsUtil {
 
-    private static CuriosTrinketsUtil INSTANCE = new CuriosTrinketsUtil();
     public static final Slot HAT = new Slot("head", "head/hat");
     public static final Slot FACE = new Slot("head", "head/face");
     public static final Slot NECKLACE = new Slot("necklace", "chest/necklace");
@@ -27,13 +26,14 @@ public class CuriosTrinketsUtil {
     public static final Slot OFFHAND = new Slot("hand", "offhand/glove");
     public static final Slot RING = new Slot("hand", "hand/ring");
     public static final Slot OFFHAND_RING = new Slot("ring", "offhand/ring");
-
-    public static void setInstance(CuriosTrinketsUtil instance) {
-        INSTANCE = instance;
-    }
+    private static CuriosTrinketsUtil INSTANCE = new CuriosTrinketsUtil();
 
     public static CuriosTrinketsUtil getInstance() {
         return INSTANCE;
+    }
+
+    public static void setInstance(CuriosTrinketsUtil instance) {
+        INSTANCE = instance;
     }
 
     public boolean isTrinkets() {
@@ -50,7 +50,7 @@ public class CuriosTrinketsUtil {
 
     public ItemStack findGlasses(LivingEntity entity, String... slots) {
 
-        if(entity.getItemBySlot(EquipmentSlot.HEAD).getItem() instanceof GlassesItem){
+        if (entity.getItemBySlot(EquipmentSlot.HEAD).getItem() instanceof GlassesItem) {
             return entity.getItemBySlot(EquipmentSlot.HEAD);
         }
 

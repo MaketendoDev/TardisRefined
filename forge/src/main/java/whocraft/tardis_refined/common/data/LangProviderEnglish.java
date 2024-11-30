@@ -12,7 +12,6 @@ import whocraft.tardis_refined.TardisRefined;
 import whocraft.tardis_refined.common.capability.tardis.upgrades.Upgrade;
 import whocraft.tardis_refined.common.hum.HumEntry;
 import whocraft.tardis_refined.common.hum.TardisHums;
-import whocraft.tardis_refined.registry.TRUpgrades;
 import whocraft.tardis_refined.common.tardis.control.Control;
 import whocraft.tardis_refined.common.tardis.themes.ShellTheme;
 import whocraft.tardis_refined.constants.ModMessages;
@@ -56,7 +55,7 @@ public class LangProviderEnglish extends LanguageProvider {
 
         //Hum Sounds
         TardisHums.registerDefaultHums();
-        for(Map.Entry<ResourceLocation, HumEntry> entry : TardisHums.getDefaultHums().entrySet()){
+        for (Map.Entry<ResourceLocation, HumEntry> entry : TardisHums.getDefaultHums().entrySet()) {
             addSound(entry.getValue().getSoundEventId(), "TARDIS hums");
         }
 

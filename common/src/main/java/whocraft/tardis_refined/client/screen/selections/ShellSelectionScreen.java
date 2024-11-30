@@ -39,21 +39,17 @@ import java.util.UUID;
 
 public class ShellSelectionScreen extends SelectionScreen {
 
-    private final List<ResourceLocation> themeList;
-    private ResourceLocation currentShellTheme;
-
-    protected int imageWidth = 256;
-    protected int imageHeight = 173;
-    private int leftPos, topPos;
-
-
     public static ResourceLocation MONITOR_TEXTURE = new ResourceLocation(TardisRefined.MODID, "textures/gui/shell.png");
     public static ResourceLocation NOISE = new ResourceLocation(TardisRefined.MODID, "textures/gui/noise.png");
+    public static GlobalShellBlockEntity globalShellBlockEntity;
+    private final List<ResourceLocation> themeList;
+    protected int imageWidth = 256;
+    protected int imageHeight = 173;
+    private ResourceLocation currentShellTheme;
+    private int leftPos, topPos;
     private ShellPattern pattern;
-
     private List<ShellPattern> patternCollection;
     private Button patternButton;
-    public static GlobalShellBlockEntity globalShellBlockEntity;
 
     public ShellSelectionScreen(ResourceLocation currentShellTheme) {
         super(Component.translatable(ModMessages.UI_SHELL_SELECTION));
@@ -140,7 +136,7 @@ public class ShellSelectionScreen extends SelectionScreen {
         guiGraphics.blit(MONITOR_TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 
         /*Model*/
-        renderShell(guiGraphics, width / 2- 75, height / 2 - 20, 25F);
+        renderShell(guiGraphics, width / 2 - 75, height / 2 - 20, 25F);
         //renderShell(guiGraphics, width / 2, height / 2, 25F);
 
 

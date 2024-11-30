@@ -1,15 +1,11 @@
 package whocraft.tardis_refined.client.overlays;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -22,16 +18,17 @@ import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
 import whocraft.tardis_refined.common.tardis.manager.TardisPilotingManager;
 import whocraft.tardis_refined.constants.ModMessages;
 
-import java.util.UUID;
-
 public class ExteriorViewOverlay {
 
+    public static final ResourceLocation BAR_TEXTURE = new ResourceLocation(TardisRefined.MODID, "textures/gui/bar_texture.png");
     public static boolean shouldRender = true;
 
     public static void renderOverlay(GuiGraphics guiGraphics) {
         Minecraft mc = Minecraft.getInstance();
 
-        if(!shouldRender) {return;}
+        if (!shouldRender) {
+            return;
+        }
 
         TardisPlayerInfo.get(mc.player).ifPresent(tardisPlayerInfo -> {
             PoseStack poseStack = guiGraphics.pose();
@@ -114,9 +111,6 @@ public class ExteriorViewOverlay {
         }
     }
 
-
-    public static final ResourceLocation BAR_TEXTURE = new ResourceLocation(TardisRefined.MODID, "textures/gui/bar_texture.png");
-
     public static void renderJourneyProgressBar(GuiGraphics guiGraphics, float journeyProgress) {
         Minecraft mc = Minecraft.getInstance();
 
@@ -145,9 +139,6 @@ public class ExteriorViewOverlay {
 
         guiGraphics.drawString(mc.font, progressText, textX, textY, 0xFFFFFF, false); // White text
     }
-
-
-
 
 
 }

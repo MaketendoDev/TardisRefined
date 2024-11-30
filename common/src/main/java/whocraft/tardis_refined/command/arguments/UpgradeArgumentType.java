@@ -22,31 +22,13 @@ import java.util.stream.Stream;
 
 public class UpgradeArgumentType implements ArgumentType<ResourceLocation> {
 
+    public static final DynamicCommandExceptionType INVALID_UPGRADE_EXCEPTION = new DynamicCommandExceptionType((upgrade) -> Component.translatable(ModMessages.CMD_ARG_UPGRADE_INVALID, upgrade));
     private static final Collection<String> EXAMPLES = Stream.of(TRUpgrades.ARCHITECTURE_SYSTEM).map((upgrade) -> {
         return upgrade != null ? upgrade.getId().toString() : "";
     }).collect(Collectors.toList());
 
-    public static final DynamicCommandExceptionType INVALID_UPGRADE_EXCEPTION = new DynamicCommandExceptionType((upgrade) -> Component.translatable(ModMessages.CMD_ARG_UPGRADE_INVALID, upgrade));
-
     public static UpgradeArgumentType upgradeArgumentType() {
         return new UpgradeArgumentType();
-    }
-
-    @Override
-    public ResourceLocation parse(StringReader reader) throws CommandSyntaxException {
-        return ResourceLocation.read(reader);
-    }
-
-    @Override
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-
-        return SharedSuggestionProvider.suggestResource(TRUpgrades.UPGRADE_REGISTRY.keySet(), builder);
-    }
-
-    @Override
-    public Collection<String> getExamples() {
-        EXAMPLES.add("*");
-        return EXAMPLES;
     }
 
     public static Upgrade getUpgrade(CommandContext<CommandSourceStack> context, String name) throws CommandSyntaxException {
@@ -64,5 +46,22 @@ public class UpgradeArgumentType implements ArgumentType<ResourceLocation> {
             throw INVALID_UPGRADE_EXCEPTION.create(resourcelocation);
         else
             return resourcelocation;
+    }
+
+    @Override
+    public ResourceLocation parse(StringReader reader) throws CommandSyntaxException {
+        return ResourceLocation.read(reader);
+    }
+
+    @Override
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+
+        return SharedSuggestionProvider.suggestResource(TRUpgrades.UPGRADE_REGISTRY.keySet(), builder);
+    }
+
+    @Override
+    public Collection<String> getExamples() {
+        EXAMPLES.add("*");
+        return EXAMPLES;
     }
 }

@@ -2,7 +2,6 @@ package whocraft.tardis_refined.registry.neoforge;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -12,7 +11,6 @@ import whocraft.tardis_refined.registry.DeferredRegistry;
 import whocraft.tardis_refined.registry.RegistrySupplier;
 import whocraft.tardis_refined.registry.RegistrySupplierHolder;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -51,13 +49,17 @@ public class DeferredRegistryImpl {
             this.syncToClient = syncToClient;
         }
 
-        /** Constructor for custom registries.*/
-        public Impl(ResourceKey<? extends Registry<T>> resourceKey, DeferredRegister<T> deferredRegister, boolean syncToClient){
+        /**
+         * Constructor for custom registries.
+         */
+        public Impl(ResourceKey<? extends Registry<T>> resourceKey, DeferredRegister<T> deferredRegister, boolean syncToClient) {
             this(resourceKey, deferredRegister, true, syncToClient);
         }
 
-        /** Constructor for non-custom registries. Creates a Neoforge {@link DeferredRegister} instance.*/
-        public Impl(String modid, ResourceKey<? extends Registry<T>> resourceKey){
+        /**
+         * Constructor for non-custom registries. Creates a Neoforge {@link DeferredRegister} instance.
+         */
+        public Impl(String modid, ResourceKey<? extends Registry<T>> resourceKey) {
             this(resourceKey, DeferredRegister.create(resourceKey, modid), false, false);
         }
 
@@ -87,7 +89,7 @@ public class DeferredRegistryImpl {
         }
 
         @Override
-        public ResourceKey<? extends Registry<T>> key(){
+        public ResourceKey<? extends Registry<T>> key() {
             return this.resourceKey;
         }
 

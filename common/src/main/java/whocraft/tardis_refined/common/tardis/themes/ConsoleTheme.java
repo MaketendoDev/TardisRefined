@@ -15,12 +15,18 @@ import whocraft.tardis_refined.registry.RegistrySupplierHolder;
 
 public class ConsoleTheme implements Theme {
 
-    /** Registry Key for the ConsoleTheme registry. For addon mods, use this as the registry key*/
+    /**
+     * Registry Key for the ConsoleTheme registry. For addon mods, use this as the registry key
+     */
     public static final ResourceKey<Registry<ConsoleTheme>> CONSOLE_THEME_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(TardisRefined.MODID, "console_theme"));
 
-    /** Tardis Refined instance of the ConsoleTheme registry. Addon Mods: DO NOT USE THIS, it is only for Tardis Refined use only*/
+    /**
+     * Tardis Refined instance of the ConsoleTheme registry. Addon Mods: DO NOT USE THIS, it is only for Tardis Refined use only
+     */
     public static final DeferredRegistry<ConsoleTheme> CONSOLE_THEME_DEFERRED_REGISTRY = DeferredRegistry.createCustom(TardisRefined.MODID, CONSOLE_THEME_REGISTRY_KEY, true);
-    /** Instance of registry containing all ConsoleTheme entries. Addon mod entries will be included in this registry as long as they are use the same ResourceKey<Registry<ObjectType>>. */
+    /**
+     * Instance of registry containing all ConsoleTheme entries. Addon mod entries will be included in this registry as long as they are use the same ResourceKey<Registry<ObjectType>>.
+     */
     public static final Registry<ConsoleTheme> CONSOLE_THEME_REGISTRY = CONSOLE_THEME_DEFERRED_REGISTRY.getRegistry().get();
 
     public static final RegistrySupplierHolder<ConsoleTheme, ConsoleTheme> FACTORY = registerConsoleTheme("factory", new FactoryConsoleTheme());
@@ -33,22 +39,20 @@ public class ConsoleTheme implements Theme {
     public static final RegistrySupplierHolder<ConsoleTheme, ConsoleTheme> NUKA = registerConsoleTheme("nuka", new NukaConsoleTheme());
     public static final RegistrySupplierHolder<ConsoleTheme, ConsoleTheme> INITIATIVE = registerConsoleTheme("initiative", new InitiativeConsoleTheme());
     public static final RegistrySupplierHolder<ConsoleTheme, ConsoleTheme> REFURBISHED = registerConsoleTheme("refurbished", new RefurbishedConsoleTheme());
-
-    private ResourceLocation translationKey;
     private final ConsoleThemeDetails consoleThemeDetails;
+    private ResourceLocation translationKey;
 
     public ConsoleTheme(ResourceLocation translationKey, ConsoleThemeDetails consoleThemeDetails) {
         this.translationKey = translationKey;
         this.consoleThemeDetails = consoleThemeDetails;
     }
 
-    public ControlSpecification[] getControlSpecificationList() {
-        return consoleThemeDetails.getControlSpecification();
+    private static RegistrySupplierHolder<ConsoleTheme, ConsoleTheme> registerConsoleTheme(String id, ConsoleThemeDetails themeDetails) {
+        return CONSOLE_THEME_DEFERRED_REGISTRY.registerHolder(id, () -> new ConsoleTheme(new ResourceLocation(TardisRefined.MODID, id), themeDetails));
     }
 
-
-    private static RegistrySupplierHolder<ConsoleTheme, ConsoleTheme> registerConsoleTheme(String id, ConsoleThemeDetails themeDetails){
-        return CONSOLE_THEME_DEFERRED_REGISTRY.registerHolder(id, () -> new ConsoleTheme(new ResourceLocation(TardisRefined.MODID, id), themeDetails));
+    public ControlSpecification[] getControlSpecificationList() {
+        return consoleThemeDetails.getControlSpecification();
     }
 
     @Override

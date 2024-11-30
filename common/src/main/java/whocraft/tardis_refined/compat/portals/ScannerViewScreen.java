@@ -58,16 +58,15 @@ import java.util.WeakHashMap;
  */
 public class ScannerViewScreen {
     /**
-     * The Framebuffer that the GUI portal is going to render onto
-     */
-    @Environment(EnvType.CLIENT)
-    private static RenderTarget frameBuffer;
-
-    /**
      * A weak hash map storing ChunkLoader objects for each players
      */
     private static final WeakHashMap<ServerPlayer, ChunkLoader>
             chunkLoaderMap = new WeakHashMap<>();
+    /**
+     * The Framebuffer that the GUI portal is going to render onto
+     */
+    @Environment(EnvType.CLIENT)
+    private static RenderTarget frameBuffer;
 
     /**
      * Remove the GUI portal chunk loader for a player
@@ -78,7 +77,6 @@ public class ScannerViewScreen {
             PortalAPI.removeChunkLoaderForPlayer(player, chunkLoader);
         }
     }
-
 
 
     public static void onCommandExecuted(ServerPlayer player, ServerLevel world, Vec3 pos) {
@@ -131,6 +129,9 @@ public class ScannerViewScreen {
         private final ResourceKey<Level> viewingDimension;
 
         private final Vec3 viewingPosition;
+        protected int imageWidth = 256;
+        protected int imageHeight = 173;
+        private int leftPos, topPos;
 
         public GuiPortalScreen(ResourceKey<Level> viewingDimension, Vec3 viewingPosition) {
             super(Component.literal(""));
@@ -154,11 +155,6 @@ public class ScannerViewScreen {
                     "whocraft.tardis_refined.compat.portals.ScannerViewScreen.RemoteCallables.serverRemoveChunkLoader"
             );
         }
-
-        protected int imageWidth = 256;
-        protected int imageHeight = 173;
-        private int leftPos, topPos;
-
 
         @Override
         public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
@@ -203,21 +199,20 @@ public class ScannerViewScreen {
                     .build();
 
             // Ask it to render the world into the framebuffer the next frame
-            if(frameBuffer != null && worldRenderInfo != null) {
-            GuiPortalRendering.submitNextFrameRendering(worldRenderInfo, frameBuffer);
+            if (frameBuffer != null && worldRenderInfo != null) {
+                GuiPortalRendering.submitNextFrameRendering(worldRenderInfo, frameBuffer);
 
 
-
-            // Draw the framebuffer
+                // Draw the framebuffer
                 int h = minecraft.getWindow().getHeight();
                 int w = minecraft.getWindow().getWidth();
-            MyRenderHelper.drawFramebuffer(
-                    frameBuffer,
-                    true, // enable alpha blend
-                    false, // don't modify alpha
-                    w * 0.2f, w * 0.8f,
-                    h * 0.2f, h * 0.8f
-            );
+                MyRenderHelper.drawFramebuffer(
+                        frameBuffer,
+                        true, // enable alpha blend
+                        false, // don't modify alpha
+                        w * 0.2f, w * 0.8f,
+                        h * 0.2f, h * 0.8f
+                );
 
             }
         }

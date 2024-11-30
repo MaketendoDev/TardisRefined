@@ -15,7 +15,7 @@ public class SpectatorGuiMixin {
     @Inject(method = "renderHotbar(Lnet/minecraft/client/gui/GuiGraphics;)V", at = @At(value = "HEAD"), cancellable = true)
     public void renderHotbar(GuiGraphics guiGraphics, CallbackInfo ci) {
         TardisPlayerInfo.get(Minecraft.getInstance().player).ifPresent(tardisPlayerInfo -> {
-            if(tardisPlayerInfo.isViewingTardis()) {
+            if (tardisPlayerInfo.isViewingTardis()) {
                 ci.cancel();
             }
         });

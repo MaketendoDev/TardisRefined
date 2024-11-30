@@ -52,7 +52,7 @@ public class TardisClientLogic {
         Player player = Minecraft.getInstance().player;
 
         TardisPlayerInfo.get(player).ifPresent(tardisPlayerInfo -> {
-            if(tardisPlayerInfo.isViewingTardis()){
+            if (tardisPlayerInfo.isViewingTardis()) {
                 Minecraft.getInstance().options.setCameraType(CameraType.THIRD_PERSON_FRONT);
             }
         });
@@ -144,7 +144,7 @@ public class TardisClientLogic {
         if (player.tickCount % 120 == 0 && !isInArsArea(player.blockPosition())) return;
         RandomSource random = player.level().random;
         Level level = player.level();
-        ClientLevel clientLevel = (ClientLevel)level;
+        ClientLevel clientLevel = (ClientLevel) level;
         double originX = player.getX();
         double originY = player.getY();
         double originZ = player.getZ();
@@ -163,8 +163,10 @@ public class TardisClientLogic {
         }
     }
 
-    /** Handle when to start playing looping sounds for anything that doesn't need to be played inside a Tardis dimension*/
-    private static void handleNonTardisLoopingSounds(Player player, Level targetLevel){
+    /**
+     * Handle when to start playing looping sounds for anything that doesn't need to be played inside a Tardis dimension
+     */
+    private static void handleNonTardisLoopingSounds(Player player, Level targetLevel) {
         SoundManager soundManager = Minecraft.getInstance().getSoundManager();
         if (GravityUtil.isInGravityShaft(Minecraft.getInstance().player)) {
             if (!soundManager.isActive(TRSoundInstances.GRAVITY_LOOP)) {
@@ -172,13 +174,15 @@ public class TardisClientLogic {
             }
         }
     }
-    /** Handle when to trigger the looping sounds to start playing. This is not a duplicate of the logic in the LoopingSound implementation. Here we are only defining when we should start or continue playing the sound*/
-    private static void handleTardisLoopingSounds(TardisClientData clientData, Player player, Level targetLevel){
+
+    /**
+     * Handle when to trigger the looping sounds to start playing. This is not a duplicate of the logic in the LoopingSound implementation. Here we are only defining when we should start or continue playing the sound
+     */
+    private static void handleTardisLoopingSounds(TardisClientData clientData, Player player, Level targetLevel) {
 
         boolean isThisTardis = clientData.getLevelKey() == targetLevel.dimension();
 
         SoundManager soundManager = Minecraft.getInstance().getSoundManager();
-
 
 
         if (isInArsArea(player.blockPosition())) {
@@ -189,7 +193,7 @@ public class TardisClientLogic {
 
         TardisPlayerInfo.get(Minecraft.getInstance().player).ifPresent(tardisPlayerInfo -> {
 
-            if(tardisPlayerInfo.isRenderVortex()) return;
+            if (tardisPlayerInfo.isRenderVortex()) return;
 
             if (isThisTardis && !clientData.isTakingOff() && !clientData.isLanding() && !clientData.isCrashing() && clientData.isFlying()) {
                 if (!soundManager.isActive(TRSoundInstances.TARDIS_SINGLE_FLY)) {
@@ -247,18 +251,18 @@ public class TardisClientLogic {
             System.out.println(tardisPlayerInfo.getPlayerPreviousRot());
             player.setXRot(tardisPlayerInfo.getPlayerPreviousYaw());
             player.setYHeadRot(tardisPlayerInfo.getPlayerPreviousRot());
-            player.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3(0, 128,0));
+            player.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3(0, 128, 0));
         });
     }
 
 
-    private static void handleScreenShake(TardisClientData clientData, Player player){
+    private static void handleScreenShake(TardisClientData clientData, Player player) {
         // Responsible for screen-shake. Not sure of a better solution at this point in time.
 
         if (player.level().dimension() == clientData.getLevelKey()) {
             if (clientData.isCrashing()) {
                 player.setXRot(player.getXRot() + (player.getRandom().nextFloat() - 0.5f) * 0.5f);
-                player.setYHeadRot(player.getYHeadRot() + (player.getRandom().nextFloat() - 0.5f) *  0.5f);
+                player.setYHeadRot(player.getYHeadRot() + (player.getRandom().nextFloat() - 0.5f) * 0.5f);
             } else {
                 if (clientData.isFlying()) {
                     player.setXRot(player.getXRot() + (player.getRandom().nextFloat() - 0.5f) * (clientData.getThrottleStage() * 0.1f));
@@ -270,10 +274,11 @@ public class TardisClientLogic {
 
     /**
      * Higher means more fog, lower means less fog
+     *
      * @return 0 -> 1 float based off fog tick delta
      */
     public static float getFogTickDelta(BlockPos playerPosition) {
-        return TardisHelper.isInArsArea(playerPosition) ? 1f :  1f - (float) FOG_TICK_DELTA / (float) MAX_FOG_TICK_DELTA;
+        return TardisHelper.isInArsArea(playerPosition) ? 1f : 1f - (float) FOG_TICK_DELTA / (float) MAX_FOG_TICK_DELTA;
     }
 
     public static void tickFog(boolean hasFuel) {
@@ -288,18 +293,18 @@ public class TardisClientLogic {
         }
     }
 
-    private static void handleAestheticEffects(TardisClientData clientData, Level targetLevel){
+    private static void handleAestheticEffects(TardisClientData clientData, Level targetLevel) {
         boolean isThisTardis = clientData.getLevelKey() == targetLevel.dimension();
 
         if (isThisTardis) {
-            tickFog(  clientData.getTardisState() < TardisLevelOperator.STATE_EYE_OF_HARMONY || clientData.getFuel() != 0);
+            tickFog(clientData.getTardisState() < TardisLevelOperator.STATE_EYE_OF_HARMONY || clientData.getFuel() != 0);
         }
 
         if (isThisTardis && clientData.getTardisState() == TardisLevelOperator.STATE_EYE_OF_HARMONY) {
             double motionX = 0;
             double motionY = 0.1 + targetLevel.random.nextFloat() / 2;
             double motionZ = 0;
-            Vec3 position = new Vec3((double)1013 + 0.5 - 2 + targetLevel.random.nextInt(4), 71, (double)55 + 0.5- 2 + targetLevel.random.nextInt(4));
+            Vec3 position = new Vec3((double) 1013 + 0.5 - 2 + targetLevel.random.nextInt(4), 71, (double) 55 + 0.5 - 2 + targetLevel.random.nextInt(4));
             ClientHelper.playParticle((ClientLevel) targetLevel, ParticleTypes.CLOUD, position, motionX, motionY, motionZ);
         }
     }

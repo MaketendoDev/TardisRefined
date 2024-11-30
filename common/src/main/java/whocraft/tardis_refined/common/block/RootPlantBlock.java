@@ -36,7 +36,7 @@ import whocraft.tardis_refined.registry.TRBlockRegistry;
 import whocraft.tardis_refined.registry.TRDimensionTypes;
 
 
-public class RootPlantBlock extends BaseEntityBlock implements SimpleWaterloggedBlock{
+public class RootPlantBlock extends BaseEntityBlock implements SimpleWaterloggedBlock {
 
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final IntegerProperty AGE = BlockStateProperties.AGE_5;
@@ -103,7 +103,6 @@ public class RootPlantBlock extends BaseEntityBlock implements SimpleWaterlogged
         if (age < this.getMaxAge()) {
 
 
-
             if (serverLevel.getBlockState(blockPos.below()).getBlock() == Blocks.MAGMA_BLOCK) {
                 if (randomSource.nextInt(6) == 0) {
                     FluidState fluidState = serverLevel.getFluidState(blockPos);
@@ -121,7 +120,7 @@ public class RootPlantBlock extends BaseEntityBlock implements SimpleWaterlogged
                         double j = randomSource.nextGaussian() * 0.02;
 
                         for (int i = 0; i < 10; ++i) {
-                            serverLevel.sendParticles(ParticleTypes.COMPOSTER, (double)blockPos.getX() + (double)0.13125f + (double)0.7375f * (double)randomSource.nextFloat(), (double)blockPos.getY() + d + (double)randomSource.nextFloat() * (1.0), (double)blockPos.getZ() + (double)0.13125f + (double)0.7375f * (double)randomSource.nextFloat(), 120, g,h,j, 0.005);
+                            serverLevel.sendParticles(ParticleTypes.COMPOSTER, (double) blockPos.getX() + (double) 0.13125f + (double) 0.7375f * (double) randomSource.nextFloat(), (double) blockPos.getY() + d + (double) randomSource.nextFloat() * (1.0), (double) blockPos.getZ() + (double) 0.13125f + (double) 0.7375f * (double) randomSource.nextFloat(), 120, g, h, j, 0.005);
                         }
                     }
 
@@ -151,7 +150,7 @@ public class RootPlantBlock extends BaseEntityBlock implements SimpleWaterlogged
     @Override
     public void onPlace(BlockState blockState, Level level, BlockPos blockPos, BlockState blockState2, boolean bl) {
 
-        if(level instanceof ServerLevel serverLevel && level.dimensionTypeId() == TRDimensionTypes.TARDIS){
+        if (level instanceof ServerLevel serverLevel && level.dimensionTypeId() == TRDimensionTypes.TARDIS) {
             TardisLevelOperator.get(serverLevel).ifPresent(TardisHelper::playCloisterBell);
             serverLevel.destroyBlock(blockPos, true); //Use Level#destroyBlock with boolean flag to TRUE so that it both destroys the block and drops its resources based off its loot table, which is the source of truth.
             return;
@@ -166,7 +165,7 @@ public class RootPlantBlock extends BaseEntityBlock implements SimpleWaterlogged
 
     @Override
     public BlockState updateShape(BlockState blockState, Direction direction, BlockState blockState2, LevelAccessor levelAccessor, BlockPos blockPos, BlockPos blockPos2) {
-        if (blockState.getValue(WATERLOGGED)){
+        if (blockState.getValue(WATERLOGGED)) {
             levelAccessor.scheduleTick(blockPos, Fluids.WATER, Fluids.WATER.getTickDelay(levelAccessor));
         }
         return super.updateShape(blockState, direction, blockState2, levelAccessor, blockPos, blockPos2);

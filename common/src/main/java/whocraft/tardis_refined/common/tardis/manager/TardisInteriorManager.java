@@ -39,29 +39,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TardisInteriorManager extends TickableHandler {
+    public static final BlockPos STATIC_CORRIDOR_POSITION = new BlockPos(1013, 99, 5);
     private final TardisLevelOperator operator;
+    // Pillars
+    BlockPos pillarTopLeft = new BlockPos(1024, 78, 55);
+    BlockPos pillarTopRight = new BlockPos(1002, 78, 55);
+    BlockPos pillarBottomLeft = new BlockPos(1016, 73, 55);
+    BlockPos pillarBottomRight = new BlockPos(1010, 73, 55);
     private boolean isWaitingToGenerate = false;
     private boolean isGeneratingDesktop = false;
     private boolean hasGeneratedCorridors = false;
     private int interiorGenerationCooldown = 0;
     private BlockPos corridorAirlockCenter = BlockPos.ZERO;
     private DesktopTheme preparedTheme, currentTheme = TardisDesktops.DEFAULT_OVERGROWN_THEME;
-
-    // Pillars
-    BlockPos pillarTopLeft = new BlockPos(1024,78,55);
-    BlockPos pillarTopRight = new BlockPos(1002,78,55);
-    BlockPos pillarBottomLeft = new BlockPos(1016,73,55);
-    BlockPos pillarBottomRight = new BlockPos(1010,73,55);
-
     // Airlock systems.
     private boolean processingWarping = false;
     private int airlockCountdownSeconds = 3;
     private int airlockTimerSeconds = 5;
-
     private HumEntry humEntry = TardisHums.getDefaultHum();
-
-    public static final BlockPos STATIC_CORRIDOR_POSITION = new BlockPos(1013, 99, 5);
-
     private double fuelForIntChange = 100; // The amount of fuel required to change interior
 
     public TardisInteriorManager(TardisLevelOperator operator) {
@@ -94,12 +89,19 @@ public class TardisInteriorManager extends TickableHandler {
 
         return new ProtectedZone[]{ctrlRoomAirlck, hubAirlck, arsRoom};
     }
-    /** Gets the @{@link DesktopTheme} which is currently used by this Tardis*/
+
+    /**
+     * Gets the @{@link DesktopTheme} which is currently used by this Tardis
+     */
     public DesktopTheme currentTheme() {
         return this.currentTheme;
     }
-    /** Updates the current @{@link DesktopTheme}.
-     * @implNote Should only be used when we are preparing to start a Desktop change*/
+
+    /**
+     * Updates the current @{@link DesktopTheme}.
+     *
+     * @implNote Should only be used when we are preparing to start a Desktop change
+     */
     public TardisInteriorManager setCurrentTheme(DesktopTheme currentTheme) {
         this.currentTheme = currentTheme;
         return this;
@@ -130,7 +132,7 @@ public class TardisInteriorManager extends TickableHandler {
 
 
         tag.putString(NbtConstants.TARDIS_IM_PREPARED_THEME, this.preparedTheme != null ? this.preparedTheme.getIdentifier().toString() : "");
-        if(currentTheme != null) {
+        if (currentTheme != null) {
             tag.putString(NbtConstants.TARDIS_IM_CURRENT_THEME, this.currentTheme.getIdentifier().toString());
         }
         tag.putString(NbtConstants.TARDIS_CURRENT_HUM, this.humEntry.getIdentifier().toString());
@@ -279,11 +281,11 @@ public class TardisInteriorManager extends TickableHandler {
         return level.getBlockState(pillarTopLeft).getBlock() == TRBlockRegistry.ARTRON_PILLAR.get() && level.getBlockState(pillarTopRight).getBlock() == TRBlockRegistry.ARTRON_PILLAR.get() && level.getBlockState(pillarBottomLeft).getBlock() == TRBlockRegistry.ARTRON_PILLAR.get() && level.getBlockState(pillarBottomRight).getBlock() == TRBlockRegistry.ARTRON_PILLAR.get() && operator.getTardisState() != TardisLevelOperator.STATE_EYE_OF_HARMONY;
     }
 
-    public void openTheEye(){
+    public void openTheEye() {
         openTheEye(false);
     }
 
-    public void setEyePillars(Level level){
+    public void setEyePillars(Level level) {
         level.setBlock(pillarTopLeft, TRBlockRegistry.ARTRON_PILLAR.get().defaultBlockState(), Block.UPDATE_ALL);
         level.setBlock(pillarTopRight, TRBlockRegistry.ARTRON_PILLAR.get().defaultBlockState(), Block.UPDATE_ALL);
         level.setBlock(pillarBottomLeft, TRBlockRegistry.ARTRON_PILLAR.get().defaultBlockState(), Block.UPDATE_ALL);
@@ -299,7 +301,7 @@ public class TardisInteriorManager extends TickableHandler {
         AABB portalDoorLength = new AABB(1011, 72, 54, 1015, 71, 56);
         AABB portalDoorWidth = new AABB(1014, 71, 57, 1012, 72, 53);
 
-        if (forced){
+        if (forced) {
             this.setEyePillars(level);
         }
 
@@ -338,17 +340,19 @@ public class TardisInteriorManager extends TickableHandler {
         return airlock.contains(livingEntity) || corridor.contains(livingEntity);
     }
 
-    public void setCorridorAirlockCenter(BlockPos center) {
-        this.corridorAirlockCenter = center;
-    }
-
     public BlockPos getCorridorAirlockCenter() {
         return this.corridorAirlockCenter;
     }
 
-    /** Master logic that schedules the desktop preparation, generation and aesthetic effects in one place
-     * <br> Should be called in the {@link TardisInteriorManager#tick()}*/
-    public void handleDesktopGeneration(ServerLevel level){
+    public void setCorridorAirlockCenter(BlockPos center) {
+        this.corridorAirlockCenter = center;
+    }
+
+    /**
+     * Master logic that schedules the desktop preparation, generation and aesthetic effects in one place
+     * <br> Should be called in the {@link TardisInteriorManager#tick()}
+     */
+    public void handleDesktopGeneration(ServerLevel level) {
         if (this.isWaitingToGenerate) {
             if (level.random.nextInt(30) == 0) {
                 level.playSound(null, TardisArchitectureHandler.DESKTOP_CENTER_POS, SoundEvents.FIRE_AMBIENT, SoundSource.BLOCKS, 5.0F + level.random.nextFloat(), level.random.nextFloat() * 0.7F + 0.3F);
@@ -360,7 +364,7 @@ public class TardisInteriorManager extends TickableHandler {
             //This check doesn't actually work for players that respawn, login or teleport to the Tardis dimension when the Tardis is waiting to generate because our tick method is being called at the start of the server tick.
             //To mitigate the problem where players become stuck inside the stone and suffocate to death, we call TardisLevelOperator#ejectPlayer in the relevant Events.
             if (level.players().isEmpty()) {
-                if (this.operator.triggerRegenState(true)){ //Make sure we actually triggered the regen state before thinking we are good to go
+                if (this.operator.triggerRegenState(true)) { //Make sure we actually triggered the regen state before thinking we are good to go
                     this.operator.forceEjectAllPlayers(); //Teleport all players to the exterior in case they still remain.
                     TardisCommonEvents.DESKTOP_CHANGE_EVENT.invoker().onDesktopChange(operator);
                     this.generateDesktop(this.preparedTheme); //During desktop generation, if the state is still the initial cave state, we will update it to terraformed but no eye activated
@@ -379,7 +383,7 @@ public class TardisInteriorManager extends TickableHandler {
 
             if (interiorGenerationCooldown == 0) {
                 if (this.operator.triggerRegenState(false)) //Make sure we actually triggered the regen state before saying we are good to go.
-                   this.isGeneratingDesktop = false;
+                    this.isGeneratingDesktop = false;
             }
 
             if (level.getGameTime() % 60 == 0) {
@@ -388,7 +392,9 @@ public class TardisInteriorManager extends TickableHandler {
         }
     }
 
-    /** Performs the desktop generation tasks such as block removal and placement tasks*/
+    /**
+     * Performs the desktop generation tasks such as block removal and placement tasks
+     */
     public void generateDesktop(DesktopTheme theme) {
 
         if (operator.getLevel() instanceof ServerLevel serverLevel) {
@@ -420,7 +426,9 @@ public class TardisInteriorManager extends TickableHandler {
         this.hasGeneratedCorridors = hasGeneratedCorridors;
     }
 
-    /** Prepares the Tardis for desktop generation but doesn't actually start it. Handles cooldowns etc.*/
+    /**
+     * Prepares the Tardis for desktop generation but doesn't actually start it. Handles cooldowns etc.
+     */
     public void prepareDesktop(DesktopTheme theme) {
         this.preparedTheme = theme;
         this.isWaitingToGenerate = true;
@@ -452,6 +460,7 @@ public class TardisInteriorManager extends TickableHandler {
 
     /**
      * Returns whether a Tardis has enough fuel to perform an interior change
+     *
      * @return true if the Tardis has enough fuel
      */
     public boolean hasEnoughFuel() {
@@ -460,6 +469,7 @@ public class TardisInteriorManager extends TickableHandler {
 
     /**
      * The amount of fuel required to change the interior
+     *
      * @return double amount of fuel to be removed
      */
     public double getRequiredFuel() {
@@ -468,6 +478,7 @@ public class TardisInteriorManager extends TickableHandler {
 
     /**
      * Sets the amount of fuel required to change the interior
+     *
      * @param fuel the amount of fuel
      */
     private void setRequiredFuel(double fuel) {

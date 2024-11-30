@@ -38,12 +38,9 @@ import java.util.List;
 
 public class GlobalConsoleBlockEntity extends BlockEntity implements BlockEntityTicker<GlobalConsoleBlockEntity> {
 
-    private boolean shouldSpawnControls = true;
-
     private final List<ControlEntity> controlEntityList = new ArrayList<>();
-
     public AnimationState liveliness = new AnimationState();
-
+    private boolean shouldSpawnControls = true;
     private ResourceLocation consoleTheme;
 
     private ConsolePattern basePattern;
@@ -147,7 +144,6 @@ public class GlobalConsoleBlockEntity extends BlockEntity implements BlockEntity
 
 
                 controlEntity.assignControlData(consoleTheme, control, this.getBlockPos());
-
 
 
                 serverLevel.addFreshEntity(controlEntity);

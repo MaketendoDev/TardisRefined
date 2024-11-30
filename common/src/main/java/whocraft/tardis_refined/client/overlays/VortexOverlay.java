@@ -1,6 +1,5 @@
 package whocraft.tardis_refined.client.overlays;
 
-import com.mojang.blaze3d.platform.IconSet;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexSorting;
@@ -31,6 +30,7 @@ public class VortexOverlay {
     private static double velY = 0.0D;
     private static float DEMAT = 0.0f;
     private static float IMMERSION = 0.0f;
+    private static long LAST_TIME = System.currentTimeMillis();
 
     public static void update(GuiGraphics gg) {
         if (globalShellBlockEntity == null) {
@@ -91,9 +91,6 @@ public class VortexOverlay {
         tardisX *= 0.99;
         tardisY *= 0.99;
     }
-
-
-    private static long LAST_TIME = System.currentTimeMillis();
 
     public static void renderOverlay(GuiGraphics gg) {
 

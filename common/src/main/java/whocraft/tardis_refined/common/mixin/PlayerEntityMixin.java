@@ -25,7 +25,7 @@ public class PlayerEntityMixin {
             }
         });
 
-        if(!player.level().isClientSide) return;
+        if (!player.level().isClientSide) return;
         GravityClient.moveGravity(player, info);
     }
 
@@ -33,18 +33,17 @@ public class PlayerEntityMixin {
     @Inject(method = "tick()V", at = @At("TAIL"))
     private void tick(CallbackInfo ci) {
         Player player = (Player) (Object) this;
-        if(GravityUtil.isInGravityShaft(player)){
+        if (GravityUtil.isInGravityShaft(player)) {
             player.resetFallDistance();
         }
 
-        if(player.tickCount % 20 == 0 && !player.level().isClientSide){
+        if (player.tickCount % 20 == 0 && !player.level().isClientSide) {
             TardisPlayerInfo.get(player).ifPresent(tardisPlayerInfo -> {
                 tardisPlayerInfo.syncToClients(null);
             });
         }
 
     }
-
 
 
 }

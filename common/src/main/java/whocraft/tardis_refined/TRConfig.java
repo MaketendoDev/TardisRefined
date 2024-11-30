@@ -34,7 +34,6 @@ public class TRConfig {
     }
 
 
-
     public static class Client {
         public final ModConfigSpec.BooleanValue CONTROL_NAMES;
         public final ModConfigSpec.BooleanValue PLAY_CONSOLE_IDLE_ANIMATIONS;

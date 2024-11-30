@@ -35,7 +35,7 @@ public class TardisPlayerInfoImpl {
             e.addCapability(new ResourceLocation(TardisRefined.MODID, "tardis_player_info"), new TardisPlayerInfoProvider(new TardisPlayerInfo(player)));
         }
     }
-    
+
 
     public static Optional<TardisPlayerInfo> get(LivingEntity player) {
         return player.getCapability(TARDIS_PLAYER_INFO).resolve();

@@ -65,7 +65,7 @@ public class ShellRenderer {
 
 
             VertexConsumer lightning = guiGraphics.bufferSource().getBuffer(RenderType.entityGlint());
-            if(VORTEX.lightning_strike > 0.4){
+            if (VORTEX.lightning_strike > 0.4) {
                 model.renderShell(globalShellBlockEntity, false, false, pose, lightning, 15728880, OverlayTexture.NO_OVERLAY, 1, 1, 1, alpha);
             }
 
