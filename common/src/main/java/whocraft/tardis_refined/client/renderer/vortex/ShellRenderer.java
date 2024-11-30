@@ -47,7 +47,7 @@ public class ShellRenderer {
 
             // Chaotic but loop able rotations
             float xR = (float) Math.sin(timeFactor * 2) * 15.0f; // Wobble on X-axis
-            float yR = ((timeFactor * 360 / (float) (2 * Math.PI)) % 360) * throttle; // Continuous spin on Y-axis
+            float yR = ((timeFactor * 360 / (float) (2 * Math.PI)) % 360) * (1 + throttle * 0.5f); // Continuous spin on Y-axis
             float zR = (float) Math.cos(timeFactor * 3) * 10.0f; // Wobble on Z-axis
 
             //pose.translate(0, -1.5, 0);//yR * control
