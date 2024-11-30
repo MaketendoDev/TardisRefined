@@ -13,6 +13,7 @@ import whocraft.tardis_refined.client.TardisClientData;
 import whocraft.tardis_refined.client.model.blockentity.console.ConsoleModelCollection;
 import whocraft.tardis_refined.client.model.blockentity.console.ConsoleUnit;
 import whocraft.tardis_refined.client.model.blockentity.shell.ShellModelCollection;
+import whocraft.tardis_refined.client.renderer.RenderHelper;
 import whocraft.tardis_refined.client.screen.selections.ShellSelectionScreen;
 import whocraft.tardis_refined.common.block.console.GlobalConsoleBlock;
 import whocraft.tardis_refined.common.blockentity.console.GlobalConsoleBlockEntity;
@@ -99,7 +100,17 @@ public class GlobalConsoleRenderer implements BlockEntityRenderer<GlobalConsoleB
 
             // Add rotation effect
             if (reactions.isFlying()) {
-                poseStack.mulPose(Axis.YP.rotationDegrees((blockEntity.getLevel().getGameTime() % 360) * (reactions.getThrottleStage() * 5L)));
+                // Time-based calculations for loop able motion and rotation
+                long time = System.currentTimeMillis();
+                float timeFactor = (time % 4000L) / 4000.0f * (float) (2 * Math.PI);
+
+                // Chaotic but loop able rotations
+                float xR = (float) Math.sin(timeFactor * 2) * 15.0f; // Wobble on X-axis
+                float yR = ((timeFactor * 360 / (float) (2 * Math.PI)) % 360) * reactions.getThrottleStage(); // Continuous spin on Y-axis
+                float zR = (float) Math.cos(timeFactor * 3) * 10.0f; // Wobble on Z-axis
+                int control = 1;
+                RenderHelper.rotateZYX(poseStack, xR * control, yR * control, zR * control);
+
             } else {
                 poseStack.mulPose(Axis.YP.rotationDegrees(rotation % 360));
             }
@@ -107,6 +118,8 @@ public class GlobalConsoleRenderer implements BlockEntityRenderer<GlobalConsoleB
             if (ShellSelectionScreen.globalShellBlockEntity == null) {
                 ShellSelectionScreen.generateDummyGlobalShell();
             }
+
+            ShellSelectionScreen.globalShellBlockEntity.setTardisId(reactions.getLevelKey());
 
             // Dynamic flickering alpha for a hologram effect
             float flickerAlpha = 0.2f + blockEntity.getLevel().random.nextFloat() * 0.1f;
@@ -118,6 +131,7 @@ public class GlobalConsoleRenderer implements BlockEntityRenderer<GlobalConsoleB
             float green = recoveryOrCrashing ? 0.5f + (float) Math.sin(time + Math.PI / 2) * 0.5f : (float) color.y;
             float blue = recoveryOrCrashing ? 0.5f + (float) Math.sin(time + Math.PI) * 0.5f : (float) color.z;
 
+            model.setIgnoreAnmationAlpha(!reactions.isTakingOff() && !reactions.isLanding());
             model.renderShell(
                     ShellSelectionScreen.globalShellBlockEntity,
                     false,
@@ -131,6 +145,7 @@ public class GlobalConsoleRenderer implements BlockEntityRenderer<GlobalConsoleB
                     blue,
                     flickerAlpha
             );
+            model.setIgnoreAnmationAlpha(false);
 
             poseStack.popPose();
         }

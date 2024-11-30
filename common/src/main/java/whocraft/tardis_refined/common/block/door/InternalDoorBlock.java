@@ -30,8 +30,10 @@ public class InternalDoorBlock extends BaseEntityBlock {
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty OPEN = BooleanProperty.create("open");
-    /** This is this door instance's understanding of if it is locked or not.
-     * <br> This is needed to account for when multiple internal doors are in a Tardis, and the player is locking a different door*/
+    /**
+     * This is this door instance's understanding of if it is locked or not.
+     * <br> This is needed to account for when multiple internal doors are in a Tardis, and the player is locking a different door
+     */
     public static final BooleanProperty LOCKED = BooleanProperty.create("locked");
     protected static final VoxelShape COLLISION = Block.box(0, 0, 0, 16, 32, 16);
     protected static BlockEntity blockEntity;

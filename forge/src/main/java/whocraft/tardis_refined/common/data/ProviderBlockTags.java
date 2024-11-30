@@ -18,7 +18,6 @@ import whocraft.tardis_refined.registry.TRBlockRegistry;
 import whocraft.tardis_refined.registry.TRTagKeys;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -82,7 +81,6 @@ public class ProviderBlockTags extends BlockTagsProvider {
                 .add(TRBlockRegistry.ASTRAL_MANIPULATOR_BLOCK.get())
                 .add(TRBlockRegistry.ZEITON_BLOCK.get())
                 .add(TRBlockRegistry.ASTRAL_MANIPULATOR_BLOCK.get());
-
 
 
         // ===== DIAGONAL WALLS =====

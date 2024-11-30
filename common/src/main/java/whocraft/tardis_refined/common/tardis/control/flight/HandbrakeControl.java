@@ -14,7 +14,8 @@ public class HandbrakeControl extends Control {
     public HandbrakeControl(ResourceLocation id) {
         super(id, true);
     }
-    public HandbrakeControl(ResourceLocation id, String langId){
+
+    public HandbrakeControl(ResourceLocation id, String langId) {
         super(id, langId, true);
     }
 
@@ -29,7 +30,7 @@ public class HandbrakeControl extends Control {
             }
 
             operator.getPilotingManager().setHandbrakeOn(true);
-            PlayerUtil.sendMessage(player, Component.translatable(operator.getPilotingManager().isHandbrakeOn() ?  ModMessages.HANDBRAKE_ENGAGED : ModMessages.HANDBRAKE_DISENGAGED), true);
+            PlayerUtil.sendMessage(player, Component.translatable(operator.getPilotingManager().isHandbrakeOn() ? ModMessages.HANDBRAKE_ENGAGED : ModMessages.HANDBRAKE_DISENGAGED), true);
             return true;
         }
 
@@ -40,11 +41,11 @@ public class HandbrakeControl extends Control {
     public boolean onRightClick(TardisLevelOperator operator, ConsoleTheme theme, ControlEntity controlEntity, Player player) {
         if (operator.getPilotingManager().isInFlight()) {
 
-            PlayerUtil.sendMessage(player, Component.translatable( ModMessages.HANDBRAKE_WARNING), true);
+            PlayerUtil.sendMessage(player, Component.translatable(ModMessages.HANDBRAKE_WARNING), true);
             return false;
         } else {
             operator.getPilotingManager().setHandbrakeOn(!operator.getPilotingManager().isHandbrakeOn());
-            PlayerUtil.sendMessage(player, Component.translatable(operator.getPilotingManager().isHandbrakeOn() ?  ModMessages.HANDBRAKE_ENGAGED : ModMessages.HANDBRAKE_DISENGAGED), true);
+            PlayerUtil.sendMessage(player, Component.translatable(operator.getPilotingManager().isHandbrakeOn() ? ModMessages.HANDBRAKE_ENGAGED : ModMessages.HANDBRAKE_DISENGAGED), true);
             return true;
         }
     }

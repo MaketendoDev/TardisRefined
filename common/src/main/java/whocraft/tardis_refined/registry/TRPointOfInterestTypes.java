@@ -13,19 +13,17 @@ import whocraft.tardis_refined.TardisRefined;
 
 public class TRPointOfInterestTypes {
 
-    public static void init(){};
-
     public static final ResourceKey<PoiType> CONSOLE_UNIT = ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, new ResourceLocation(TardisRefined.MODID, "console_unit"));
     public static final ResourceKey<PoiType> ASTRAL_MAP = ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, new ResourceLocation(TardisRefined.MODID, "astral_map"));
 
-
+    ;
     public static final DeferredRegistry<PoiType> POIS = DeferredRegistry.create(TardisRefined.MODID, Registries.POINT_OF_INTEREST_TYPE);
-
-
     public static final RegistrySupplier<PoiType> CONSOLE_UNIT_POI = POIS.register("console_unit", () -> registerPointOfInterest(6, 15, TRBlockRegistry.GLOBAL_CONSOLE_BLOCK.get()));
     public static final RegistrySupplier<PoiType> ASTRAL_MAP_POI = POIS.register("astral_map", () -> registerPointOfInterest(1, 1, TRBlockRegistry.ASTRAL_MAP.get()));
+    private static boolean hasBeenRegistered = false;
 
-
+    public static void init() {
+    }
 
     private static PoiType registerPointOfInterest(int maxTickets, int validRange, Block... blocks) {
 
@@ -37,14 +35,14 @@ public class TRPointOfInterestTypes {
         return new PoiType(builder.build(), maxTickets, validRange);
     }
 
-    private static boolean hasPOIbeenSetup = false;
 
-    // Call this at Server starting
-    public static void registerBlockStates(){
-        if (hasPOIbeenSetup) return;
-        PoiTypes.registerBlockStates(BuiltInRegistries.POINT_OF_INTEREST_TYPE.getHolderOrThrow(CONSOLE_UNIT), CONSOLE_UNIT_POI.get().matchingStates());
-        PoiTypes.registerBlockStates(BuiltInRegistries.POINT_OF_INTEREST_TYPE.getHolderOrThrow(ASTRAL_MAP), ASTRAL_MAP_POI.get().matchingStates());
-        hasPOIbeenSetup = true;
+    // Call this at Server starting - ONLY ON FABRIC!!
+    public static void registerBlockStates() {
+        if (!hasBeenRegistered) {
+            PoiTypes.registerBlockStates(BuiltInRegistries.POINT_OF_INTEREST_TYPE.getHolderOrThrow(CONSOLE_UNIT), CONSOLE_UNIT_POI.get().matchingStates());
+            PoiTypes.registerBlockStates(BuiltInRegistries.POINT_OF_INTEREST_TYPE.getHolderOrThrow(ASTRAL_MAP), ASTRAL_MAP_POI.get().matchingStates());
+            hasBeenRegistered = true;
+        }
     }
 
 }

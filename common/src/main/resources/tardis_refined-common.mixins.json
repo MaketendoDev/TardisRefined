@@ -13,9 +13,11 @@
   ],
   "client": [
     "FogRendererMixin",
+    "GuiMixin",
     "LocalPlayerMixin",
     "MultiplayerGameModeMixin",
-    "PlayerRenderMixin"
+    "PlayerRenderMixin",
+    "SpectatorGuiMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -216,7 +216,7 @@ public class KeyItem extends Item {
 
 
             TardisClientData tardisClientData = TardisClientData.getInstance(mainTardisLevel);
-            if(tardisClientData.isInRecovery()){
+            if (tardisClientData.isInRecovery()) {
                 int cooldownTicks = tardisClientData.getRecoveryTicks();
                 int maxCooldownTicks = 12000; // 10 minutes in ticks
                 int percentage = (int) ((cooldownTicks / (float) maxCooldownTicks) * 100);

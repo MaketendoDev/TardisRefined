@@ -24,14 +24,25 @@ import java.util.UUID;
  * External Shell data.
  **/
 public class TardisExteriorManager extends BaseHandler {
-    private double fuelForShellChange = 15; // Amount of fuel required to change the shell
-
     private final TardisLevelOperator operator;
-    /** Determine if the Tardis's doors, no matter the external shell or internal door, should be locked*/
+    private double fuelForShellChange = 15; // Amount of fuel required to change the shell
+    private boolean locked;
+    private boolean isLanding;
+    private boolean isTakingOff;
+    public TardisExteriorManager(TardisLevelOperator operator) {
+        this.operator = operator;
+    }
+
+    /**
+     * Determine if the Tardis's doors, no matter the external shell or internal door, should be locked
+     */
     public boolean locked() {
         return this.locked;
     }
-    /** Update the external shell block's locked property so that players cannot enter it without a synced Key item*/
+
+    /**
+     * Update the external shell block's locked property so that players cannot enter it without a synced Key item
+     */
     public void setLocked(boolean locked) {
 
         TardisPilotingManager pilotingManager = this.operator.getPilotingManager();
@@ -57,14 +68,9 @@ public class TardisExteriorManager extends BaseHandler {
 
     }
 
-    private boolean locked;
-    private boolean isLanding;
-
     public boolean isLanding() {
         return this.isLanding;
     }
-
-    private boolean isTakingOff;
 
     public boolean isTakingOff() {
         return this.isTakingOff;
@@ -72,11 +78,8 @@ public class TardisExteriorManager extends BaseHandler {
 
     public void setIsTakingOff(boolean isTakingOff) {
         this.isTakingOff = isTakingOff;
-    }
-
-
-    public TardisExteriorManager(TardisLevelOperator operator) {
-        this.operator = operator;
+        operator.tardisClientData().setIsTakingOff(true);
+        operator.tardisClientData().sync();
     }
 
     @Override
@@ -86,6 +89,7 @@ public class TardisExteriorManager extends BaseHandler {
 
         return tag;
     }
+
     @Override
     public void loadData(CompoundTag tag) {
         locked = tag.getBoolean(NbtConstants.LOCKED);
@@ -106,12 +110,15 @@ public class TardisExteriorManager extends BaseHandler {
 
 
     }
-    /** Sets the Exterior Shell to be opened or closed*/
+
+    /**
+     * Sets the Exterior Shell to be opened or closed
+     */
     public void setDoorClosed(boolean closeDoor) {
 
         TardisNavLocation currentPosition = this.operator.getPilotingManager().getCurrentLocation();
 
-        if(currentPosition == null) return;
+        if (currentPosition == null) return;
         ServerLevel lastKnownLocationLevel = currentPosition.getLevel();
 
         // Get the exterior block.
@@ -138,13 +145,17 @@ public class TardisExteriorManager extends BaseHandler {
             lastKnownLocationLevel.setChunkForced(chunkPos.x, chunkPos.z, true); //Set chunk to be force loaded to properly remove block
             //Remove block
             if (lastKnownLocationLevel.getBlockState(lastKnownLocationPosition).getBlock() instanceof GlobalShellBlock shellBlock) {
-                lastKnownLocationLevel.removeBlock(lastKnownLocationPosition, false); //Set block to air with drop items flag to false
+                lastKnownLocationLevel.removeBlock(lastKnownLocationPosition, false);
+//Set block to air with drop items flag to false
             }
             //Un-force load chunk
             lastKnownLocationLevel.setChunkForced(chunkPos.x, chunkPos.z, false); //Set chunk to not be force loaded after we remove the block
         }
     }
-    /** Setup the landing data updates and physical placement of the shell block */
+
+    /**
+     * Setup the landing data updates and physical placement of the shell block
+     */
     public void startLanding(TardisLevelOperator operator, TardisNavLocation location) {
         ServerLevel targetLevel = location.getLevel();
         BlockPos lastKnownLocationPosition = location.getPosition();
@@ -152,18 +163,21 @@ public class TardisExteriorManager extends BaseHandler {
 
         //Force load target chunk
         targetLevel.setChunkForced(chunkPos.x, chunkPos.z, true); //Set chunk to be force loaded to properly place block
+        this.isLanding = true;
+        operator.tardisClientData().setIsLanding(true);
+        operator.tardisClientData().sync();
 
         this.placeExteriorBlockForLanding(location);
 
         //Un-force load target chunk
         targetLevel.setChunkForced(chunkPos.x, chunkPos.z, false); //Set chunk to be not be force loaded after we place the block
 
-        this.isLanding = true;
     }
 
-    /** Convenience method to place the exterior block when the Tardis is landing */
-    public void placeExteriorBlockForLanding(TardisNavLocation location){
-        TardisPlayerInfo.updateTardisForAllPlayers(operator, location);
+    /**
+     * Convenience method to place the exterior block when the Tardis is landing
+     */
+    public void placeExteriorBlockForLanding(TardisNavLocation location) {
         this.operator.setOrUpdateExteriorBlock(location, Optional.empty());
     }
 
@@ -176,7 +190,7 @@ public class TardisExteriorManager extends BaseHandler {
         }
 
         TardisNavLocation currentPosition = this.operator.getPilotingManager().getCurrentLocation();
-        if(currentPosition == null) return false;
+        if (currentPosition == null) return false;
 
         BlockPos lastKnownLocationPosition = currentPosition.getPosition();
         ServerLevel lastKnownLocationLevel = currentPosition.getLevel();
@@ -193,6 +207,7 @@ public class TardisExteriorManager extends BaseHandler {
 
     /**
      * Returns whether a Tardis has enough fuel to perform an interior change
+     *
      * @return true if the Tardis has enough fuel
      */
     public boolean hasEnoughFuelForShellChange() {
@@ -201,6 +216,7 @@ public class TardisExteriorManager extends BaseHandler {
 
     /**
      * The amount of fuel required to change the exterior shell
+     *
      * @return double amount of fuel to be removed
      */
     public double getFuelForShellChange() {
@@ -209,6 +225,7 @@ public class TardisExteriorManager extends BaseHandler {
 
     /**
      * Sets the amount of fuel required to change the exterior shell
+     *
      * @param fuel the amount of fuel
      */
     private void setFuelForShellChange(double fuel) {

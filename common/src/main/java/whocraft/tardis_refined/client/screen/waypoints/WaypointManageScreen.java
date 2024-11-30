@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -21,6 +22,8 @@ import whocraft.tardis_refined.constants.ModMessages;
 
 import java.awt.*;
 import java.util.List;
+
+import static whocraft.tardis_refined.client.screen.selections.SelectionScreen.BUTTON_LOCATION;
 
 public class WaypointManageScreen extends Screen {
 

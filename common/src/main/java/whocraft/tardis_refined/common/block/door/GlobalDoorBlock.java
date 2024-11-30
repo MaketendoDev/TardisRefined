@@ -71,7 +71,7 @@ public class GlobalDoorBlock extends InternalDoorBlock {
     public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
         if (interactionHand == InteractionHand.MAIN_HAND) {
             if (!player.level().isClientSide()) {
-                if (level instanceof  ServerLevel serverLevel) {
+                if (level instanceof ServerLevel serverLevel) {
                     if (TardisLevelOperator.get(serverLevel).isPresent()) {
                         if (serverLevel.getBlockEntity(blockPos) instanceof GlobalDoorBlockEntity entity) {
                             entity.onRightClick(blockState, entity, player);

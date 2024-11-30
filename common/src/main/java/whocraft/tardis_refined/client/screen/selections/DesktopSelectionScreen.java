@@ -112,6 +112,11 @@ public class DesktopSelectionScreen extends SelectionScreen {
     }
 
     @Override
+    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+
+    }
+
+    @Override
     public Component getSelectedDisplayName() {
         return Component.Serializer.fromJson(currentDesktopTheme.getName());
     }

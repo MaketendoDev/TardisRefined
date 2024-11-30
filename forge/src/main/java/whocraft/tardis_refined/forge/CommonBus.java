@@ -24,17 +24,10 @@ import whocraft.tardis_refined.common.util.MiscHelper;
 import whocraft.tardis_refined.common.util.TardisHelper;
 import whocraft.tardis_refined.patterns.ConsolePatterns;
 import whocraft.tardis_refined.patterns.ShellPatterns;
-import whocraft.tardis_refined.registry.TRPointOfInterestTypes;
 
 @Mod.EventBusSubscriber(modid = TardisRefined.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class CommonBus {
 
-
-    @SubscribeEvent
-    public static void onServerStarted(ServerStartedEvent event) {
-        // We call this here to make sure blocks are registered
-        TRPointOfInterestTypes.registerBlockStates();
-    }
 
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {

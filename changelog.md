@@ -1,4 +1,4 @@
-# Version 2.0.8
+# Version 2.1.0
 
 ![TARDIS Refined](https://wiki.tardisrefined.net/TARDIS-Refined-Wiki/tardis_refined_v2.png)
 
@@ -10,6 +10,7 @@
 - tardis is damaged [#351](https://github.com/WhoCraft/TardisRefined/issues/351)
 - Diagonal Windows makes it impossible to craft the terraformer [#383](https://github.com/WhoCraft/TardisRefined/issues/383)
 - relogging causes TARDIS Dance events to not occur [#387](https://github.com/WhoCraft/TardisRefined/issues/387)
+- [Incompatibility] Tardis refined dimensions fail to load with Dimension Threads  [#374](https://github.com/WhoCraft/TardisRefined/issues/374)
 - Console cannot be removed/changed with the console configurator outside the TARDIS dimension  [#380](https://github.com/WhoCraft/TardisRefined/issues/380)
 
 ## Gameplay changes
@@ -20,3 +21,4 @@
 - Holographic exteriors on consoles now spin according to throttle
 - Improved UI for Gravity Shaft
 - Speed up downwards descent for Gravity Shaft
+- Fixed a bug where the overlay keybinds always rendered the default key

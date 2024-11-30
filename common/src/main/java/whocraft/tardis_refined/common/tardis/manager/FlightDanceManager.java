@@ -38,8 +38,8 @@ public class FlightDanceManager extends TickableHandler {
     private List<ControlEntity> getNonCriticalControls(GlobalConsoleBlockEntity controllerConsole) {
         var allControlsOnConsole = controllerConsole.getControlEntityList();
         List<ControlEntity> updatedList = new ArrayList<>(allControlsOnConsole); //Copy over all entries to a new which we can manipulate
-        for(ControlEntity controlEntity : allControlsOnConsole){ //Out of all controls in the original control list, remove any from our copy which are considered critical for normal operations.
-            if(controlEntity.controlSpecification().control().isCriticalForTardisOperation()){
+        for (ControlEntity controlEntity : allControlsOnConsole) { //Out of all controls in the original control list, remove any from our copy which are considered critical for normal operations.
+            if (controlEntity.controlSpecification().control().isCriticalForTardisOperation()) {
                 updatedList.remove(controlEntity); //Remove entries from our copy
             }
         }
@@ -47,7 +47,7 @@ public class FlightDanceManager extends TickableHandler {
     }
 
     public void startFlightDance(GlobalConsoleBlockEntity controllerConsole) {
-        if(controllerConsole == null) return;
+        if (controllerConsole == null) return;
         this.controlEntityList = getNonCriticalControls(controllerConsole);
         this.weAreDancing = true;
         this.console = controllerConsole;
@@ -99,12 +99,12 @@ public class FlightDanceManager extends TickableHandler {
     }
 
     private void triggerNextEvent() {
-        if(controlEntityList.isEmpty()) {
+        if (controlEntityList.isEmpty()) {
             GlobalConsoleBlockEntity console = operator.getPilotingManager().getCurrentConsole();
             // Someone logged out during flight / a desync happened - we will just nicely end the flight
-            if(console == null){
+            if (console == null) {
                 stopDancing();
-                operator.getPilotingManager().endFlight(true);
+                operator.getPilotingManager().endFlight(true, false);
                 return;
             } else {
                 console.killControls(); // Just incase

@@ -9,9 +9,6 @@ import net.minecraft.world.entity.ai.behavior.BlockPosTracker;
 import net.minecraft.world.entity.ai.behavior.WorkAtPoi;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
-import whocraft.tardis_refined.common.block.device.ConsoleConfigurationBlock;
 import whocraft.tardis_refined.common.blockentity.console.GlobalConsoleBlockEntity;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.entity.ControlEntity;
@@ -20,6 +17,18 @@ import whocraft.tardis_refined.common.tardis.manager.TardisPilotingManager;
 import java.util.Optional;
 
 public class FlyTardisAtPOI extends WorkAtPoi {
+
+    private Direction direction = Direction.NORTH;
+
+    public void rotateDirection() {
+        switch (direction) {
+            case NORTH -> direction = Direction.EAST;
+            case EAST -> direction = Direction.SOUTH;
+            case SOUTH -> direction = Direction.WEST;
+            case WEST -> direction = Direction.NORTH;
+            default -> throw new IllegalStateException("Invalid direction: " + direction);
+        }
+    }
 
 
     @Override
@@ -40,49 +49,31 @@ public class FlyTardisAtPOI extends WorkAtPoi {
             if (console == null) return;
 
             if (pilotManager.isInFlight()) {
-                BlockPos consolePos = console.getBlockPos();
-                BlockState consoleState = serverLevel.getBlockState(consolePos);
 
-                if (!consoleState.hasProperty(ConsoleConfigurationBlock.FACING)) {
-                    return; // Exit if FACING property is not available
-                }
 
-                Direction facing = consoleState.getValue(ConsoleConfigurationBlock.FACING);
-                double distanceToConsoleSqr = consolePos.distToCenterSqr(villager.position().x, villager.position().y, villager.position().z);
 
-                if (pilotManager.canEndFlight()) {
+            /*    if(pilotManager.canEndFlight()){
                     pilotManager.setThrottleStage(0);
                     pilotManager.setHandbrakeOn(true);
-                    pilotManager.endFlight(true);
-                }
+                } else {
+                    if(pilotManager.getTargetLocation().getPosition().getX() != 45){
+                        pilotManager.getTargetLocation().setPosition(new BlockPos(45,45,45));
+                        pilotManager.setThrottleStage(4);
+                        pilotManager.setHandbrakeOn(false);
+                    }
+                }*/
 
-                // Ensure the villager is within a reasonable radius
-                if (distanceToConsoleSqr > 9) { // Too far from the console (3 blocks radius)
-                    villager.getNavigation().moveTo(consolePos.getX() + 0.5, villager.position().y, consolePos.getZ() + 0.5, 1);
-                    return;
-                }
-
-           /*     double observePointOffset = 4;
-
-                // Calculate villager position relative to the FACING direction
-                Vec3 offset = switch (facing) {
-                    case NORTH -> new Vec3(0, 0, -observePointOffset); // Stand 1.5 blocks away to the north
-                    case SOUTH -> new Vec3(0, 0, observePointOffset);  // Stand 1.5 blocks away to the south
-                    case WEST -> new Vec3(-observePointOffset, 0, 0);  // Stand 1.5 blocks away to the west
-                    case EAST -> new Vec3(observePointOffset, 0, 0);   // Stand 1.5 blocks away to the east
-                    default -> Vec3.ZERO;               // Default fallback
-                };
-
-                Vec3 targetPosition = new Vec3(consolePos.getX(), villager.position().y, consolePos.getZ()).add(offset);
-
-                villager.getNavigation().moveTo(targetPosition.x, targetPosition.y, targetPosition.z, 1);
-*/
-                // Find the nearest control and perform actions
                 for (ControlEntity controlEntity : console.getControlEntityList()) {
-                    if (controlEntity.isTickingDown() && villager.getRandom().nextBoolean()) {
-                        controlEntity.realignControl();
-                        villager.setUnhappyCounter(40);
-                        return;
+                    if (controlEntity.isTickingDown()) {
+                        rotateDirection();
+                        // Adjust bounding box check to ensure proximity, but without intersecting
+                        if (controlEntity.level().random.nextBoolean()) {
+                            for (int i = 0; i < 5; i++) {
+                                controlEntity.realignControl();
+                            }
+                            villager.setUnhappyCounter(40);
+                            return;
+                        }
                     }
                 }
             }
@@ -97,9 +88,15 @@ public class FlyTardisAtPOI extends WorkAtPoi {
         Brain<Villager> brain = villager.getBrain();
         brain.setMemory(MemoryModuleType.LAST_WORKED_AT_POI, l);
         brain.getMemory(MemoryModuleType.JOB_SITE).ifPresent((globalPos) -> {
-            brain.setMemory(MemoryModuleType.LOOK_TARGET, new BlockPosTracker(globalPos.pos()));
-            villager.moveTo(new Vec3(globalPos.pos().getX(), globalPos.pos().getY(), globalPos.pos().getZ()));
+            BlockPos position = globalPos.pos().relative(direction, 2);
+            brain.setMemory(MemoryModuleType.LOOK_TARGET, new BlockPosTracker(position));
+            villager.getNavigation().moveTo(position.getX(), position.getY(), position.getZ(), 1);
+            villager.getLookControl().setLookAt(globalPos.pos().getX(), globalPos.pos().getY(), globalPos.pos().getZ());
         });
+
+        if (villager.tickCount % 80 == 0) {
+            rotateDirection();
+        }
 
         this.useWorkstation(serverLevel, villager);
     }

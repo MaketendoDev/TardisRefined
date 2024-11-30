@@ -33,6 +33,7 @@ import whocraft.tardis_refined.common.tardis.TardisDesktops;
 import whocraft.tardis_refined.common.tardis.TardisNavLocation;
 import whocraft.tardis_refined.common.tardis.manager.*;
 import whocraft.tardis_refined.common.tardis.themes.ShellTheme;
+import whocraft.tardis_refined.common.util.Platform;
 import whocraft.tardis_refined.common.util.TardisHelper;
 import whocraft.tardis_refined.compat.ModCompatChecker;
 import whocraft.tardis_refined.compat.portals.ImmersivePortals;
@@ -46,12 +47,12 @@ import java.util.UUID;
 
 import static whocraft.tardis_refined.common.block.shell.ShellBaseBlock.REGEN;
 
-public class TardisLevelOperator{
+public class TardisLevelOperator {
+    public static final int STATE_CAVE = 0;
+    public static final int STATE_TERRAFORMED_NO_EYE = 1;
+    public static final int STATE_EYE_OF_HARMONY = 2;
     private final Level level;
     private final ResourceKey<Level> levelKey;
-    private boolean hasInitiallyGenerated = false;
-    private TardisInternalDoor internalDoor = null;
-
     // Managers
     private final TardisExteriorManager exteriorManager;
     private final TardisInteriorManager interiorManager;
@@ -61,13 +62,10 @@ public class TardisLevelOperator{
     private final TardisClientData tardisClientData;
     private final UpgradeHandler upgradeHandler;
     private final AestheticHandler aestheticHandler;
-
+    private boolean hasInitiallyGenerated = false;
+    private TardisInternalDoor internalDoor = null;
     // TARDIS state refers to different stages of TARDIS creation. This allows for different logic to operate in those moments.
     private int tardisState = 0;
-
-    public static final int STATE_CAVE = 0;
-    public static final int STATE_TERRAFORMED_NO_EYE = 1;
-    public static final int STATE_EYE_OF_HARMONY = 2;
 
 
     public TardisLevelOperator(Level level) {
@@ -81,6 +79,11 @@ public class TardisLevelOperator{
         this.upgradeHandler = new UpgradeHandler(this);
         this.aestheticHandler = new AestheticHandler(this);
         this.flightDanceManager = new FlightDanceManager(this);
+    }
+
+    @ExpectPlatform
+    public static Optional<TardisLevelOperator> get(ServerLevel level) {
+        throw new AssertionError();
     }
 
     public UpgradeHandler getUpgradeHandler() {
@@ -97,11 +100,6 @@ public class TardisLevelOperator{
 
     public FlightDanceManager getFlightDanceManager() {
         return this.flightDanceManager;
-    }
-
-    @ExpectPlatform
-    public static Optional<TardisLevelOperator> get(ServerLevel level) {
-        throw new AssertionError();
     }
 
     public CompoundTag serializeNBT() {
@@ -161,11 +159,23 @@ public class TardisLevelOperator{
 
     public void tick(ServerLevel level) {
 
-        if (interiorManager != null) {  interiorManager.tick(level);}
-        if (pilotingManager != null) {  pilotingManager.tick(level);}
-        if (flightDanceManager != null) {  flightDanceManager.tick(level);}
+        if (interiorManager != null) {
+            interiorManager.tick(level);
+        }
+        if (pilotingManager != null) {
+            pilotingManager.tick(level);
+        }
+        if (flightDanceManager != null) {
+            flightDanceManager.tick(level);
+        }
 
-        
+        // Update Viewing Players!
+        level.getServer().getPlayerList().getPlayers().forEach(serverPlayer -> {
+            TardisPlayerInfo.get(serverPlayer).ifPresent(tardisPlayerInfo -> {
+                tardisPlayerInfo.tick(this, serverPlayer);
+            });
+        });
+
         var shouldSync = level.getGameTime() % 40 == 0;
         if (shouldSync) {
             tardisClientData.setIsOnCooldown(pilotingManager.isInRecovery());
@@ -176,6 +186,18 @@ public class TardisLevelOperator{
             tardisClientData.setMaximumFuel(pilotingManager.getMaximumFuel());
             tardisClientData.setTardisState(tardisState);
             tardisClientData.setRecoveryProgress(pilotingManager.getCrashRecoveryTicks());
+
+            //Needed now for flight viewer
+            tardisClientData.setFlying(pilotingManager.isInFlight());
+            tardisClientData.setIsLanding(exteriorManager.isLanding());
+            tardisClientData.setIsTakingOff(exteriorManager.isTakingOff());
+
+            float percentageCompleted = (getPilotingManager().getFlightPercentageCovered() * 100f);
+            if (percentageCompleted > 100) {
+                percentageCompleted = 100;
+            }
+
+            tardisClientData.setJourneyProgress(percentageCompleted);
 
             tardisClientData.sync();
         } else {
@@ -232,6 +254,7 @@ public class TardisLevelOperator{
     public boolean isTardisReady() {
         return !this.getInteriorManager().isGeneratingDesktop();
     }
+
     public boolean exitTardis(Entity entity, ServerLevel doorLevel, BlockPos doorPos, Direction doorDirection, boolean ignoreDoor) {
 
         if (!ignoreDoor && !this.internalDoor.isOpen()) {
@@ -275,17 +298,19 @@ public class TardisLevelOperator{
         return false;
     }
 
-    public void forceEjectAllPlayers(){
-        for (Player player : this.level.players()){
-            if (player instanceof ServerPlayer serverPlayer){
+    public void forceEjectAllPlayers() {
+        for (Player player : this.level.players()) {
+            if (player instanceof ServerPlayer serverPlayer) {
                 this.forceEjectPlayer(serverPlayer);
             }
         }
     }
 
-    /** Helper to automatically teleport the player to the Tardis' current location
-     * <br> Used for emergency eject feature or to prevent players from remaining in the Tardis during desktop generaton*/
-    public boolean forceEjectPlayer(ServerPlayer player){
+    /**
+     * Helper to automatically teleport the player to the Tardis' current location
+     * <br> Used for emergency eject feature or to prevent players from remaining in the Tardis during desktop generaton
+     */
+    public boolean forceEjectPlayer(ServerPlayer player) {
         if (player != null) {
             TardisNavLocation location = this.getPilotingManager().getCurrentLocation();
             return this.exitTardis(player, location.getLevel(), location.getPosition(), location.getDirection(), true);
@@ -293,7 +318,8 @@ public class TardisLevelOperator{
         return false;
     }
 
-    /** Unified logic to update blockstates and data
+    /**
+     * Unified logic to update blockstates and data
      *
      * @param startRegen - True if we should mark the Tardis is regenerating itself.
      * @return True if successfully triggered, false if failed
@@ -306,7 +332,7 @@ public class TardisLevelOperator{
         }
 
         TardisNavLocation currentPosition = this.getPilotingManager().getCurrentLocation();
-        if(currentPosition == null) return false;
+        if (currentPosition == null) return false;
         BlockPos currentBlockPos = currentPosition.getPosition();
         ServerLevel currentLevel = currentPosition.getLevel();
 
@@ -323,15 +349,14 @@ public class TardisLevelOperator{
 
             //Extra sanity check to ensure the player didn't rapidly replace the block at this position with another block.
             //Unlikely, but you never know what players are capable of.
-            if (blockStateAfterDoorUpdates.hasProperty(ShellBaseBlock.REGEN)){
+            if (blockStateAfterDoorUpdates.hasProperty(ShellBaseBlock.REGEN)) {
                 BlockState updatedBlockState = blockStateAfterDoorUpdates.setValue(ShellBaseBlock.REGEN, startRegen); //Set the block to be in a regenerating state
-                if (this.getTardisState() == STATE_CAVE || this.getTardisState() == STATE_TERRAFORMED_NO_EYE){ //If either in a cave state or terraformed without an activated eye of harmony, assume we are transforming from root shell to half baked Tardis
+                if (this.getTardisState() == STATE_CAVE || this.getTardisState() == STATE_TERRAFORMED_NO_EYE) { //If either in a cave state or terraformed without an activated eye of harmony, assume we are transforming from root shell to half baked Tardis
                     //If starting regen for a root shell, update, but do not, create a new blockstate instance
                     //We only want to create a new blockstate instance when generation is finished so that a new GlobalShellBlockEntity instance can be placed with the half-baked theme applied
                     //The logic to handle whether to use the passed in blockstate is being handled in setOrUpdateExteriorBlock
                     this.setOrUpdateExteriorBlock(currentPosition, Optional.of(updatedBlockState), startRegen, ShellChangeSources.ROOT_TO_TARDIS);
-                }
-                else {
+                } else {
                     this.setOrUpdateExteriorBlock(currentPosition, Optional.of(updatedBlockState), startRegen, ShellChangeSources.REGEN_EXISTING_TARDIS);
                 }
                 return true;
@@ -339,23 +364,28 @@ public class TardisLevelOperator{
         }
         return false;
     }
-    /** Convenience method to use when we are going to update the exterior block but we are not setting up a new Tardis
-     * @param location - location of the block we are updating
+
+    /**
+     * Convenience method to use when we are going to update the exterior block but we are not setting up a new Tardis
+     *
+     * @param location         - location of the block we are updating
      * @param targetBlockState - Only leave this empty if we are landing the Tardis after finishing flight, otherwise provide a value to indicate we are updating specific data on an existing Tardis shell.
      * @implNote You must call this after calling {@link TardisLevelOperator#setShellTheme(ResourceLocation, ResourceLocation, ShellChangeSource)}
-     * */
-    public void setOrUpdateExteriorBlock(TardisNavLocation location, Optional<BlockState> targetBlockState){
+     */
+    public void setOrUpdateExteriorBlock(TardisNavLocation location, Optional<BlockState> targetBlockState) {
         setOrUpdateExteriorBlock(location, targetBlockState, false, ShellChangeSources.GENERIC_UPDATE);
     }
 
-    /** Common logic to set or update the exterior shell block. This is needed to ensure we preserve data on the exterior shell such as Shell Patterns.
-     * @implNote If we have updated the ShellTheme but haven't updated the Exterior data yet, you must call this after calling {@link TardisLevelOperator#setShellTheme(ResourceLocation, ResourceLocation, ShellChangeSource)}
-     * @param location - target position we are performing block updates on.
+    /**
+     * Common logic to set or update the exterior shell block. This is needed to ensure we preserve data on the exterior shell such as Shell Patterns.
+     *
+     * @param location             - target position we are performing block updates on.
      * @param overridingBlockState - Pass in an updated exterior shell blockstate with the data you want to include. Only leave this empty if we are landing the Tardis after finishing flight, otherwise provide a value to indicate we are updating specific data on an existing Tardis shell.
-     * @param startingRegen - If we are starting or finishing the regenerating of the Tardis. e.g. During Desktop generation.
-     * @param shellChangeSource - Source of the shell update. If the Shell Change event was caused by a Tardis being setup from a Root Shell to a fully functioning version.
+     * @param startingRegen        - If we are starting or finishing the regenerating of the Tardis. e.g. During Desktop generation.
+     * @param shellChangeSource    - Source of the shell update. If the Shell Change event was caused by a Tardis being setup from a Root Shell to a fully functioning version.
+     * @implNote If we have updated the ShellTheme but haven't updated the Exterior data yet, you must call this after calling {@link TardisLevelOperator#setShellTheme(ResourceLocation, ResourceLocation, ShellChangeSource)}
      */
-    public void setOrUpdateExteriorBlock(TardisNavLocation location, Optional<BlockState> overridingBlockState, boolean startingRegen, ShellChangeSource shellChangeSource){
+    public void setOrUpdateExteriorBlock(TardisNavLocation location, Optional<BlockState> overridingBlockState, boolean startingRegen, ShellChangeSource shellChangeSource) {
         AestheticHandler aestheticHandler = this.getAestheticHandler();
         ResourceLocation theme = (aestheticHandler.getShellTheme() != null) ? aestheticHandler.getShellTheme() : ShellTheme.HALF_BAKED.getId();
         ShellTheme shellTheme = ShellTheme.getShellTheme(theme);
@@ -375,12 +405,11 @@ public class TardisLevelOperator{
         //If the Tardis is landing after a flight or we are setting up a Tardis for the first time, utilise a new blockstate.
         //Otherwise, simply update the values of the passed-in blockstate so that we don't need to change things we don't want.
         BlockState selectedBlockState;
-        if (shellChangeSource == ShellChangeSources.ROOT_TO_TARDIS){
+        if (shellChangeSource == ShellChangeSources.ROOT_TO_TARDIS) {
             //If starting regen for a root shell, update, but do not, create a new blockstate instance
             //We only want to create a new blockstate instance when generation is finished so that a new GlobalShellBlockEntity instance can be placed with the half-baked theme applied
             selectedBlockState = startingRegen ? overridingBlockState.orElse(newExteriorBlock) : newExteriorBlock;
-        }
-        else {
+        } else {
             //Otherwise, if we are regenerating a Tardis that is fully terraformed and eye of harmony is activated, use the passed in blockstate for specific data updates, or if the provided blockstate is NULL, use the new exterior shell instance
             selectedBlockState = overridingBlockState.orElse(newExteriorBlock);
         }
@@ -390,7 +419,7 @@ public class TardisLevelOperator{
         BlockState updatedBlockState = selectedBlockState.setValue(ShellBaseBlock.FACING, location.getDirection().getOpposite())
                 .setValue(ShellBaseBlock.WATERLOGGED, location.getLevel().getBlockState(targetLocation).getFluidState().getType() == Fluids.WATER);
 
-        if (updatedBlockState.hasProperty(GlobalShellBlock.LIT) && shellTheme != null){ //Special logic to account for RootedShellBlock not having the LIT blockstate property
+        if (updatedBlockState.hasProperty(GlobalShellBlock.LIT) && shellTheme != null) { //Special logic to account for RootedShellBlock not having the LIT blockstate property
             updatedBlockState.setValue(GlobalShellBlock.LIT, shellTheme.producesLight());
         }
 
@@ -399,7 +428,7 @@ public class TardisLevelOperator{
         targetLevel.setBlock(targetLocation, updatedBlockState, Block.UPDATE_ALL);
 
         // Set TARDIS Id, so the block actually knows what it is
-        if(targetLevel.getBlockEntity(targetLocation) instanceof GlobalShellBlockEntity globalShellBlockEntity){
+        if (targetLevel.getBlockEntity(targetLocation) instanceof GlobalShellBlockEntity globalShellBlockEntity) {
             globalShellBlockEntity.setTardisId(levelKey);
             globalShellBlockEntity.setPattern(shellPattern);
             globalShellBlockEntity.sendUpdates();
@@ -413,9 +442,11 @@ public class TardisLevelOperator{
         targetLevel.sendBlockUpdated(targetLocation, updatedBlockState, updatedBlockState, Block.UPDATE_CLIENTS);
     }
 
-    /** Unified logic to close or open a door
+    /**
+     * Unified logic to close or open a door
      * <br> Updates both internal door and exterior shell door OPEN state
-     * <br> Fires the CloseDoor/OpenDoor events*/
+     * <br> Fires the CloseDoor/OpenDoor events
+     */
     public void setDoorClosed(boolean closeDoor) {
         TardisInternalDoor intDoor = getInternalDoor();
         //Closed the internal door
@@ -437,9 +468,12 @@ public class TardisLevelOperator{
         }
 
     }
-    /** Unified logic to lock or unlock a door
+
+    /**
+     * Unified logic to lock or unlock a door
      * <br> Updates both internal door and exterior shell door LOCK state
-     * <br> Fires the LockDoor/UnlockDoor events*/
+     * <br> Fires the LockDoor/UnlockDoor events
+     */
     public void setDoorLocked(boolean lockDoor) {
         TardisInternalDoor intDoor = getInternalDoor();
 
@@ -449,7 +483,7 @@ public class TardisLevelOperator{
 
         if (this.pilotingManager != null) {
             if (this.pilotingManager.getCurrentLocation() != null) {
-                if (this.exteriorManager != null){
+                if (this.exteriorManager != null) {
                     this.exteriorManager.setLocked(lockDoor);
                 }
             }
@@ -463,7 +497,9 @@ public class TardisLevelOperator{
 
     }
 
-    /** Unified logic to update the Tardis' ShellTheme and Pattern, as well as the exterior and internal doors*/
+    /**
+     * Unified logic to update the Tardis' ShellTheme and Pattern, as well as the exterior and internal doors
+     */
     public void setShellTheme(ResourceLocation shellTheme, ResourceLocation shellPattern, ShellChangeSource shellChangeSource) {
         aestheticHandler.setShellTheme(shellTheme, shellPattern, this.getPilotingManager().getCurrentLocation());
         aestheticHandler.setShellPattern(ShellPatterns.getPatternOrDefault(shellTheme, shellPattern));
@@ -475,21 +511,10 @@ public class TardisLevelOperator{
     }
 
     /**
-     * Sets the main operating door of an interior.
-     *
-     * @param door Internal door object.
-     **/
-    public void setInternalDoor(TardisInternalDoor door) {
-        if (this.internalDoor != null) {
-            this.internalDoor.onSetMainDoor(false);
-        }
-        this.internalDoor = door;
-        if (door != null) //If the new door value is not null
-            this.internalDoor.onSetMainDoor(true);
-    }
-    /** Sets up data and prepares the desktop theme for when the Tardis is generating for the first time.
+     * Sets up data and prepares the desktop theme for when the Tardis is generating for the first time.
      * <br> DO NOT update the exterior/internal doors here, because door updating logic is unified in {@link TardisLevelOperator#triggerRegenState(boolean)}
-     * <br> We do not need to open the Tardis doors here because it is always being called in {@link whocraft.tardis_refined.common.block.shell.RootedShellBlock}*/
+     * <br> We do not need to open the Tardis doors here because it is always being called in {@link whocraft.tardis_refined.common.block.shell.RootedShellBlock}
+     */
     public void setupInitialCave(ServerLevel shellServerLevel, BlockState shellBlockState, BlockPos shellBlockPos) {
         this.interiorManager.generateDesktop(TardisDesktops.DEFAULT_OVERGROWN_THEME);
 
@@ -506,15 +531,33 @@ public class TardisLevelOperator{
     public TardisExteriorManager getExteriorManager() {
         return this.exteriorManager;
     }
+
     public TardisInternalDoor getInternalDoor() {
         return this.internalDoor;
     }
+
+    /**
+     * Sets the main operating door of an interior.
+     *
+     * @param door Internal door object.
+     **/
+    public void setInternalDoor(TardisInternalDoor door) {
+        if (this.internalDoor != null) {
+            this.internalDoor.onSetMainDoor(false);
+        }
+        this.internalDoor = door;
+        if (door != null) //If the new door value is not null
+            this.internalDoor.onSetMainDoor(true);
+    }
+
     public TardisInteriorManager getInteriorManager() {
         return this.interiorManager;
     }
+
     public TardisPilotingManager getPilotingManager() {
         return this.pilotingManager;
     }
+
     public TardisWaypointManager getTardisWaypointManager() {
         return tardisWaypointManager;
     }

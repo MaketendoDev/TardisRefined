@@ -46,33 +46,38 @@ import whocraft.tardis_refined.registry.*;
 
 public class ControlEntity extends Entity {
 
-    /** The total amount of control alignment health points before a control will start causing the Tardis to crash.
-     * <br> This name comes from a time when the terminology wasn't finalised, and a more traditional "health" system was being used. */
+    /**
+     * Flag to determine if this Control can continue to become more mis-aligned and thus lose "health".
+     * <br> This name comes from a time when the terminology wasn't finalised, and a more traditional "health" system was being used.
+     * <br> True - if able to keep being mis-aligned, False if cannot be further mis-aligned
+     */
+    private static final EntityDataAccessor<Boolean> TICKING_DOWN = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.BOOLEAN);
+    /**
+     * Flag to determine if this Control is far too mis-aligned and is considered "dead".
+     * <br> This name comes from a time when the terminology wasn't finalised, and a more traditional "health" system was being used.
+     */
+    private static final EntityDataAccessor<Boolean> IS_DEAD = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.BOOLEAN);
+    /**
+     * Attribute to determine how far this Control is mis-aligned.
+     * <br> This name comes from a time when the terminology wasn't finalised, and a more traditional "health" system was being used.
+     */
+    private static final EntityDataAccessor<Integer> CONTROL_HEALTH = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> SHOW_PARTICLE = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Float> SIZE_WIDTH = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> SIZE_HEIGHT = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.FLOAT);
+    /**
+     * The total amount of control alignment health points before a control will start causing the Tardis to crash.
+     * <br> This name comes from a time when the terminology wasn't finalised, and a more traditional "health" system was being used.
+     */
     private int totalControlHealth = 10;
-
     private ControlSpecification controlSpecification;
     private ConsoleTheme consoleTheme;
     private BlockPos consoleBlockPos;
     private FlightDanceManager flightDanceManager;
     private Vector3f offset;
-
     public ControlEntity(EntityType<?> entityTypeIn, Level level) {
         super(entityTypeIn, level);
     }
-
-    /** Flag to determine if this Control can continue to become more mis-aligned and thus lose "health".
-     * <br> This name comes from a time when the terminology wasn't finalised, and a more traditional "health" system was being used.
-     * <br> True - if able to keep being mis-aligned, False if cannot be further mis-aligned*/
-    private static final EntityDataAccessor<Boolean> TICKING_DOWN = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.BOOLEAN);
-    /** Flag to determine if this Control is far too mis-aligned and is considered "dead".
-     * <br> This name comes from a time when the terminology wasn't finalised, and a more traditional "health" system was being used. */
-    private static final EntityDataAccessor<Boolean> IS_DEAD = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.BOOLEAN);
-    /** Attribute to determine how far this Control is mis-aligned.
-     * <br> This name comes from a time when the terminology wasn't finalised, and a more traditional "health" system was being used. */
-    private static final EntityDataAccessor<Integer> CONTROL_HEALTH = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Boolean> SHOW_PARTICLE = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Float> SIZE_WIDTH = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Float> SIZE_HEIGHT = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.FLOAT);
 
     public ControlEntity(Level level) {
         super(TREntityRegistry.CONTROL_ENTITY.get(), level);
@@ -143,7 +148,7 @@ public class ControlEntity extends Entity {
 
 
         TardisClientData tardisClientData = TardisClientData.getInstance(level().dimension());
-        if(tardisClientData.isInRecovery()){
+        if (tardisClientData.isInRecovery()) {
             int cooldownTicks = tardisClientData.getRecoveryTicks();
             int maxCooldownTicks = 12000; // 10 minutes in ticks
             int percentage = (int) ((cooldownTicks / (float) maxCooldownTicks) * 100);
@@ -158,7 +163,9 @@ public class ControlEntity extends Entity {
     }
 
 
-    /** Tell the Tardis that the control is currently continuing to be misaligned
+    /**
+     * Tell the Tardis that the control is currently continuing to be misaligned
+     *
      * @param manager
      * @return true if can continue to become more misaligned, false if already too misaligned.
      */
@@ -244,7 +251,7 @@ public class ControlEntity extends Entity {
     public boolean hurt(DamageSource damageSource, float f) {
         if (damageSource.getDirectEntity() instanceof Player player) { //Using getDirectEntity can allow for players to indirectly interact with controls, such as through primed TNT
             if (this.level() instanceof ServerLevel serverLevel) {
-                if(!player.level().isClientSide()) {
+                if (!player.level().isClientSide()) {
                     if (entityData.get(IS_DEAD)) {
                         return false;
                     }
@@ -252,7 +259,7 @@ public class ControlEntity extends Entity {
 
                         ItemStack itemStack = player.getMainHandItem();
 
-                        if(itemStack.is(TRItemRegistry.MALLET.get()) && !player.getCooldowns().isOnCooldown(TRItemRegistry.MALLET.get())){
+                        if (itemStack.is(TRItemRegistry.MALLET.get()) && !player.getCooldowns().isOnCooldown(TRItemRegistry.MALLET.get())) {
                             player.getCooldowns().addCooldown(TRItemRegistry.MALLET.get(), 600);
                             playSound(TRSoundRegistry.MALLET.get());
                             itemStack.hurtAndBreak(15, player, (livingEntityx) -> {
@@ -314,7 +321,10 @@ public class ControlEntity extends Entity {
     public boolean isTickingDown() {
         return getEntityData().get(TICKING_DOWN);
     }
-    /** Restores the control alignment points to a higher value so that it won't cause the Tardis to crash*/
+
+    /**
+     * Restores the control alignment points to a higher value so that it won't cause the Tardis to crash
+     */
     public void realignControl() {
         int currentHealth = this.entityData.get(CONTROL_HEALTH);
         int nextHealth = currentHealth + 2;
@@ -467,17 +477,16 @@ public class ControlEntity extends Entity {
     }
 
     private boolean handleLeftClick(Player player, ServerLevel serverLevel) {
-        if (!TardisLevelOperator.get(serverLevel).isPresent()){
+        if (!TardisLevelOperator.get(serverLevel).isPresent()) {
             return false;
-        }
-        else {
+        } else {
             TardisLevelOperator cap = TardisLevelOperator.get(serverLevel).get();
 
             if (cap.getPilotingManager().getCurrentConsole() == null || cap.getPilotingManager().getCurrentConsole() != getConsoleBlockEntity()) {
                 cap.getPilotingManager().setCurrentConsole(this.getConsoleBlockEntity());
             }
 
-            if (!controlSpecification.control().canUseControl(cap, controlSpecification.control(), this)){
+            if (!controlSpecification.control().canUseControl(cap, controlSpecification.control(), this)) {
                 return false;
             }
 
@@ -491,10 +500,9 @@ public class ControlEntity extends Entity {
     }
 
     private boolean handleRightClick(Player player, ServerLevel serverLevel, InteractionHand interactionHand) {
-        if (!TardisLevelOperator.get(serverLevel).isPresent()){
+        if (!TardisLevelOperator.get(serverLevel).isPresent()) {
             return false;
-        }
-        else {
+        } else {
             TardisLevelOperator cap = TardisLevelOperator.get(serverLevel).get();
 
             if (cap.getPilotingManager().getCurrentConsole() == null || cap.getPilotingManager().getCurrentConsole() != getConsoleBlockEntity()) {
@@ -560,7 +568,9 @@ public class ControlEntity extends Entity {
         return false;
     }
 
-    /** Gets the total amount of control alignment health points before a control will start causing the Tardis to crash*/
+    /**
+     * Gets the total amount of control alignment health points before a control will start causing the Tardis to crash
+     */
     public int getTotalControlHealth() {
         return this.totalControlHealth;
     }

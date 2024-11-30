@@ -101,8 +101,6 @@ public class ConsoleConfigurationBlock extends BaseEntityBlock {
             }
 
 
-
-
             if (level instanceof ServerLevel serverLevel) {
                 if (serverLevel.dimensionTypeId() == TRDimensionTypes.TARDIS) {
                     TardisLevelOperator.get(serverLevel).ifPresent(operator -> {

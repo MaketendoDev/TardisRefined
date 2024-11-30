@@ -150,7 +150,6 @@ public class GlobalConsoleBlockEntity extends BlockEntity implements BlockEntity
                 controlEntity.assignControlData(consoleTheme, control, this.getBlockPos());
 
 
-
                 serverLevel.addFreshEntity(controlEntity);
                 controlEntityList.add(controlEntity);
             }

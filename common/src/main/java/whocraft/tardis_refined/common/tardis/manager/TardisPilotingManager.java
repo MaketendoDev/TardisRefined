@@ -44,14 +44,12 @@ import java.util.*;
 
 public class TardisPilotingManager extends TickableHandler {
 
+    public static final int MAX_THROTTLE_STAGE = 5;
     // CONSTANTS
     private static final int TICKS_LANDING_MAX = 9 * 20;
     private static final int TICKS_COOLDOWN_MAX = (10 * 60) * 20;
     private static final double DEFAULT_MAXIMUM_FUEL = 1000;
     private static final double FLIGHT_COST = 0.5f;
-
-    public static final int MAX_THROTTLE_STAGE = 5;
-
     private final TardisLevelOperator operator;
 
     // Location based.
@@ -186,6 +184,7 @@ public class TardisPilotingManager extends TickableHandler {
 
         return tag;
     }
+
     @Override
     public void tick(ServerLevel level) {
 
@@ -260,7 +259,7 @@ public class TardisPilotingManager extends TickableHandler {
 
             // Automatically trigger the ship to land for things such as landing pads.
             if (distanceCovered >= flightDistance && autoLand && !this.isLanding()) {
-                this.endFlight(false);
+                this.endFlight(false, false);
             }
         }
 
@@ -289,8 +288,6 @@ public class TardisPilotingManager extends TickableHandler {
         }
 
 
-
-
     }
 
 
@@ -305,14 +302,14 @@ public class TardisPilotingManager extends TickableHandler {
         }
 
         if (isInFlight && this.canEndFlight() && !this.isLanding() && !this.isTakingOff() && (this.isHandbrakeOn || this.throttleStage == 0)) {
-            this.endFlight(false);
+            this.endFlight(false, false);
         }
     }
 
     private void tickCrashRecovery() {
         ticksinCrashRecovery++;
 
-        if(ticksinCrashRecovery % 120 == 0) {
+        if (ticksinCrashRecovery % 120 == 0) {
             TardisHelper.playCloisterBell(operator);
         }
         // After 10 minutes
@@ -364,15 +361,13 @@ public class TardisPilotingManager extends TickableHandler {
         // If the exact target location was a valid area, let's set it as the final position to use for landing, no extra searching needed.
         if (!solutionsInRow.isEmpty()) {
             closest = location;
-        }
-        else{
+        } else {
 
             //If the exact target location isn't valid, check blocks in the vertical column
             List<TardisNavLocation> nextValidLocations = this.findValidLocationInColumn(level, position, direction, minHeight, maxBuildHeight);
-            if (!nextValidLocations.isEmpty()){
+            if (!nextValidLocations.isEmpty()) {
                 solutionsInRow.addAll(nextValidLocations);
-            }
-            else {
+            } else {
                 //If the vertical column is not valid, let's check the surrounding area at the same y level.
                 List<BlockPos> surroundingPositionsSameYLevel = LevelHelper.getBlockPosInRadius(position, 1, true, false);
                 for (BlockPos directionOffset : surroundingPositionsSameYLevel) {
@@ -388,9 +383,9 @@ public class TardisPilotingManager extends TickableHandler {
 
                     List<BlockPos> surroundingPositionsForColumn = LevelHelper.getBlockPosInRadius(position, 1, true, true);
 
-                    for(BlockPos pos : surroundingPositionsForColumn){
+                    for (BlockPos pos : surroundingPositionsForColumn) {
                         List<TardisNavLocation> surroundingColumn = this.findValidLocationInColumn(level, pos, direction, minHeight, maxBuildHeight);
-                        if (!surroundingColumn.isEmpty()){
+                        if (!surroundingColumn.isEmpty()) {
                             solutionsInRow.addAll(surroundingColumn);
                         }
                     }
@@ -412,11 +407,13 @@ public class TardisPilotingManager extends TickableHandler {
         return this.findValidLocationInColumn(location.getLevel(), location.getPosition(), location.getDirection(), minHeight, maxBuildHeight);
     }
 
-    /** Within all Y level positions for a given position, search for valid landing positions
-     * @param level - target Level we are trying to land in
-     * @param position - the original position we are searching vertically in
-     * @param direction - the direction we are landing at
-     * @param minHeight - minimum height to search upwards from
+    /**
+     * Within all Y level positions for a given position, search for valid landing positions
+     *
+     * @param level          - target Level we are trying to land in
+     * @param position       - the original position we are searching vertically in
+     * @param direction      - the direction we are landing at
+     * @param minHeight      - minimum height to search upwards from
      * @param maxBuildHeight - the maximum height to search under
      * @return
      */
@@ -451,8 +448,10 @@ public class TardisPilotingManager extends TickableHandler {
         return solutionsInRow;
     }
 
-    /** Finds the closest valid position out of a list of possible solutions, from the original intended landing location*/
-    private TardisNavLocation findClosestValidPositionFromTarget(List<TardisNavLocation> validPositions, TardisNavLocation targetLocation){
+    /**
+     * Finds the closest valid position out of a list of possible solutions, from the original intended landing location
+     */
+    private TardisNavLocation findClosestValidPositionFromTarget(List<TardisNavLocation> validPositions, TardisNavLocation targetLocation) {
         int distance = Integer.MAX_VALUE;
         TardisNavLocation intendedLocation = targetLocation;
         TardisNavLocation closestSolution = new TardisNavLocation(BlockPos.ZERO, Direction.NORTH, intendedLocation.getLevel());
@@ -468,9 +467,10 @@ public class TardisPilotingManager extends TickableHandler {
 
     /**
      * Gets a list of block positions in the same y level as the reference point
+     *
      * @param referencePoint - the position to search vertically in
-     * @param min - The minimum Y value to search upwards from
-     * @param max - The maximum Y value to search downwards from (this max value is included in the search)
+     * @param min            - The minimum Y value to search upwards from
+     * @param max            - The maximum Y value to search downwards from (this max value is included in the search)
      * @return
      */
     private List<BlockPos> getBlockPosColumn(BlockPos referencePoint, int min, int max) {
@@ -487,18 +487,18 @@ public class TardisPilotingManager extends TickableHandler {
 
     /**
      * Check if the block at the target position is a valid block to land inside.
-     * **/
+     **/
     private boolean isLegalLandingBlock(ServerLevel level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
         // Can land in air or override any block that can be marked as "replaceable" such as snow, tall grass etc.
         return state.isAir() || (state.canBeReplaced() && state.getFluidState().isEmpty() && !state.isCollisionShapeFullBlock(level, pos));
     }
 
-    private boolean isExitPositionSafe(TardisNavLocation location){
+    private boolean isExitPositionSafe(TardisNavLocation location) {
         return this.isExitPositionSafe(location.getLevel(), location.getPosition(), location.getDirection());
     }
 
-    private boolean isExitPositionSafe(ServerLevel level, BlockPos pos, Direction offsetDirection){
+    private boolean isExitPositionSafe(ServerLevel level, BlockPos pos, Direction offsetDirection) {
         BlockPos exitPosition = pos.offset(offsetDirection.getNormal()); //Check the block that is facing away from the doors.
         if (this.isLegalLandingBlock(level, exitPosition.above())
                 && this.isLegalLandingBlock(level, exitPosition) //If there is a 2 block space for the entity to be placed at
@@ -509,16 +509,20 @@ public class TardisPilotingManager extends TickableHandler {
         return false;
     }
 
-    /** If there is a 2 block vertical space for the exterior to be placed at, and the block below the exterior is solid*/
-    private boolean canPlaceTardis(TardisNavLocation location){
+    /**
+     * If there is a 2 block vertical space for the exterior to be placed at, and the block below the exterior is solid
+     */
+    private boolean canPlaceTardis(TardisNavLocation location) {
         ServerLevel targetLevel = location.getLevel();
         BlockPos pos = location.getPosition();
         boolean isBelowNetherRoof = (targetLevel.dimension() == Level.NETHER && pos.getY() <= 125);
         return isBelowNetherRoof && this.isLegalLandingBlock(targetLevel, pos) && isLegalLandingBlock(targetLevel, pos.above()) && !isLegalLandingBlock(targetLevel, pos.below());
     }
 
-    /** If there is a 2 block vertical space for the exterior to be placed at, and the block below the exterior is solid*/
-    private boolean canPlaceTardis(ServerLevel level, BlockPos pos){
+    /**
+     * If there is a 2 block vertical space for the exterior to be placed at, and the block below the exterior is solid
+     */
+    private boolean canPlaceTardis(ServerLevel level, BlockPos pos) {
         return this.isLegalLandingBlock(level, pos) && isLegalLandingBlock(level, pos.above()) && !isLegalLandingBlock(level, pos.below());
     }
 
@@ -563,7 +567,6 @@ public class TardisPilotingManager extends TickableHandler {
         }
 
 
-
         if (this.canBeginFlight()) {
 
             this.autoLand = autoLand;
@@ -586,10 +589,6 @@ public class TardisPilotingManager extends TickableHandler {
             }
 
 
-            TardisPlayerInfo.updateTardisForAllPlayers(operator, targetPosition);
-
-
-
             operator.setDoorClosed(true);
             operator.getLevel().playSound(null, operator.getInternalDoor().getDoorPosition(), TRSoundRegistry.TARDIS_TAKEOFF.get(), SoundSource.AMBIENT, 10f, 1f);
             operator.getExteriorManager().playSoundAtShell(TRSoundRegistry.TARDIS_TAKEOFF.get(), SoundSource.BLOCKS, 1, 1);
@@ -598,7 +597,7 @@ public class TardisPilotingManager extends TickableHandler {
             this.isInFlight = true;
             this.ticksInFlight = 0;
             this.ticksTakingOff = 1;
-            this.operator.getExteriorManager().setIsTakingOff(true);
+            this.operator.getExteriorManager().setIsTakingOff(isTakingOff());
 
             this.operator.tardisClientData().sync();//Sync to client
             //Debug if the blockstate at the current position during takeoff is air. If not air, it means we have forgotten to actually remove the exterior block which could be the cause of the duplication issue
@@ -660,7 +659,7 @@ public class TardisPilotingManager extends TickableHandler {
      * @param forceFlightEnd Ignores the required flight time conditions for the TARDIS to land and lands.
      * @return false if didn't end flight, true if flight was ended
      */
-    public boolean endFlight(boolean forceFlightEnd) {
+    public boolean endFlight(boolean forceFlightEnd, boolean isCrashing) {
         if (forceFlightEnd || this.canEndFlight()) {
             this.ticksInFlight = 0;
 
@@ -673,19 +672,19 @@ public class TardisPilotingManager extends TickableHandler {
             TardisNavLocation landingLocation = this.targetLocation;
             TardisNavLocation location = findClosestValidPosition(landingLocation);
 
-            currentLocation = location;
+            // Added so it updates for everything else
+            setTargetLocation(location);
+            setCurrentLocation(location);
 
             exteriorManager.startLanding(operator, location);
 
-            TardisPlayerInfo.updateTardisForAllPlayers(operator, location);
 
-
-            exteriorManager.playSoundAtShell(TRSoundRegistry.TARDIS_LAND.get(), SoundSource.BLOCKS, 1, 1);
+            exteriorManager.playSoundAtShell(isCrashing ? TRSoundRegistry.TARDIS_CRASH_LAND.get() : TRSoundRegistry.TARDIS_LAND.get(), SoundSource.BLOCKS, 1, 1);
 
             if (currentConsole != null) {
-                level.playSound(null, currentConsole.getBlockPos(), TRSoundRegistry.TARDIS_LAND.get(), SoundSource.AMBIENT, 10f, 1f);
+                level.playSound(null, currentConsole.getBlockPos(), isCrashing ? TRSoundRegistry.TARDIS_CRASH_LAND.get() : TRSoundRegistry.TARDIS_LAND.get(), SoundSource.AMBIENT, 10f, 1f);
             } else {
-                level.playSound(null, TardisArchitectureHandler.DESKTOP_CENTER_POS, TRSoundRegistry.TARDIS_LAND.get(), SoundSource.AMBIENT, 10f, 1f);
+                level.playSound(null, TardisArchitectureHandler.DESKTOP_CENTER_POS, isCrashing ? TRSoundRegistry.TARDIS_CRASH_LAND.get() : TRSoundRegistry.TARDIS_LAND.get(), SoundSource.AMBIENT, 10f, 1f);
             }
 
             int totalPoints = (int) (distanceCovered * 0.05f);
@@ -731,29 +730,30 @@ public class TardisPilotingManager extends TickableHandler {
             }
         }
 
-        this.endFlight(true);
+        this.endFlight(true, false);
     }
 
     /**
      * Start to remove the Tardis Shell block and set up fast return location data. This means we are no longer taking off.
      */
     public void enterTimeVortex() {
+        TardisNavLocation lastKnown = this.getCurrentLocation();
         operator.getExteriorManager().removeExteriorBlock();
         this.ticksTakingOff = 0;
         this.operator.getExteriorManager().setIsTakingOff(false);
-        TardisNavLocation lastKnown = this.getCurrentLocation();
         TardisCommonEvents.TAKE_OFF.invoker().onTakeOff(operator, lastKnown.getLevel(), lastKnown.getPosition());
 
         if (this.currentConsole != null) {
             operator.getFlightDanceManager().startFlightDance(this.currentConsole);
         }
 
-        TardisPlayerInfo.updateTardisForAllPlayers(operator, lastKnown);
-
 
         this.operator.tardisClientData().sync();
     }
-    /** Update data to indicate we have completed the landing process.*/
+
+    /**
+     * Update data to indicate we have completed the landing process.
+     */
     public void onFlightEnd() {
         this.operator.getFlightDanceManager().stopDancing();
 
@@ -762,11 +762,9 @@ public class TardisPilotingManager extends TickableHandler {
         this.autoLand = false;
 
         if (this.getFuel() < getMaximumFuel() * 0.1) {
-            this.operator.getLevel().playSound(null, this.currentConsoleBlockPos, TRSoundRegistry.LOW_FUEL.get(), SoundSource.AMBIENT, 1000, 1 );
+            this.operator.getLevel().playSound(null, this.currentConsoleBlockPos, TRSoundRegistry.LOW_FUEL.get(), SoundSource.AMBIENT, 1000, 1);
         }
 
-        TardisPlayerInfo.updateTardisForAllPlayers(operator, getTargetLocation());
-        
         TardisCommonEvents.LAND.invoker().onLand(operator, getTargetLocation().getLevel(), getTargetLocation().getPosition());
         this.operator.tardisClientData().sync();
     }
@@ -804,12 +802,13 @@ public class TardisPilotingManager extends TickableHandler {
         int z = (int) (currentPos.z + ((targetPos.z - currentPos.z) * progress));
 
         BlockPos landingLocation = new BlockPos(x, y, z);
-
         this.setTargetPosition(landingLocation);
-        TardisNavLocation landing = this.targetLocation;
-        TardisNavLocation location = findClosestValidPosition(landing);
+        TardisNavLocation weWantToGoHere = this.targetLocation;
+        TardisNavLocation safeLocation = findClosestValidPosition(weWantToGoHere);
+        setTargetLocation(safeLocation);
+        setCurrentLocation(safeLocation);
 
-        tardisExteriorManager.startLanding(operator, location);
+        endFlight(true, true);
 
         tardisExteriorManager.playSoundAtShell(TRSoundRegistry.TARDIS_CRASH_LAND.get(), SoundSource.BLOCKS, 1, 1);
         tarisLevel.playSound(null, TardisArchitectureHandler.DESKTOP_CENTER_POS, TRSoundRegistry.TARDIS_CRASH_LAND.get(), SoundSource.BLOCKS, 10f, 1f);
@@ -850,6 +849,10 @@ public class TardisPilotingManager extends TickableHandler {
         return this.targetLocation;
     }
 
+    public void setTargetLocation(TardisNavLocation targetLocation) {
+        this.targetLocation = targetLocation;
+    }
+
     /**
      * @return the current fast return location
      */
@@ -857,15 +860,12 @@ public class TardisPilotingManager extends TickableHandler {
         return this.fastReturnLocation;
     }
 
-    public void setTargetLocation(TardisNavLocation targetLocation) {
-        this.targetLocation = targetLocation;
+    public TardisNavLocation getCurrentLocation() {
+        return Objects.requireNonNullElse(this.currentLocation, TardisNavLocation.ORIGIN);
     }
 
     public void setCurrentLocation(TardisNavLocation currentLocation) {
         this.currentLocation = currentLocation;
-    }
-    public TardisNavLocation getCurrentLocation() {
-        return Objects.requireNonNullElse(this.currentLocation, TardisNavLocation.ORIGIN);
     }
 
     public void setTargetPosition(BlockPos pos) {
@@ -963,7 +963,7 @@ public class TardisPilotingManager extends TickableHandler {
 
             Level level = this.currentConsole.getLevel();
 
-            if (level.getBlockState(this.currentConsole.getBlockPos()).getBlock() instanceof GlobalConsoleBlock && level.getBlockEntity(this.currentConsole.getBlockPos()) instanceof GlobalConsoleBlockEntity consoleBlockEntity ) {
+            if (level.getBlockState(this.currentConsole.getBlockPos()).getBlock() instanceof GlobalConsoleBlock && level.getBlockEntity(this.currentConsole.getBlockPos()) instanceof GlobalConsoleBlockEntity consoleBlockEntity) {
 
                 ResourceLocation oldTheme = consoleBlockEntity.theme();
                 ConsolePattern oldPattern = consoleBlockEntity.pattern();
@@ -983,7 +983,7 @@ public class TardisPilotingManager extends TickableHandler {
 
         Level level = this.currentConsole.getLevel();
 
-        if (level.getBlockState(this.currentConsole.getBlockPos()).getBlock() instanceof GlobalConsoleBlock && level.getBlockEntity(this.currentConsole.getBlockPos()) instanceof GlobalConsoleBlockEntity consoleBlockEntity ) {
+        if (level.getBlockState(this.currentConsole.getBlockPos()).getBlock() instanceof GlobalConsoleBlock && level.getBlockEntity(this.currentConsole.getBlockPos()) instanceof GlobalConsoleBlockEntity consoleBlockEntity) {
 
             ResourceLocation oldTheme = consoleBlockEntity.theme();
             ConsolePattern oldPattern = consoleBlockEntity.pattern();
@@ -1032,6 +1032,21 @@ public class TardisPilotingManager extends TickableHandler {
         return this.fuel;
     }
 
+    public void setFuel(double fuel) {
+        double previous = this.fuel;
+
+        this.fuel = Mth.clamp(fuel, 0, this.getMaximumFuel());
+
+        if (this.isOutOfFuel() && previous > 0) {
+            this.onRunOutOfFuel();
+            return;
+        }
+        if (!this.isOutOfFuel() && previous == 0) {
+            this.onRestoreFuel();
+            return;
+        }
+    }
+
     /**
      * Accessor for the maximum amount of fuel a Tardis can hold
      * Will be adjustable in future to allow for upgrades etc.
@@ -1066,21 +1081,6 @@ public class TardisPilotingManager extends TickableHandler {
         return this.fuel == 0;
     }
 
-    public void setFuel(double fuel) {
-        double previous = this.fuel;
-
-        this.fuel = Mth.clamp(fuel, 0, this.getMaximumFuel());
-
-        if (this.isOutOfFuel() && previous > 0) {
-            this.onRunOutOfFuel();
-            return;
-        }
-        if (!this.isOutOfFuel() && previous == 0) {
-            this.onRestoreFuel();
-            return;
-        }
-    }
-
     /**
      * Removes fuel from the Tardis.
      * Clamps fuel to 0 if it goes below 0
@@ -1093,11 +1093,14 @@ public class TardisPilotingManager extends TickableHandler {
 
     /**
      * Is the TARDIS set to refuel passively?
-     * **/
-    public boolean isPassivelyRefuelling() {return this.isPassivelyRefuelling;}
+     **/
+    public boolean isPassivelyRefuelling() {
+        return this.isPassivelyRefuelling;
+    }
 
     /**
      * Sets the TARDIS to passively fuel
+     *
      * @return Returns if it was successful in updating the state. Will fail if the TARDIS is in flight or has crashed.
      */
     public boolean setPassivelyRefuelling(boolean refuel) {

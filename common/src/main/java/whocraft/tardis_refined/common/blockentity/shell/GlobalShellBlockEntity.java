@@ -46,14 +46,18 @@ public class GlobalShellBlockEntity extends ShellBaseBlockEntity {
         this.basePattern = this.pattern();
     }
 
-    public ResourceLocation theme(){
-        if (this.shellTheme == null){
+    public ResourceLocation theme() {
+        if (this.shellTheme == null) {
             this.shellTheme = ShellTheme.HALF_BAKED.getId();
         }
         return this.shellTheme;
     }
 
-    public void setShellTheme(ResourceLocation theme){
+    public ResourceLocation getShellTheme() {
+        return shellTheme;
+    }
+
+    public void setShellTheme(ResourceLocation theme) {
         this.shellTheme = theme;
         this.setChanged();
         this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), Block.UPDATE_CLIENTS);
@@ -80,7 +84,7 @@ public class GlobalShellBlockEntity extends ShellBaseBlockEntity {
         }
 
         if (pTag.contains(NbtConstants.PATTERN)) {
-            if (this.shellTheme != null){
+            if (this.shellTheme != null) {
                 ResourceLocation currentPattern = new ResourceLocation(pTag.getString(NbtConstants.PATTERN));
                 if (ShellPatterns.doesPatternExist(this.shellTheme, currentPattern)) {
                     this.basePattern = ShellPatterns.getPatternOrDefault(this.shellTheme, currentPattern);
@@ -88,7 +92,7 @@ public class GlobalShellBlockEntity extends ShellBaseBlockEntity {
             }
         }
 
-        if (this.shellTheme == null){
+        if (this.shellTheme == null) {
             this.shellTheme = this.theme();
         }
 
@@ -145,7 +149,7 @@ public class GlobalShellBlockEntity extends ShellBaseBlockEntity {
                     return true;
                 }
 
-                if(!exteriorManager.locked()){ //If the Tardis thinks it is not locked, open this shell's door
+                if (!exteriorManager.locked()) { //If the Tardis thinks it is not locked, open this shell's door
                     level.setBlock(blockPos, blockState.cycle(GlobalShellBlock.OPEN), Block.UPDATE_ALL); //Cycle the door to open/closed
                     tardisLevelOperator.setDoorClosed(blockState.getValue(GlobalShellBlock.OPEN)); //Now update both the internal door and re-update the external shell for good measure too.
                     return true;
@@ -167,7 +171,7 @@ public class GlobalShellBlockEntity extends ShellBaseBlockEntity {
         for (int i = 0; i < numberOfItems; i++) {
             ItemStack coralItem = new ItemStack(Items.HORN_CORAL_FAN);
             BlockPos currentPos = getBlockPos();
-            Containers.dropItemStack(level, currentPos.getX(), currentPos.getY(), currentPos.getZ() , coralItem);
+            Containers.dropItemStack(level, currentPos.getX(), currentPos.getY(), currentPos.getZ(), coralItem);
         }
     }
 

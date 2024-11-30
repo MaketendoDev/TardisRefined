@@ -15,7 +15,6 @@ import whocraft.tardis_refined.client.screen.selections.HumSelectionScreen;
 import whocraft.tardis_refined.client.screen.selections.SelectionScreen;
 import whocraft.tardis_refined.common.capability.upgrades.UpgradeHandler;
 import whocraft.tardis_refined.common.capability.tardis.upgrades.UpgradeHandler;
-import whocraft.tardis_refined.registry.TRUpgrades;
 import whocraft.tardis_refined.common.network.messages.EjectPlayerFromConsoleMessage;
 import whocraft.tardis_refined.common.network.messages.screens.C2SRequestShellSelection;
 import whocraft.tardis_refined.common.network.messages.waypoints.RequestWaypointsMessage;
