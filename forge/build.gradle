@@ -5,6 +5,10 @@ plugins {
 architectury {
     platformSetupLoomIde()
     forge();
+    neoForge {
+        platformPackage = "forge"
+    }
+
 }
 
 def generatedResources = project(":forge").file("src/generated/resources")
@@ -169,6 +173,9 @@ processResources {
     inputs.properties replaceProperties
     replaceProperties.put 'project', project
 
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+
     filesMatching(resourceTargets) {
         expand replaceProperties
     }
@@ -199,6 +206,7 @@ remapJar {
 }
 
 sourcesJar {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     def commonSources = project(":common").sourcesJar
     dependsOn commonSources
     from commonSources.archiveFile.map { zipTree(it) }

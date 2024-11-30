@@ -127,6 +127,7 @@ public class TardisPlayerInfo implements TardisPilot {
     @Override
     public void endPlayerForInspection(ServerPlayer serverPlayer) {
 
+
         BlockPos targetPosition = getPlayerPreviousPos().getPosition();
 
         TardisTeleportData.scheduleEntityTeleport(serverPlayer, getPlayerPreviousPos().getDimensionKey(), targetPosition.getX(), targetPosition.getY(), targetPosition.getZ(), playerPreviousYaw, playerPreviousRot);

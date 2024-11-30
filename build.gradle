@@ -39,6 +39,8 @@ subprojects {
     }
 }
 
+
+
 allprojects {
     apply plugin: "java"
     apply plugin: "architectury-plugin"
@@ -47,6 +49,7 @@ allprojects {
     archivesBaseName = "${project.name}-${rootProject.jar_name}"
     version = "mc${rootProject.minecraft_version}-v${rootProject.mod_version}"
     group = rootProject.maven_group
+
 
     repositories {
 
