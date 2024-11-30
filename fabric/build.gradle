@@ -174,7 +174,7 @@ dependencies {
     modImplementation "curse.maven:huge-structure-blocks-474114:4803539"
 
     // Trinkets
-    modImplementation ("dev.emi:trinkets:${rootProject.trinkets_version}") {
+    modCompileOnly ("dev.emi:trinkets:${rootProject.trinkets_version}") {
         exclude(group: "dev.onyxstudios.cardinal-components-api")
     }
 

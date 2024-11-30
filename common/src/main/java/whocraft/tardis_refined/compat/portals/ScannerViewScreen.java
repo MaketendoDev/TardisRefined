@@ -160,7 +160,7 @@ public class ScannerViewScreen {
         public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
             super.render(guiGraphics, mouseX, mouseY, delta);
 
-            this.renderTransparentBackground(guiGraphics);
+            guiGraphics.fillGradient(0, 0, this.width, this.height, -1072689136, -804253680);
 
             /*Render Back drop*/
             RenderSystem.setShader(GameRenderer::getPositionTexShader);

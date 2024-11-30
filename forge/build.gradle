@@ -72,12 +72,6 @@ loom {
         }
 
     }
-
-    runs {
-        data {
-            programArgs "--existing", project(":common").file("src/main/resources/").absolutePath
-        }
-    }
 }
 
 
@@ -104,7 +98,7 @@ dependencies {
     //   modCompileOnly "curse.maven:jei-238222:${jei_version}"
 
     compileOnly "curse.maven:immersive-portals-355440:${immersive_portals_forge_version}"
-    modImplementation "curse.maven:curios-309927:4921744"
+    modImplementation("curse.maven:curios-309927:5843594")
     // With ForgeGradle 5, use the runtimeOnly configuration
     //runtimeOnly("me.djtheredstoner:DevAuth-${dev_auth_module_forge}:${dev_auth_forge_version}")
 
@@ -120,7 +114,7 @@ dependencies {
 if (System.getenv("curseforge") != null && System.getenv("modrinth") != null) {
     unifiedPublishing {
         project {
-            displayName = "[NeoForge] Tardis Refined - $project.version"
+            displayName = "[Forge] Tardis Refined - $project.version"
             releaseType = "release"
             changelog = new File("${rootProject.projectDir}/changelog.md").text
             gameVersions = ["$rootProject.minecraft_version"]

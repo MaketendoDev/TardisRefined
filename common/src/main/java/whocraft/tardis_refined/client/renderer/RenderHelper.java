@@ -2,17 +2,17 @@ package whocraft.tardis_refined.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.authlib.yggdrasil.ProfileResult;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import com.mojang.realmsclient.util.RealmsUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.DefaultPlayerSkin;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.util.profiling.ProfileResults;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
@@ -26,9 +26,7 @@ public class RenderHelper {
 
     public static void renderPlayerFace(GuiGraphics guiGraphics, int i, int j, int k, UUID uUID) {
         Minecraft minecraft = Minecraft.getInstance();
-        ProfileResult profileResult = minecraft.getMinecraftSessionService().fetchProfile(uUID, false);
-        PlayerSkin playerSkin = profileResult != null ? minecraft.getSkinManager().getInsecureSkin(profileResult.profile()) : DefaultPlayerSkin.get(uUID);
-        PlayerFaceRenderer.draw(guiGraphics, playerSkin.texture(), i, j, k);
+        RealmsUtil.renderPlayerFace(guiGraphics, i, j, k, uUID.toString());
     }
 
     public static void renderFilledBox(PoseStack stack, VertexConsumer vertexConsumer, AABB box, float red, float green, float blue, float alpha, int combinedLightIn) {

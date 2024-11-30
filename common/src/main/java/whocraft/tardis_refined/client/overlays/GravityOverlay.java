@@ -33,7 +33,7 @@ public class GravityOverlay {
             checkOverlay(player);
         }
 
-        if (isInShaft && !mc.getDebugOverlay().showDebugScreen()) {
+        if (isInShaft && !mc.options.renderDebug) {
             poseStack.pushPose();
             poseStack.scale(1.2f, 1.2f, 1.2f);
 
