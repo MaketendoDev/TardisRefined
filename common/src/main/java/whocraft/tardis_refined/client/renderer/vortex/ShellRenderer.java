@@ -47,7 +47,7 @@ public class ShellRenderer {
 
             // Chaotic but loop able rotations
             float xR = (float) Math.sin(timeFactor * 2) * 15.0f; // Wobble on X-axis
-            float yR = ((timeFactor * 360 / (float) (2 * Math.PI)) % 360) * throttle; // Continuous spin on Y-axis
+            float yR = ((timeFactor * 360 / (float) (2 * Math.PI)) % 360) * (1 + throttle * 0.5f); // Continuous spin on Y-axis
             float zR = (float) Math.cos(timeFactor * 3) * 10.0f; // Wobble on Z-axis
 
             //pose.translate(0, -1.5, 0);//yR * control
@@ -65,7 +65,7 @@ public class ShellRenderer {
 
 
             VertexConsumer lightning = guiGraphics.bufferSource().getBuffer(RenderType.entityGlint());
-            if(VORTEX.lightning_strike > 0.4){
+            if (VORTEX.lightning_strike > 0.4) {
                 model.renderShell(globalShellBlockEntity, false, false, pose, lightning, 15728880, OverlayTexture.NO_OVERLAY, 1, 1, 1, alpha);
             }
 

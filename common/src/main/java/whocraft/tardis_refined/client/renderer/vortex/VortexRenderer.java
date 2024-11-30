@@ -39,11 +39,11 @@ public class VortexRenderer {
             .add(-1f, 234, 204, 77);
 
     private static final VortexGradientTint ModernVortex = new VortexGradientTint()
-            .add(-1.0f, 238,164,107)
-            .add(-0.5f,199,92,159)
-            .add(0.0f, 238,164,107)
-            .add(0.5f,199,92,159)
-            .add(1.0f, 238,164,107);
+            .add(-1.0f, 238, 164, 107)
+            .add(-0.5f, 199, 92, 159)
+            .add(0.0f, 238, 164, 107)
+            .add(0.5f, 199, 92, 159)
+            .add(1.0f, 238, 164, 107);
 
     private static final VortexGradientTint PastelGradient = new VortexGradientTint()
             .add(1f, 223, 190, 223)
@@ -92,7 +92,6 @@ public class VortexRenderer {
     public void renderVortex(PoseStack pose, float opacity) {
         this.opacity = Math.min(opacity, 1);
         if (vortexType.movingGradient) this.vortexType.gradient.offset = time.getFloat() * 2;
-        this.time.speed = 0.5f;
         this.time.update();
         pose.pushPose();
 

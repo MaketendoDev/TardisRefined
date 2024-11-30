@@ -10,7 +10,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
+import org.joml.Quaternionf;
 import whocraft.tardis_refined.client.TardisClientData;
 import whocraft.tardis_refined.client.renderer.vortex.VortexRenderer;
 import whocraft.tardis_refined.client.screen.selections.ShellSelectionScreen;
@@ -31,6 +34,8 @@ public class VortexOverlay {
     private static double velY = 0.0D;
     private static float DEMAT = 0.0f;
     private static float IMMERSION = 0.0f;
+    private static float YROT = 0.0f;
+    private static float VYR = 0.0f;
 
     public static void update(GuiGraphics gg) {
         if (globalShellBlockEntity == null) {
@@ -69,6 +74,11 @@ public class VortexOverlay {
         if (IMMERSION > 1) IMMERSION = 1;
         if (IMMERSION < 0) IMMERSION = 0;
 
+        if (VORTEX.lightning_strike > 0.4)
+            velX -= (Math.random() > 0.5 ? 0.001 : -0.001) * VORTEX.lightning_strike * 90 * Mth.sin(VORTEX.lightning_strike);
+        if (VORTEX.lightning_strike > 0.4)
+            velY -= (Math.random() > 0.5 ? 0.001 : -0.001) * VORTEX.lightning_strike * 90 * Mth.sin(VORTEX.lightning_strike);
+
 
         if (tardisX * tardisX + tardisY * tardisY > 1) {
             try {
@@ -79,6 +89,8 @@ public class VortexOverlay {
 
             }
         }
+
+
         if (velX > 1) velX = 1;
         if (velX < -1) velX = -1;
         if (velY > 1) velY = 1;
@@ -114,8 +126,8 @@ public class VortexOverlay {
             boolean land = tardisClientData.isLanding() || !tardisClientData.isFlying();
 
             //DEV TESTING
-            //takeoff = mc.options.keyShift.isDown();
-            //land = !takeoff;
+            takeoff = mc.options.keyShift.isDown();
+            land = !takeoff;
 
             if (takeoff) {
                 DEMAT += (System.currentTimeMillis() - LAST_TIME) / 12000.0f;
@@ -125,68 +137,63 @@ public class VortexOverlay {
             }
 
             if (!tardisPlayerInfo.isViewingTardis()) return;
-            if (!tardisPlayerInfo.isRenderVortex()) return;
+            //if (!tardisPlayerInfo.isRenderVortex()) return;
 
             VortexOverlay.update(gg);
-
 
             float demat_transparency = Mth.cos(DEMAT * (Mth.PI) / (2f)) * (Mth.cos(16f * Mth.PI * DEMAT) * 0.5f + 0.5f) * (-DEMAT * 0.5f + 0.5f) - DEMAT * 0.5f + 0.5f;
 
             Camera camera = mc.gameRenderer.getMainCamera();
             Vec3 camPos = camera.getPosition().subtract(mc.player.position()).subtract(0, 1.62, 0);
+            double camdist = Math.sqrt(camPos.x * camPos.x + camPos.y * camPos.y + camPos.z * camPos.z);
+
+            float mul = IMMERSION;
+            float mulinv = 1 - IMMERSION;
+
+            float xRot = camera.getXRot() * mulinv;
+            if (DEMAT < 1) {
+                YROT = camera.getYRot() + 180;
+                while (YROT > 180) YROT -= 360;
+                while (YROT < -180) YROT += 360;
+            }
+
+            long time = System.currentTimeMillis();
+            float timeFactor = (time % 4000L) / 4000.0f * (float) (2 * Math.PI);
+            if (DEMAT < 1)
+                VYR = ((timeFactor * 360 / (float) (2 * Math.PI)) % 360) * (1 + tardisClientData.getThrottleStage() * 0.5f);
+
+            if (DEMAT > 0 && DEMAT < 1)
+                mc.getCameraEntity().setYRot(mc.getCameraEntity().getYRot() - ((System.currentTimeMillis() - LAST_TIME) / 10.0f) * (1 + tardisClientData.getThrottleStage() * 0.5f));
+
+            VORTEX.time.speed = (0.3f + tardisClientData.getThrottleStage() * 0.1f);
 
             /*Perspective Rendering*/
             RenderSystem.backupProjectionMatrix();
 
             Matrix4f perspective = new Matrix4f();
-            perspective.perspective((float) Math.toRadians(mc.options.fov().get()), width / height, 0.1f, 9999);
-            perspective.translate(0, 0, 11000);
+            perspective.perspective((float) Math.toRadians(mc.options.fov().get()), width / height, 1, 9999, false, perspective);
+            perspective.translate(0, 0, 11000f - (float) camdist);
             RenderSystem.setProjectionMatrix(perspective, VertexSorting.DISTANCE_TO_ORIGIN);
 
             pose.pushPose();
-
-            long time = System.currentTimeMillis();
-            float timeFactor = (time % 4000L) / 4000.0f * (float) (2 * Math.PI);
-            float yR = ((timeFactor * 360 / (float) (2 * Math.PI)) % 360) * tardisClientData.getThrottleStage();
-
-            if (DEMAT > 0 && IMMERSION < 0.5 && tardisClientData.getThrottleStage() > 0)
-                mc.getCameraEntity().setYRot(mc.getCameraEntity().getYRot() - 1.5f * tardisClientData.getThrottleStage());
-
-            float mul = IMMERSION;
-            float mulinv = 1 - IMMERSION;
-
-
-            float xRot = -mc.getCameraEntity().getXRot() * mulinv;
-            float yRot = mc.getCameraEntity().getYRot() % 360;
-
-            while (yRot > 180) yRot -= 360;
-            while (yRot < -180) yRot += 360;
-
-            yRot *= mulinv;
-
             pose.mulPose(Axis.XP.rotationDegrees(xRot));
-            pose.mulPose(Axis.YP.rotationDegrees(yRot));
-
-            pose.translate(-camPos.x * mulinv, -camPos.y * mulinv, -camPos.z * mulinv);
-
+            pose.mulPose(Axis.YP.rotationDegrees(YROT * mulinv));
             //Vortex
             pose.pushPose();
             pose.scale(100, 100, 100);
-            pose.mulPose(Axis.YP.rotationDegrees(yR * mulinv));
+            pose.mulPose(Axis.YP.rotationDegrees(VYR * mulinv));
             VORTEX.renderVortex(gg, 1 - demat_transparency);
             pose.popPose();
 
             //Box
-            pose.translate(4 * tardisX * mul, 4 * tardisY * mul, -5 * mul);
-            pose.translate(0, 1.5, 0);
+            pose.translate(4 * tardisX * mul, 4 * tardisY * mul, 0);
             pose.mulPose(Axis.ZP.rotationDegrees((float) (mul * -450 * velX)));
             pose.mulPose(Axis.ZP.rotationDegrees(mul * VORTEX.lightning_strike * 90 * Mth.sin(VORTEX.lightning_strike)));
-            if (VORTEX.lightning_strike > 0.4)
-                velX -= (Math.random() > 0.5 ? 0.001 : -0.001) * VORTEX.lightning_strike * 90 * Mth.sin(VORTEX.lightning_strike);
-            if (VORTEX.lightning_strike > 0.4)
-                velY -= (Math.random() > 0.5 ? 0.001 : -0.001) * VORTEX.lightning_strike * 90 * Mth.sin(VORTEX.lightning_strike);
-            pose.translate(0, -1.5, 0);
-            if (DEMAT > 0) renderShell(gg, IMMERSION, 1 - demat_transparency, tardisClientData.getThrottleStage());
+
+            pose.pushPose();
+            pose.scale(0.95f, 0.95f, 0.95f);
+            renderShell(gg, IMMERSION, 1 - demat_transparency, tardisClientData.getThrottleStage());
+            pose.popPose();
 
             pose.popPose();
 
