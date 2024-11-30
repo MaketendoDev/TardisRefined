@@ -9,11 +9,14 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.level.Level;
 import whocraft.tardis_refined.ControlGroupCheckers;
 import whocraft.tardis_refined.client.TRItemColouring;
@@ -22,6 +25,7 @@ import whocraft.tardis_refined.client.overlays.ExteriorViewOverlay;
 import whocraft.tardis_refined.client.overlays.GravityOverlay;
 import whocraft.tardis_refined.client.overlays.VortexOverlay;
 import whocraft.tardis_refined.command.TardisRefinedCommand;
+import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.dimension.DimensionHandler;
 import whocraft.tardis_refined.common.dimension.TardisTeleportData;
@@ -58,6 +62,14 @@ public class ModEvents {
             // We call this here to make sure blocks are registered
             TRPointOfInterestTypes.registerBlockStates();
 
+        });
+
+        // Force End a Vortex Session
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            ServerPlayer player = handler.getPlayer();
+            TardisPlayerInfo.get(player).ifPresent(tardisPlayerInfo -> {
+                tardisPlayerInfo.endPlayerForInspection(player);
+            });
         });
 
         ServerTickEvents.START_SERVER_TICK.register(ControlGroupCheckers::tickServer);

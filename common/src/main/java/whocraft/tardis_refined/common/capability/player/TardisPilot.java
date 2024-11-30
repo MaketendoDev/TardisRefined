@@ -16,7 +16,7 @@ public interface TardisPilot {
 
     void setupPlayerForInspection(ServerPlayer serverPlayer, TardisLevelOperator tardisLevelOperator, TardisNavLocation spectateTarget, boolean timeVortex);
 
-    void endPlayerForInspection(ServerPlayer serverPlayer, TardisLevelOperator tardisLevelOperator);
+    void endPlayerForInspection(ServerPlayer serverPlayer);
 
     UUID getViewedTardis();
 

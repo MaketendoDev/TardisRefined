@@ -16,6 +16,7 @@ import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import whocraft.tardis_refined.ControlGroupCheckers;
 import whocraft.tardis_refined.TardisRefined;
 import whocraft.tardis_refined.command.TardisRefinedCommand;
+import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
 import whocraft.tardis_refined.common.dimension.DimensionHandler;
 import whocraft.tardis_refined.common.dimension.TardisTeleportData;
 import whocraft.tardis_refined.common.hum.TardisHums;
@@ -47,6 +48,16 @@ public class CommonBus {
 
     }
 
+    @SubscribeEvent
+    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent playerLoggedOutEvent) {
+        // Force End a Vortex Session
+        Player player = playerLoggedOutEvent.getEntity();
+        if (player instanceof ServerPlayer serverPlayer) {
+            TardisPlayerInfo.get(player).ifPresent(tardisPlayerInfo -> {
+                tardisPlayerInfo.endPlayerForInspection(serverPlayer);
+            });
+        }
+    }
 
     @SubscribeEvent
     public static void onDatapack(AddReloadListenerEvent addReloadListenerEvent) {

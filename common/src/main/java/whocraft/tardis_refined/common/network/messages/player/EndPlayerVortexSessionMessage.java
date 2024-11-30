@@ -8,12 +8,12 @@ import whocraft.tardis_refined.common.network.MessageS2C;
 import whocraft.tardis_refined.common.network.MessageType;
 import whocraft.tardis_refined.common.network.TardisNetwork;
 
-public class EndPlayerVortexSession extends MessageS2C {
+public class EndPlayerVortexSessionMessage extends MessageS2C {
 
-    public EndPlayerVortexSession() {
+    public EndPlayerVortexSessionMessage() {
     }
 
-    public EndPlayerVortexSession(FriendlyByteBuf friendlyByteBuf) {
+    public EndPlayerVortexSessionMessage(FriendlyByteBuf friendlyByteBuf) {
     }
 
 

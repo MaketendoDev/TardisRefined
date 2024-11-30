@@ -15,6 +15,7 @@ import whocraft.tardis_refined.client.screen.selections.HumSelectionScreen;
 import whocraft.tardis_refined.client.screen.selections.SelectionScreen;
 import whocraft.tardis_refined.common.capability.tardis.upgrades.UpgradeHandler;
 import whocraft.tardis_refined.common.network.messages.EjectPlayerFromConsoleMessage;
+import whocraft.tardis_refined.common.network.messages.player.StartVortexSessionMessage;
 import whocraft.tardis_refined.common.network.messages.screens.C2SRequestShellSelection;
 import whocraft.tardis_refined.common.network.messages.waypoints.RequestWaypointsMessage;
 import whocraft.tardis_refined.common.tardis.TardisNavLocation;
@@ -72,8 +73,8 @@ public class MonitorScreen extends SelectionScreen {
 
 
         selectionList.children().add(new SelectionListEntry(Component.translatable(ModMessages.UI_MONITOR_WAYPOINTS), entry -> new RequestWaypointsMessage().send(), leftPos, TRUpgrades.WAYPOINTS.get().isUnlocked(upgradeHandler)));
+        selectionList.children().add(new SelectionListEntry(Component.translatable(ModMessages.UI_MONITOR_SHELL_VIEW), entry -> new StartVortexSessionMessage().send(), leftPos, TRUpgrades.WAYPOINTS.get().isUnlocked(upgradeHandler)));
 
-        //selectionList.children().add(new SelectionListEntry(Component.translatable(ModMessages.UI_MONITOR_UPLOAD_COORDS), entry -> new C2SOpenCoordinatesDisplayMessage(CoordInputType.TRAVEL).send(), leftPos, Upgrades.COORDINATE_INPUT.get().isUnlocked(upgradeHandler)));
 
         selectionList.children().add(new SelectionListEntry(Component.translatable(ModMessages.UI_MONITOR_SELECT_HUM), entry -> Minecraft.getInstance().setScreen(new HumSelectionScreen()), leftPos));
         selectionList.children().add(new SelectionListEntry(Component.translatable(ModMessages.UI_MONITOR_EJECT), entry -> {
