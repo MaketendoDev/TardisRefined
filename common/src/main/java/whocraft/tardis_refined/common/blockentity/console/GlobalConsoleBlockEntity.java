@@ -40,6 +40,8 @@ public class GlobalConsoleBlockEntity extends BlockEntity implements BlockEntity
 
     private final List<ControlEntity> controlEntityList = new ArrayList<>();
     public AnimationState liveliness = new AnimationState();
+    public AnimationState powerOff = new AnimationState();
+    public AnimationState powerOn = new AnimationState();
     private boolean shouldSpawnControls = true;
     private ResourceLocation consoleTheme;
 

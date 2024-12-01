@@ -191,6 +191,7 @@ public class TardisLevelOperator {
             tardisClientData.setFlying(pilotingManager.isInFlight());
             tardisClientData.setIsLanding(exteriorManager.isLanding());
             tardisClientData.setIsTakingOff(exteriorManager.isTakingOff());
+            tardisClientData.setIsCrashing(pilotingManager.isCrashing());
 
             float percentageCompleted = (getPilotingManager().getFlightPercentageCovered() * 100f);
             if (percentageCompleted > 100) {
@@ -201,6 +202,7 @@ public class TardisLevelOperator {
 
             tardisClientData.sync();
         } else {
+            tardisClientData.setIsCrashing(pilotingManager.isCrashing());
             tardisClientData.setRecoveryProgress(pilotingManager.getCrashRecoveryTicks());
             tardisClientData.setFlying(pilotingManager.isInFlight());
             tardisClientData.setIsLanding(exteriorManager.isLanding());

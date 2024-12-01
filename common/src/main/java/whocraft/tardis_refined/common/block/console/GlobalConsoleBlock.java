@@ -44,6 +44,7 @@ public class GlobalConsoleBlock extends BaseEntityBlock {
 
     public static final BooleanProperty POWERED = BooleanProperty.create("powered");
 
+
     public GlobalConsoleBlock(Properties properties) {
 
         super(properties);
@@ -205,6 +206,16 @@ public class GlobalConsoleBlock extends BaseEntityBlock {
                 }
             }
         }
+
+        if (level.isClientSide) {
+            if (level.getBlockEntity(blockPos) instanceof GlobalConsoleBlockEntity consoleBlockEntity) {
+                if(!blockState.getValue(POWERED)){
+                    consoleBlockEntity.powerOff.stop();
+                    consoleBlockEntity.powerOn.start(player.tickCount);
+                }
+            }
+        }
+
 
         return InteractionResult.sidedSuccess(true); //Use InteractionResult.sidedSuccess(true) for client side. Stops hand swinging twice. We don't want to use InteractionResult.SUCCESS because the client calls SUCCESS, so the server side calling it too sends the hand swinging packet twice.
     }
