@@ -37,9 +37,9 @@ public class InitiativeConsoleModel extends HierarchicalModel implements Console
 
     public InitiativeConsoleModel(ModelPart root) {
         this.root = root;
-        this.throttle = findPart(this, "bone178");
-        this.rotor_on = findPart(this, "rotor_on");
-        this.handbrake = findPart(this, "bone185");
+        this.throttle = JsonToAnimationDefinition.findPart(this, "bone178");
+        this.rotor_on = JsonToAnimationDefinition.findPart(this, "rotor_on");
+        this.handbrake = JsonToAnimationDefinition.findPart(this, "bone185");
     }
 
     public static LayerDefinition createBodyLayer() {

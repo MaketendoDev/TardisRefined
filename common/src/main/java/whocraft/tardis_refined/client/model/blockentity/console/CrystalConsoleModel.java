@@ -50,8 +50,8 @@ public class CrystalConsoleModel extends HierarchicalModel implements ConsoleUni
         this.controls = root.getChild("controls");
         this.spinninglight = root.getChild("spinninglight");
         this.bb_main = root.getChild("bb_main");
-        this.throttle = findPart(this, "large_lever_control_throttle");
-        this.handbrake = findPart(this, "large_lever3_control");
+        this.throttle = JsonToAnimationDefinition.findPart(this, "large_lever_control_throttle");
+        this.handbrake = JsonToAnimationDefinition.findPart(this, "large_lever3_control");
     }
 
     public static LayerDefinition createBodyLayer() {
