@@ -23,7 +23,7 @@ public class ExteriorDisplayControl extends Control {
 
     @Override
     public boolean onLeftClick(TardisLevelOperator operator, ConsoleTheme theme, ControlEntity controlEntity, Player player) {
-        if (player instanceof ServerPlayer serverPlayer) {
+        if(player instanceof ServerPlayer serverPlayer){
             sendPacket(serverPlayer, operator);
         }
         return true;
