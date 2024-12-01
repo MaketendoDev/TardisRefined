@@ -9,6 +9,8 @@ import net.minecraft.client.animation.AnimationChannel;
 import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.client.animation.Keyframe;
 import net.minecraft.client.animation.KeyframeAnimations;
+import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.joml.Vector3f;
@@ -41,6 +43,9 @@ import static net.minecraft.client.animation.AnimationChannel.Targets.ROTATION;
  */
 public class JsonToAnimationDefinition {
 
+    public static ModelPart findPart(HierarchicalModel hierarchicalModel, String string) {
+        return hierarchicalModel.root().getAllParts().filter((modelPart) -> modelPart.hasChild(string)).findFirst().map((modelPart) -> modelPart.getChild(string)).get();
+    }
 
     public static final AnimationChannel.Interpolation SNAP_TO = (destination, progress, keyFrames, startIndex, endIndex, scaleFactor) -> {
         Vector3f startVector = keyFrames[startIndex].target();

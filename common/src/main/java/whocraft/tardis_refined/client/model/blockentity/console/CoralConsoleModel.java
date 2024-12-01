@@ -42,7 +42,7 @@ public class CoralConsoleModel extends HierarchicalModel implements ConsoleUnit 
         this.base_console = root.getChild("base_console");
         this.throttle = base_console.getChild("controls").getChild("borders").getChild("bone23").getChild("bone17").getChild("throttle");
         this.anim_parts = root.getChild("anim_parts");
-        this.handbrake = findPart(this, "handbrake");
+        this.handbrake = JsonToAnimationDefinition.findPart(this, "handbrake");
     }
 
     public static LayerDefinition createBodyLayer() {

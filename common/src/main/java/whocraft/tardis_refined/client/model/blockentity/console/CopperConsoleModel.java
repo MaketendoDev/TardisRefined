@@ -65,7 +65,7 @@ public class CopperConsoleModel extends HierarchicalModel implements ConsoleUnit
         this.south_left = root.getChild("south_left");
         this.west = root.getChild("west");
         this.throttle = north_right.getChild("bone203").getChild("bone213").getChild("main_lever_control2");
-        this.handbrake = findPart(this, "lever_control8");
+        this.handbrake = JsonToAnimationDefinition.findPart(this, "lever_control8");
     }
 
     public static LayerDefinition createBodyLayer() {
