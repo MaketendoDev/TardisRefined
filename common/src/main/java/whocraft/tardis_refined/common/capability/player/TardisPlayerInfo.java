@@ -1,20 +1,17 @@
 package whocraft.tardis_refined.common.capability.player;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.dimension.TardisTeleportData;
-import whocraft.tardis_refined.common.network.messages.player.EndPlayerVortexSession;
+import whocraft.tardis_refined.common.network.messages.player.EndPlayerVortexSessionMessage;
 import whocraft.tardis_refined.common.network.messages.player.SyncTardisPlayerInfoMessage;
 import whocraft.tardis_refined.common.tardis.TardisNavLocation;
 import whocraft.tardis_refined.common.tardis.manager.TardisPilotingManager;
@@ -128,15 +125,14 @@ public class TardisPlayerInfo implements TardisPilot {
     }
 
     @Override
-    public void endPlayerForInspection(ServerPlayer serverPlayer, TardisLevelOperator tardisLevelOperator) {
-
+    public void endPlayerForInspection(ServerPlayer serverPlayer) {
 
         BlockPos targetPosition = getPlayerPreviousPos().getPosition();
 
-        TardisTeleportData.scheduleEntityTeleport(serverPlayer, tardisLevelOperator.getLevelKey(), targetPosition.getX(), targetPosition.getY(), targetPosition.getZ(), playerPreviousYaw, playerPreviousRot);
+        TardisTeleportData.scheduleEntityTeleport(serverPlayer, getPlayerPreviousPos().getDimensionKey(), targetPosition.getX(), targetPosition.getY(), targetPosition.getZ(), playerPreviousYaw, playerPreviousRot);
         updatePlayerAbilities(serverPlayer, serverPlayer.getAbilities(), false);
         serverPlayer.onUpdateAbilities();
-        new EndPlayerVortexSession().send(serverPlayer);
+        new EndPlayerVortexSessionMessage().send(serverPlayer);
 
         setPlayerPreviousPos(TardisNavLocation.ORIGIN);
         setRenderVortex(false);

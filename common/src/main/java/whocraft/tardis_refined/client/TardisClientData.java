@@ -23,6 +23,7 @@ public class TardisClientData {
     static int MAX_FOG_TICK_DELTA = 2 * 20; // This is for adjusting how fast the fog will fade in and out.
     private final ResourceKey<Level> levelKey;
     public AnimationState ROTOR_ANIMATION = new AnimationState();
+    public AnimationState CRASHING_ANIMATION = new AnimationState();
     public AnimationState LANDING_ANIMATION = new AnimationState();
     public AnimationState TAKEOFF_ANIMATION = new AnimationState();
     public int landingTime = 0, takeOffTime = 0;

@@ -100,6 +100,7 @@ public class TardisClientLogic {
             tardisClientData.ROTOR_ANIMATION.start(0);
         }
 
+        // Handle landing animation
         if (tardisClientData.isLanding()) {
             if (!tardisClientData.LANDING_ANIMATION.isStarted()) {
                 tardisClientData.TAKEOFF_ANIMATION.stop();
@@ -109,6 +110,7 @@ public class TardisClientLogic {
             tardisClientData.LANDING_ANIMATION.stop();
         }
 
+        // Handle takeoff animation
         if (tardisClientData.isTakingOff()) {
             if (!tardisClientData.TAKEOFF_ANIMATION.isStarted()) {
                 tardisClientData.LANDING_ANIMATION.stop();
@@ -117,7 +119,20 @@ public class TardisClientLogic {
         } else if (tardisClientData.TAKEOFF_ANIMATION.isStarted()) {
             tardisClientData.TAKEOFF_ANIMATION.stop();
         }
+
+        // Handle crashing animation
+        if (tardisClientData.isCrashing()) {
+            if (!tardisClientData.CRASHING_ANIMATION.isStarted()) {
+                tardisClientData.ROTOR_ANIMATION.stop();
+                tardisClientData.LANDING_ANIMATION.stop();
+                tardisClientData.TAKEOFF_ANIMATION.stop();
+                tardisClientData.CRASHING_ANIMATION.start(0);
+            }
+        } else if (tardisClientData.CRASHING_ANIMATION.isStarted()) {
+            tardisClientData.CRASHING_ANIMATION.stop();
+        }
     }
+
 
     /**
      * Called by platform-specific methods

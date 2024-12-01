@@ -23,17 +23,14 @@ public class ExteriorDisplayControl extends Control {
 
     @Override
     public boolean onLeftClick(TardisLevelOperator operator, ConsoleTheme theme, ControlEntity controlEntity, Player player) {
-        if (player instanceof ServerPlayer serverPlayer) {
+        if(player instanceof ServerPlayer serverPlayer){
             sendPacket(serverPlayer, operator);
         }
         return true;
     }
 
     private void sendPacket(ServerPlayer player, TardisLevelOperator tardisLevelOperator) {
-        // new OpenShellSelectionScreen(tardisLevelOperator.getAestheticHandler().getShellTheme()).send(player);
-        TardisPlayerInfo.get(player).ifPresent(tardisInfo ->
-                tardisInfo.setupPlayerForInspection(player, tardisLevelOperator, tardisLevelOperator.getPilotingManager().isTakingOff() ? tardisLevelOperator.getPilotingManager().getCurrentLocation() : tardisLevelOperator.getPilotingManager().getTargetLocation(), !tardisLevelOperator.getPilotingManager().isTakingOff())
-        );
+        new OpenShellSelectionScreen(tardisLevelOperator.getAestheticHandler().getShellTheme()).send(player);
     }
 
 
