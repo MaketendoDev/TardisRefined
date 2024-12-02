@@ -27,8 +27,8 @@ import whocraft.tardis_refined.common.tardis.themes.ConsoleTheme;
 public class VictorianConsoleModel extends HierarchicalModel implements ConsoleUnit {
 
 /*
-    public static final AnimationDefinition IDLE = JsonToAnimationDefinition.loadAnimation(Minecraft.getInstance().getResourceManager(), new ResourceLocation(TardisRefined.MODID, "animations/console/victorian/idle.json"));
-    public static final AnimationDefinition FLIGHT = JsonToAnimationDefinition.loadAnimation(Minecraft.getInstance().getResourceManager(), new ResourceLocation(TardisRefined.MODID, "animations/console/victorian/flight.json"));
+    public static final AnimationDefinition IDLE = JsonToAnimationDefinition.loadAnimation(Minecraft.getInstance().getResourceManager(), new ResourceLocation(TardisRefined.MODID, "animated/console/victorian/idle.json"));
+    public static final AnimationDefinition FLIGHT = JsonToAnimationDefinition.loadAnimation(Minecraft.getInstance().getResourceManager(), new ResourceLocation(TardisRefined.MODID, "animated/console/victorian/flight.json"));
 */
 
 

@@ -25,8 +25,8 @@ import whocraft.tardis_refined.common.tardis.themes.ConsoleTheme;
 
 public class ToyotaConsoleModel extends HierarchicalModel implements ConsoleUnit {
 
-    public static final AnimationDefinition IDLE = JsonToAnimationDefinition.loadAnimation(Minecraft.getInstance().getResourceManager(), new ResourceLocation(TardisRefined.MODID, "animations/console/toyota/idle.json"));
-    public static final AnimationDefinition FLIGHT = JsonToAnimationDefinition.loadAnimation(Minecraft.getInstance().getResourceManager(), new ResourceLocation(TardisRefined.MODID, "animations/console/toyota/flight.json"));
+    public static final AnimationDefinition IDLE = JsonToAnimationDefinition.loadAnimation(Minecraft.getInstance().getResourceManager(), new ResourceLocation(TardisRefined.MODID, "animated/console/toyota/idle.json"));
+    public static final AnimationDefinition FLIGHT = JsonToAnimationDefinition.loadAnimation(Minecraft.getInstance().getResourceManager(), new ResourceLocation(TardisRefined.MODID, "animated/console/toyota/flight.json"));
 
 
     private static final ResourceLocation TOYOTA_TEXTURE = new ResourceLocation(TardisRefined.MODID, "textures/blockentity/console/toyota/toyota_console.png");

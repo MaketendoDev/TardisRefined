@@ -26,8 +26,8 @@ import whocraft.tardis_refined.common.tardis.themes.ConsoleTheme;
 public class CoralConsoleModel extends HierarchicalModel implements ConsoleUnit {
 
 
-    public static final AnimationDefinition IDLE = JsonToAnimationDefinition.loadAnimation(Minecraft.getInstance().getResourceManager(), new ResourceLocation(TardisRefined.MODID, "animations/console/coral/idle.json"));
-    public static final AnimationDefinition FLIGHT = JsonToAnimationDefinition.loadAnimation(Minecraft.getInstance().getResourceManager(), new ResourceLocation(TardisRefined.MODID, "animations/console/coral/flight.json"));
+    public static final AnimationDefinition IDLE = JsonToAnimationDefinition.loadAnimation(Minecraft.getInstance().getResourceManager(), new ResourceLocation(TardisRefined.MODID, "animated/console/coral/idle.json"));
+    public static final AnimationDefinition FLIGHT = JsonToAnimationDefinition.loadAnimation(Minecraft.getInstance().getResourceManager(), new ResourceLocation(TardisRefined.MODID, "animated/console/coral/flight.json"));
 
 
     private static final ResourceLocation CORAL_TEXTURE = new ResourceLocation(TardisRefined.MODID, "textures/blockentity/console/coral/coral_console.png");
