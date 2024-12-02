@@ -42,12 +42,6 @@ public class VortexOverlay {
 
         double speed = 0.01D;
         Minecraft mc = Minecraft.getInstance();
-        float width = gg.guiWidth();
-        float height = gg.guiHeight();
-
-        double radius = 5;
-
-        float yRot = Objects.requireNonNull(mc.getCameraEntity()).getYRot();
 
         if (mc.screen == null) { // Ensure no screen (like inventory) is open
             if (mc.options.keyUp.isDown()) velY += speed;
@@ -87,7 +81,6 @@ public class VortexOverlay {
             }
         }
 
-
         if (velX > 1) velX = 1;
         if (velX < -1) velX = -1;
         if (velY > 1) velY = 1;
@@ -120,9 +113,9 @@ public class VortexOverlay {
             boolean land = tardisClientData.isLanding() || !tardisClientData.isFlying();
 
             //DEV TESTING
-       /*     takeoff = mc.options.keyShift.isDown();
-            land = !takeoff;
-*/
+            //takeoff = mc.options.keyShift.isDown();
+            //land = !takeoff;
+
             if (takeoff) {
                 DEMAT += (System.currentTimeMillis() - LAST_TIME) / 12000.0f;
             }
