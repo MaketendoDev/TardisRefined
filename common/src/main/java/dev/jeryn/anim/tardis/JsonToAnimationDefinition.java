@@ -26,6 +26,7 @@ import static net.minecraft.client.animation.AnimationChannel.Interpolations.LIN
 import static net.minecraft.client.animation.AnimationChannel.Targets.POSITION;
 import static net.minecraft.client.animation.AnimationChannel.Targets.ROTATION;
 import static whocraft.tardis_refined.TardisRefined.LOGGER;
+import static net.minecraft.client.animation.AnimationChannel.Targets.*;
 
 /**
  * <h1>JsonToAnimationDefinition</h1>
@@ -61,7 +62,7 @@ public class JsonToAnimationDefinition {
         JsonArray animations = animationJson.getAsJsonArray("animations");
 
         if(animationJson == null || animations.isEmpty() || animations.isJsonNull()){
-            LOGGER.info("The specified animation '{}' does not exist?", resourceLocation);
+            TardisRefined.LOGGER.info("The specified animation '{}' does not exist?", resourceLocation);
         }
 
         float animationLength = animationJson.get("length").getAsFloat();
@@ -76,14 +77,12 @@ public class JsonToAnimationDefinition {
 
         for (JsonElement boneEntry : animations.getAsJsonArray()) {
             JsonObject boneData = boneEntry.getAsJsonObject();
-            System.out.println(boneData);
+
             List<Keyframe> rotationKeyframes = new ArrayList<>();
             List<Keyframe> positionKeyframes = new ArrayList<>();
+            List<Keyframe> scaleKeyframes = new ArrayList<>();
 
             String boneName = boneData.get("bone").getAsString();
-
-            System.out.println(boneData.get("target").getAsString());
-
 
             if(boneData.get("target").getAsString().equals("rotation")){
                 rotationKeyframes = parseKeyframes(boneData, ROTATION);
@@ -93,16 +92,25 @@ public class JsonToAnimationDefinition {
                 positionKeyframes = parseKeyframes(boneData, POSITION);
             }
 
+            if(boneData.get("target").getAsString().equals("scale")){
+                scaleKeyframes = parseKeyframes(boneData, SCALE);
+            }
+
 
 
             AnimationChannel positionChannel = positionKeyframes.isEmpty() ? null : new AnimationChannel(POSITION, positionKeyframes.toArray(new Keyframe[0]));
             AnimationChannel rotationChannel = rotationKeyframes.isEmpty() ? null : new AnimationChannel(ROTATION, rotationKeyframes.toArray(new Keyframe[0]));
+            AnimationChannel scaleChannel = scaleKeyframes.isEmpty() ? null : new AnimationChannel(SCALE, scaleKeyframes.toArray(new Keyframe[0]));
 
             if (positionChannel != null) {
                 animationDefinition.addAnimation(boneName, positionChannel);
             }
             if (rotationChannel != null) {
                 animationDefinition.addAnimation(boneName, rotationChannel);
+            }
+
+            if (scaleChannel != null) {
+                animationDefinition.addAnimation(boneName, scaleChannel);
             }
 
 
@@ -117,8 +125,7 @@ public class JsonToAnimationDefinition {
         if(transformationData == null) return keyframes;
 
         JsonObject jsonObject = transformationData.getAsJsonObject();
-
-        System.out.println(jsonObject);
+        TardisRefined.LOGGER.info("Keyframe Info: {}", jsonObject);
 
         if (!jsonObject.has("keyframes") || !jsonObject.get("keyframes").isJsonArray()) {
             return keyframes;
@@ -135,47 +142,76 @@ public class JsonToAnimationDefinition {
             JsonArray targetArray = keyframeObject.has("target") ? keyframeObject.getAsJsonArray("target") : null;
             AnimationChannel.Interpolation interpolation = keyframeObject.has("interpolation") ? getInterpolation(keyframeObject.get("interpolation").getAsString()) : getInterpolation("linear");
 
-            Vector3f vector3f = new Vector3f();
+            Vector3f vector3f;
 
-            // Validate and convert the target array to a 3D vector (e.g., float[])
-            float[] target = new float[3];
             if (targetArray != null && targetArray.size() == 3) {
-                for (int i = 0; i < 3; i++) {
-                    target[i] = targetArray.get(i).getAsFloat();
-                }
+                vector3f = new Vector3f(
+                        targetArray.get(0).getAsFloat(),
+                        targetArray.get(1).getAsFloat(),
+                        targetArray.get(2).getAsFloat()
+                );
             } else {
                 continue; // Skip this keyframe if target is invalid
             }
 
-            vector3f.set(target);
-            System.out.println(vector3f);
+
             // Create a new Keyframe object and add it to the list
-            Keyframe keyframe = new Keyframe(timestamp, targetType == POSITION ? KeyframeAnimations.posVec(vector3f.x, vector3f.y, vector3f.z) : KeyframeAnimations.degreeVec(vector3f.x, vector3f.y, vector3f.z), interpolation);
+            Keyframe keyframe = new Keyframe(timestamp, Objects.requireNonNull(targetToVector(targetType, vector3f)), interpolation);
             keyframes.add(keyframe);
         }
 
         // Log the total number of keyframes parsed
-        LOGGER.info("Total keyframes parsed for target " + targetType + ": " + keyframes.size());
+        TardisRefined.LOGGER.info("Total keyframes parsed for target {}: {}", targetToString(targetType), keyframes.size());
 
         return keyframes;
     }
 
 
-    private static AnimationChannel.Interpolation getInterpolation(String easingType) {
-        if(easingType.equals("linear")){
-            return LINEAR;
+    private static String targetToString(AnimationChannel.Target  target){
+        if(target == POSITION){
+            return "Position";
         }
 
-        if(easingType.equals("catmullrom")){
-            return CATMULLROM;
+        if(target == ROTATION){
+            return "Rotation";
         }
 
-        return SNAP_TO;
+        if(target == SCALE){
+            return "Scale";
+        }
+
+        return null; // We should never get here
     }
+
+    private static Vector3f targetToVector(AnimationChannel.Target  target, Vector3f vector3f){
+        if(target == POSITION){
+            return KeyframeAnimations.posVec(vector3f.x, vector3f.y, vector3f.z);
+        }
+
+        if(target == ROTATION){
+            return KeyframeAnimations.degreeVec(vector3f.x, vector3f.y, vector3f.z);
+        }
+
+        if(target == SCALE){
+            return KeyframeAnimations.scaleVec(vector3f.x, vector3f.y, vector3f.z);
+        }
+
+        return null; // We should never get here
+    }
+
+    private static AnimationChannel.Interpolation getInterpolation(String easingType) {
+        return switch (easingType) {
+            case "linear" -> LINEAR;
+            case "catmullrom" -> CATMULLROM;
+            default -> SNAP_TO;
+        };
+    }
+
 
 
     public static JsonObject loadJsonFromResource(ResourceManager resourceManager, ResourceLocation resourceLocation) {
         try {
+            TardisRefined.LOGGER.info("Loading Animation: {}", resourceLocation);
             InputStream inputStream = resourceManager.getResource(resourceLocation).get().open();
             JsonReader reader = new JsonReader(new InputStreamReader(inputStream));
             return JsonParser.parseReader(reader).getAsJsonObject();

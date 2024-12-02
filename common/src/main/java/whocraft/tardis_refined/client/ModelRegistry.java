@@ -26,8 +26,9 @@ public class ModelRegistry {
 
     public static ModelLayerLocation FACTORY_CONSOLE = new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "factory"), "console");
     public static ModelLayerLocation NUKA_CONSOLE;
-    public static ModelLayerLocation COPPER_CONSOLE;
-    public static ModelLayerLocation CORAL_CONSOLE;
+    public static ModelLayerLocation CORAL_CONSOLE = new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "coral"), "console");
+    public static ModelLayerLocation COPPER_CONSOLE = new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "copper"), "console");
+
     public static ModelLayerLocation TOYOTA_CONSOLE = new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "toyota"), "console");
     public static ModelLayerLocation CRYSTAL_CONSOLE;
     public static ModelLayerLocation VICTORIAN_CONSOLE;
@@ -92,8 +93,6 @@ public class ModelRegistry {
         ROOT_PLANT_STATE_FIVE = register(new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "root_plant_five"), "root_plant_five"), RootPlantStateFiveModel::createBodyLayer);
 
         NUKA_CONSOLE = register(new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "nuka_console"), "nuka_console"), NukaConsoleModel::createBodyLayer);
-        COPPER_CONSOLE = register(new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "copper_console"), "copper_console"), CopperConsoleModel::createBodyLayer);
-        CORAL_CONSOLE = register(new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "coral_console"), "coral_console"), CoralConsoleModel::createBodyLayer);
         CRYSTAL_CONSOLE = register(new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "crystal_console"), "crystal_console"), CrystalConsoleModel::createBodyLayer);
         VICTORIAN_CONSOLE = register(new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "victorian_console"), "victorian_console"), VictorianConsoleModel::createBodyLayer);
         MYST_CONSOLE = register(new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "myst_console"), "myst_console"), MystConsoleModel::createBodyLayer);
