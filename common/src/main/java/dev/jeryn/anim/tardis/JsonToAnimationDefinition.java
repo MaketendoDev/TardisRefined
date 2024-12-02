@@ -25,6 +25,7 @@ import static net.minecraft.client.animation.AnimationChannel.Interpolations.CAT
 import static net.minecraft.client.animation.AnimationChannel.Interpolations.LINEAR;
 import static net.minecraft.client.animation.AnimationChannel.Targets.POSITION;
 import static net.minecraft.client.animation.AnimationChannel.Targets.ROTATION;
+import static whocraft.tardis_refined.TardisRefined.LOGGER;
 
 /**
  * <h1>JsonToAnimationDefinition</h1>
@@ -60,7 +61,7 @@ public class JsonToAnimationDefinition {
         JsonArray animations = animationJson.getAsJsonArray("animations");
 
         if(animationJson == null || animations.isEmpty() || animations.isJsonNull()){
-            TardisRefined.LOGGER.info("The specified animation '{}' does not exist?", resourceLocation);
+            LOGGER.info("The specified animation '{}' does not exist?", resourceLocation);
         }
 
         float animationLength = animationJson.get("length").getAsFloat();
@@ -154,7 +155,7 @@ public class JsonToAnimationDefinition {
         }
 
         // Log the total number of keyframes parsed
-        TardisRefined.LOGGER.info("Total keyframes parsed for target " + targetType + ": " + keyframes.size());
+        LOGGER.info("Total keyframes parsed for target " + targetType + ": " + keyframes.size());
 
         return keyframes;
     }
@@ -179,8 +180,9 @@ public class JsonToAnimationDefinition {
             JsonReader reader = new JsonReader(new InputStreamReader(inputStream));
             return JsonParser.parseReader(reader).getAsJsonObject();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to load JSON from resource: {}", resourceLocation, e);
             return null;
         }
     }
+
 }
