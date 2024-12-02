@@ -45,10 +45,14 @@ public class VortexRenderer {
 
     private static final VortexGradientTint PastelGradient = new VortexGradientTint()
             .add(1f, 223, 190, 223)
+            .add(0.75f, 190, 210, 255)
             .add(0.5f, 243, 209, 215)
             .add(0f, 247, 223, 209)
+            .add(-0.75f, 190, 210, 255)
             .add(-0.5f, 228, 190, 207)
             .add(-1f, 223, 190, 223);
+
+
     public VortexTypes vortexType;
 
     public final RenderHelper.DynamicTimeKeep time = new RenderHelper.DynamicTimeKeep(2);
