@@ -5,6 +5,7 @@ plugins {
 architectury {
     platformSetupLoomIde()
     forge();
+
     neoForge {
         platformPackage = "forge"
     }
