@@ -22,3 +22,9 @@
 - Improved UI for Gravity Shaft
 - Speed up downwards descent for Gravity Shaft
 - Fixed a bug where the overlay keybinds always rendered the default key
+- Added Pilot Villager 
+- 
+
+## Technical changes
+- Most animations for Consoles are now loaded from JSON
+- Some models for Consoles are now loaded from JSON

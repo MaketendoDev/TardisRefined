@@ -27,8 +27,8 @@ import whocraft.tardis_refined.common.tardis.themes.ConsoleTheme;
 public class CopperConsoleModel extends HierarchicalModel implements ConsoleUnit {
 
 
-    public static final AnimationDefinition IDLE = JsonToAnimationDefinition.loadAnimation(Minecraft.getInstance().getResourceManager(), new ResourceLocation(TardisRefined.MODID, "animations/console/copper/idle.json"));
-    public static final AnimationDefinition FLIGHT = JsonToAnimationDefinition.loadAnimation(Minecraft.getInstance().getResourceManager(), new ResourceLocation(TardisRefined.MODID, "animations/console/copper/flight.json"));
+    public static final AnimationDefinition IDLE = JsonToAnimationDefinition.loadAnimation(Minecraft.getInstance().getResourceManager(), new ResourceLocation(TardisRefined.MODID, "animated/console/copper/idle.json"));
+    public static final AnimationDefinition FLIGHT = JsonToAnimationDefinition.loadAnimation(Minecraft.getInstance().getResourceManager(), new ResourceLocation(TardisRefined.MODID, "animated/console/copper/flight.json"));
 
     private static final ResourceLocation COPPER_TEXTURE = new ResourceLocation(TardisRefined.MODID, "textures/blockentity/console/copper/copper_console.png");
 
