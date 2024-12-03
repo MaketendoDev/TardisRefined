@@ -18,6 +18,7 @@
     "MultiplayerGameModeMixin",
     "PlayerRenderMixin",
     "SpectatorGuiMixin",
+    "render.MixinMainTarget",
     "render.MixinRenderTarget"
   ],
   "injectors": {

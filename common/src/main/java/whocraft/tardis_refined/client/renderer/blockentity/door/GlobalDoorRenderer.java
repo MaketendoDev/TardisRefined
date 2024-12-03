@@ -1,11 +1,8 @@
 package whocraft.tardis_refined.client.renderer.blockentity.door;
 
-import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -21,11 +18,6 @@ import whocraft.tardis_refined.client.renderer.vortex.RenderTargetHelper;
 import whocraft.tardis_refined.common.block.door.InternalDoorBlock;
 import whocraft.tardis_refined.common.blockentity.door.GlobalDoorBlockEntity;
 
-import static com.mojang.blaze3d.platform.GlStateManager.DestFactor.ONE;
-import static com.mojang.blaze3d.platform.GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA;
-import static com.mojang.blaze3d.platform.GlStateManager.SourceFactor.SRC_ALPHA;
-import static com.mojang.blaze3d.platform.GlStateManager.SourceFactor.ZERO;
-
 public class GlobalDoorRenderer implements BlockEntityRenderer<GlobalDoorBlockEntity>, BlockEntityRendererProvider<GlobalDoorBlockEntity> {
     private static final RenderTargetHelper RENDER_TARGET_HELPER = new RenderTargetHelper();
     protected static ShellDoorModel currentModel;
@@ -35,7 +27,7 @@ public class GlobalDoorRenderer implements BlockEntityRenderer<GlobalDoorBlockEn
     public GlobalDoorRenderer(BlockEntityRendererProvider.Context context) {
     }
 
-    private static boolean renderDoor(GlobalDoorBlockEntity blockEntity, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, int packedLight) {
+    public static boolean renderDoor(GlobalDoorBlockEntity blockEntity, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, int packedLight) {
         BlockState blockstate = blockEntity.getBlockState();
         float rotation = blockstate.getValue(InternalDoorBlock.FACING).toYRot();
         poseStack.mulPose(Axis.YP.rotationDegrees(rotation));
@@ -51,45 +43,8 @@ public class GlobalDoorRenderer implements BlockEntityRenderer<GlobalDoorBlockEn
     }
 
     @Override
-    public void render(GlobalDoorBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-        poseStack.pushPose();
-        poseStack.translate(0.5F, 1.5F, 0.5F);
-        poseStack.mulPose(Axis.ZP.rotationDegrees(180F));
-
-        MultiBufferSource.BufferSource imBuffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-
-        try {
-            boolean isOpen = renderDoor(blockEntity, poseStack, imBuffer, packedLight);
-
-          /*  if (isOpen) {
-                RenderSystem.clear(GlConst.GL_DEPTH_BUFFER_BIT, false);
-                Minecraft.getInstance().getMainRenderTarget().unbindWrite();
-                RENDER_TARGET_HELPER.start();
-
-                enableStencilTest(blockEntity, partialTick, poseStack, imBuffer, packedLight, packedOverlay);
-
-                renderVortexEffect(blockEntity, partialTick, poseStack, imBuffer, packedLight, packedOverlay);
-
-                disableStencilTest(blockEntity, partialTick, poseStack, imBuffer, packedLight, packedOverlay);
-
-                Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
-
-                RenderSystem.enableBlend();
-                RenderSystem.blendFuncSeparate(SRC_ALPHA, ONE_MINUS_SRC_ALPHA, ZERO, ONE);
-                RENDER_TARGET_HELPER.renderTarget.blitToScreen(Minecraft.getInstance().getWindow().getWidth(), Minecraft.getInstance().getWindow().getHeight(), false);
-
-                RenderSystem.disableBlend();
-                RenderSystem.defaultBlendFunc();
-
-                RENDER_TARGET_HELPER.end();
-                Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
-                imBuffer.endBatch();
-            }*/
-        } finally {
-            imBuffer.endBatch();
-        }
-
-        poseStack.popPose();
+    public void render(GlobalDoorBlockEntity blockEntity, float partialTick, PoseStack stack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+        RenderTargetHelper.renderVortex(blockEntity, partialTick, stack, bufferSource, packedLight, packedOverlay);
     }
 
     private void renderVortexEffect(GlobalDoorBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, int packedLight, int packedOverlay) {
