@@ -161,6 +161,8 @@ public class TardisExteriorManager extends BaseHandler {
         BlockPos lastKnownLocationPosition = location.getPosition();
         ChunkPos chunkPos = location.getLevel().getChunk(lastKnownLocationPosition).getPos();
 
+        this.isLanding = true;
+
         //Force load target chunk
         targetLevel.setChunkForced(chunkPos.x, chunkPos.z, true); //Set chunk to be force loaded to properly place block
         this.isLanding = true;

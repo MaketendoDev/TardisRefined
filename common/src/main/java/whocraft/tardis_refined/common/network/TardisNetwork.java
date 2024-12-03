@@ -14,6 +14,7 @@ import whocraft.tardis_refined.common.network.messages.player.SyncTardisPlayerIn
 import whocraft.tardis_refined.common.network.messages.screens.C2SRequestShellSelection;
 import whocraft.tardis_refined.common.network.messages.screens.OpenMonitorMessage;
 import whocraft.tardis_refined.common.network.messages.screens.OpenShellSelectionScreen;
+import whocraft.tardis_refined.common.network.messages.screens.*;
 import whocraft.tardis_refined.common.network.messages.sync.*;
 import whocraft.tardis_refined.common.network.messages.upgrades.S2CDisplayUpgradeScreen;
 import whocraft.tardis_refined.common.network.messages.upgrades.UnlockUpgradeMessage;
@@ -26,7 +27,7 @@ public class TardisNetwork {
     public static MessageType START_VORTEX_SESSION, END_VORTEX_SESSION, TARDIS_EXIT, OPEN_SHELL_SELECT, SYNC_HUMS, OPEN_WAYPOINTS_DISPLAY, DEL_WAYPOINT, CLIENT_OPEN_COORDS_DISPLAY, SERVER_OPEN_COORDS_DISPLAY, UPGRADE_SCREEN_S2C,
             REQUEST_SHELL_C2S, CLIENT_OPEN_COORDS_SCREEN, SERVER_OPEN_COORDS_SCREEN, CLIENT_OPEN_EDIT_COORDS_SCREEN, SERVER_OPEN_EDIT_COORDS_SCREEN, UPLOAD_WAYPOINT,
             EDIT_WAYPOINT, SET_WAYPOINT, CHANGE_HUM, REQUEST_WAYPOINTS, SYNC_DESKTOPS, SYNC_CONSOLE_PATTERNS, SYNC_SHELL_PATTERNS, SYNC_LEVELS, INT_REACTION,
-            OPEN_MONITOR, CHANGE_SHELL, CHANGE_DESKTOP, CANCEL_CHANGE_DESKTOP, UNLOCK_UPGRADE, EJECT_PLAYER, TARDIS_PLAYER_INFO;
+            OPEN_MONITOR, CHANGE_SHELL, CHANGE_DESKTOP, CANCEL_CHANGE_DESKTOP, UNLOCK_UPGRADE, EJECT_PLAYER, MONITOR_POSITION_DATA, MONITOR_CLOSED, TARDIS_PLAYER_INFO;
 
     public static void init() {
         // S2C Messages
@@ -45,6 +46,7 @@ public class TardisNetwork {
         UPGRADE_SCREEN_S2C = NETWORK.registerS2C("upgrade_screen_s2c", S2CDisplayUpgradeScreen::new);
         TARDIS_PLAYER_INFO = NETWORK.registerS2C("tardis_player_info", SyncTardisPlayerInfoMessage::new);
         END_VORTEX_SESSION = NETWORK.registerS2C("end_vortex_session", EndPlayerVortexSessionMessage::new);
+        MONITOR_POSITION_DATA = NETWORK.registerS2C("monitor_position_data", MonitorPositionDataMessage::new);
 
         // C2S Messages
         CHANGE_SHELL = NETWORK.registerC2S("change_shell", ChangeShellMessage::new);
@@ -64,6 +66,7 @@ public class TardisNetwork {
         EJECT_PLAYER = NETWORK.registerC2S("eject_player", EjectPlayerFromConsoleMessage::new);
         TARDIS_EXIT = NETWORK.registerC2S("tardis_exit", ExitTardisViewMessage::new);
         START_VORTEX_SESSION = NETWORK.registerC2S("start_vortex_session", StartVortexSessionMessage::new);
+        MONITOR_CLOSED = NETWORK.registerC2S("monitor_closed", C2SMonitorClosed::new);
     }
 
 
