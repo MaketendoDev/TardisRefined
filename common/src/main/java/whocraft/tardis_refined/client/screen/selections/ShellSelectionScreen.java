@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexSorting;
 import com.mojang.brigadier.StringReader;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -19,10 +20,13 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
+import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
 import whocraft.tardis_refined.TardisRefined;
 import whocraft.tardis_refined.client.TardisClientData;
 import whocraft.tardis_refined.client.model.blockentity.shell.ShellModel;
 import whocraft.tardis_refined.client.model.blockentity.shell.ShellModelCollection;
+import whocraft.tardis_refined.client.overlays.VortexOverlay;
 import whocraft.tardis_refined.client.screen.components.GenericMonitorSelectionList;
 import whocraft.tardis_refined.client.screen.components.SelectionListEntry;
 import whocraft.tardis_refined.common.blockentity.shell.GlobalShellBlockEntity;
@@ -89,8 +93,8 @@ public class ShellSelectionScreen extends SelectionScreen {
         this.leftPos = (this.width - this.imageWidth) / 2;
         this.topPos = (this.height - this.imageHeight) / 2;
 
-        addSubmitButton(width / 2 + 90, (height) / 2 + 35);
-        addCancelButton(width / 2 - 11, (height) / 2 + 35);
+        addSubmitButton(width / 2 + 90, (height) / 2 + 34);
+        addCancelButton(width / 2 - 11, (height) / 2 + 34);
 
         patternButton = addRenderableWidget(Button.builder(Component.literal(""), button -> {
             pattern = ShellPatterns.next(this.patternCollection, this.pattern);
@@ -112,7 +116,9 @@ public class ShellSelectionScreen extends SelectionScreen {
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBackground(guiGraphics);
         PoseStack poseStack = guiGraphics.pose();
-        ClientLevel lvl = Minecraft.getInstance().level;
+        Minecraft mc = Minecraft.getInstance();
+        ClientLevel lvl = mc.level;
+        assert lvl != null;
         RandomSource rand = lvl.random;
 
         boolean isCrashed = TardisClientData.getInstance(lvl.dimension()).isCrashing();
@@ -129,15 +135,53 @@ public class ShellSelectionScreen extends SelectionScreen {
         }
 
 
+        guiGraphics.enableScissor(leftPos + 3, topPos + 3, width - leftPos - 3, height - topPos - 3);
+        RenderSystem.backupProjectionMatrix();
+        Matrix4f perspective = new Matrix4f();
+        perspective.perspective((float) Math.toRadians(mc.options.fov().get()), (float) width / (float) height, 0.01f, 9999, false, perspective);
+        perspective.translate(0, 0, 11000f);
+        RenderSystem.setProjectionMatrix(perspective, VertexSorting.DISTANCE_TO_ORIGIN);
+        poseStack.pushPose();
+        poseStack.mulPose(Axis.YP.rotationDegrees(20));
+        VortexOverlay.VORTEX.time.speed = 0.75;
+        VortexOverlay.VORTEX.renderVortex(guiGraphics, 1, false);
+        RenderSystem.restoreProjectionMatrix();
+        poseStack.popPose();
+        guiGraphics.disableScissor();
+
+        guiGraphics.enableScissor(0, 0, width + 3, topPos + 3);
+        this.renderBackground(guiGraphics);
+        guiGraphics.disableScissor();
+        guiGraphics.enableScissor(0, topPos + 3, leftPos + 3, height - topPos - 3);
+        this.renderBackground(guiGraphics);
+        guiGraphics.disableScissor();
+        guiGraphics.enableScissor(width - leftPos - 3, topPos + 3, width, height - topPos - 3);
+        this.renderBackground(guiGraphics);
+        guiGraphics.disableScissor();
+        guiGraphics.enableScissor(0, height - topPos - 3, width, height);
+        this.renderBackground(guiGraphics);
+        guiGraphics.disableScissor();
+
+        poseStack.pushPose();
+        int c = -1072689136;
+        int l = leftPos + 3, t = topPos + 3, b = height - t, r = width - l;
+        int l1 = leftPos + imageWidth / 4, l2 = leftPos + imageWidth / 2;
+
+        guiGraphics.fill(l2, t, r, b, -1072689136);
+
+        poseStack.mulPose(Axis.ZP.rotationDegrees(-90));
+        poseStack.translate(-height, 0, 0);
+        guiGraphics.fillGradient(t, l1, b, l2, 0x00000000, -1072689136);
+        poseStack.popPose();
+
         /*Render Back drop*/
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        //RenderSystem.setShader(GameRenderer::getPositionTexShader); //REDUNDANT
+        //RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         guiGraphics.blit(MONITOR_TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 
         /*Model*/
         renderShell(guiGraphics, width / 2 - 75, height / 2 - 20, 25F);
         //renderShell(guiGraphics, width / 2, height / 2, 25F);
-
 
         double alpha = (100.0D - this.age * 3.0D) / 100.0D;
         if (isCrashed) {

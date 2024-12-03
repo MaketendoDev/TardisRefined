@@ -214,24 +214,7 @@ public class TardisLevelOperator {
             tardisClientData.setIsTakingOff(exteriorManager.isTakingOff());
             tardisClientData.setThrottleStage(pilotingManager.getThrottleStage());
             tardisClientData.setHandbrakeEngaged(pilotingManager.isHandbrakeOn());
-
-            CompoundTag oldData = tardisClientData.serializeNBT();
-            tardisClientData.setIsOnCooldown(pilotingManager.isInRecovery());
-            tardisClientData.setShellTheme(aestheticHandler.getShellTheme());
-            tardisClientData.setShellPattern(aestheticHandler.shellPattern().id());
-            tardisClientData.setHumEntry(interiorManager.getHumEntry());
-            tardisClientData.setFuel(pilotingManager.getFuel());
-            tardisClientData.setMaximumFuel(pilotingManager.getMaximumFuel());
-            tardisClientData.setTardisState(tardisState);
-            tardisClientData.setFlying(pilotingManager.isInFlight());
-            tardisClientData.setIsLanding(exteriorManager.isLanding());
-            tardisClientData.setIsTakingOff(exteriorManager.isTakingOff());
-            tardisClientData.setThrottleStage(pilotingManager.getThrottleStage());
-            tardisClientData.setHandbrakeEngaged(pilotingManager.isHandbrakeOn());
-            CompoundTag newData = tardisClientData.serializeNBT();
-            if (!oldData.equals(newData)) {
-                tardisClientData.sync();
-            }
+            tardisClientData.sync();
         }
 
         Iterator<ServerPlayer> updatingMonitorsIterator = updatingMonitors.iterator();
