@@ -56,9 +56,11 @@ public class VortexRenderer {
     public VortexTypes vortexType;
 
     public final RenderHelper.DynamicTimeKeep time = new RenderHelper.DynamicTimeKeep(2);
+
     public VortexRenderer(VortexTypes type) {
         this.vortexType = type;
     }
+
     private final List<VortexQuad> vortex_quads = new ArrayList<>();
     public float opacity = 1;
     public float lightning_strike = 0;
@@ -66,7 +68,7 @@ public class VortexRenderer {
     /**
      * Renders the Time Vortex
      */
-    public void renderVortex(PoseStack pose, float opacity) {
+    public void renderVortex(PoseStack pose, float opacity, boolean half) {
         this.opacity = Math.min(opacity, 1);
         if (vortexType.movingGradient) this.vortexType.gradient.offset = time.getFloat() * 2;
         this.time.update();
@@ -75,7 +77,7 @@ public class VortexRenderer {
         RenderHelper.rotateZYX(pose, 90.0f, 180, 0.0f);
         pose.scale(1, this.vortexType.rows, 1);
 
-        for (int row = -this.vortexType.rows; row < this.vortexType.rows; row++) {
+        for (int row = half ? 0 : -this.vortexType.rows; row < this.vortexType.rows; row++) {
             Tesselator tesselator = beginTextureColor(Mode.TRIANGLE_STRIP);
             pose.pushPose();
             pose.translate(0, o(row), 0);
@@ -106,9 +108,13 @@ public class VortexRenderer {
         pose.popPose();
     }
 
-    public void renderVortex(GuiGraphics guiGraphics, float opacity) {
+    public void renderVortex(GuiGraphics guiGraphics, float opacity, boolean half) {
         PoseStack pose = guiGraphics.pose();
-        renderVortex(pose, opacity);
+        renderVortex(pose, opacity, half);
+    }
+
+    public void renderVortex(GuiGraphics guiGraphics, float opacity) {
+        renderVortex(guiGraphics, opacity, false);
     }
 
     private void renderCylinder(PoseStack poseStack, int row) {
