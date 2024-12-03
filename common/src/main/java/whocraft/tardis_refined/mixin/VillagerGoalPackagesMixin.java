@@ -1,4 +1,4 @@
-package whocraft.tardis_refined.common.mixin;
+package whocraft.tardis_refined.mixin;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;

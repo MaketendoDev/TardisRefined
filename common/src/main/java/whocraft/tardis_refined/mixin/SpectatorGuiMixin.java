@@ -1,4 +1,4 @@
-package whocraft.tardis_refined.common.mixin;
+package whocraft.tardis_refined.mixin;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

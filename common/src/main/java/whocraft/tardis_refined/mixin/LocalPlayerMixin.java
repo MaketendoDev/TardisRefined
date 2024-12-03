@@ -1,4 +1,4 @@
-package whocraft.tardis_refined.common.mixin;
+package whocraft.tardis_refined.mixin;
 
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;

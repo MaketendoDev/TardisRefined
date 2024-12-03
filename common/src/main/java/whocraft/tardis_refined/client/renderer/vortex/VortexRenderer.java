@@ -98,7 +98,7 @@ public class VortexRenderer {
                     vortex_quads.add(new VortexQuad(this.vortexType, this.time));
                     break;
                 }
-                vortex_quads.get(i).renderQuad(pose, (float) (i / (this.vortexType.rows / 2f)), this.opacity);
+                vortex_quads.get(i).renderQuad(pose, i / (this.vortexType.rows / 2f), this.opacity);
                 this.lightning_strike += vortex_quads.get(i).lightning_strike * vortex_quads.get(i).lightning_strike / (this.vortexType.rows / 2f);
                 pose.popPose();
             }

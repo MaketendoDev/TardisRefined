@@ -1,4 +1,4 @@
-package whocraft.tardis_refined.common.mixin;
+package whocraft.tardis_refined.mixin;
 
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;

@@ -3,53 +3,62 @@ package whocraft.tardis_refined.client.model.blockentity.door.interior;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import dev.jeryn.anim.tardis.JsonToAnimationDefinition;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.model.geom.PartPose;
-import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.world.entity.Entity;
 import whocraft.tardis_refined.common.blockentity.door.GlobalDoorBlockEntity;
+import whocraft.tardis_refined.compat.ModCompatChecker;
+import whocraft.tardis_refined.compat.portals.ImmersivePortalsClient;
 
 public class FactoryDoorModel extends ShellDoorModel {
 
     private final ModelPart root;
     private final ModelPart leftDoor;
     private final ModelPart rightDoor;
+    private final ModelPart portal;
+    private final ModelPart frame;
 
     public FactoryDoorModel(ModelPart root) {
         this.root = root;
-        this.leftDoor = this.root.getChild("left_door");
-        this.rightDoor = this.root.getChild("right_door");
+        this.leftDoor = JsonToAnimationDefinition.findPart(this, "left_door");
+        this.frame = JsonToAnimationDefinition.findPart(this, "frame");
+        this.rightDoor = JsonToAnimationDefinition.findPart(this, "right_door");
+        this.portal = JsonToAnimationDefinition.findPart(this, "portal");
     }
 
-    public static LayerDefinition createBodyLayer() {
-        MeshDefinition meshdefinition = new MeshDefinition();
-        PartDefinition partdefinition = meshdefinition.getRoot();
-
-        PartDefinition door = partdefinition.addOrReplaceChild("door", CubeListBuilder.create().texOffs(48, 6).addBox(-9.0F, -4.0F, -8.0F, 18.0F, 2.0F, 3.0F, new CubeDeformation(0.0F))
-                .texOffs(0, 0).addBox(-7.0F, -37.0F, -6.0F, 14.0F, 33.0F, 1.0F, new CubeDeformation(0.0F))
-                .texOffs(48, 0).addBox(-9.0F, -39.0F, -8.0F, 18.0F, 2.0F, 3.0F, new CubeDeformation(0.0F))
-                .texOffs(48, 17).addBox(-5.0F, -37.0F, -8.0F, 10.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
-                .texOffs(9, 35).addBox(-9.0F, -37.0F, -7.0F, 2.0F, 33.0F, 2.0F, new CubeDeformation(0.0F))
-                .texOffs(0, 35).addBox(7.0F, -37.0F, -7.0F, 2.0F, 33.0F, 2.0F, new CubeDeformation(0.0F))
-                .texOffs(48, 12).addBox(-7.0F, -37.0F, -6.1F, 14.0F, 3.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 26.0F, 13.0F));
-
-        PartDefinition bone = door.addOrReplaceChild("bone", CubeListBuilder.create(), PartPose.offsetAndRotation(0.0F, -20.0F, 11.0F, 0.0F, 1.5708F, 0.0F));
-
-        PartDefinition left_door = partdefinition.addOrReplaceChild("left_door", CubeListBuilder.create().texOffs(31, 33).addBox(0.0F, -15.0F, -0.6F, 7.0F, 31.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(-7.0F, 6.0F, 7.4F));
-
-        PartDefinition right_door = partdefinition.addOrReplaceChild("right_door", CubeListBuilder.create().texOffs(31, 0).addBox(-7.0F, -15.0F, -0.6F, 7.0F, 31.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(7.0F, 6.0F, 7.4F));
-
-        return LayerDefinition.create(meshdefinition, 128, 128);
-    }
 
     @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        root.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        this.root().getAllParts().forEach(ModelPart::resetPose);
+        this.portal.visible = false;
+        this.root().render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
     }
 
     @Override
-    public void renderInteriorDoor(GlobalDoorBlockEntity doorBlockEntity, boolean open, boolean isBaseModel, PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        root.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    public void renderFrame(GlobalDoorBlockEntity doorBlockEntity, boolean open, boolean isBaseModel, PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        this.root().getAllParts().forEach(ModelPart::resetPose);
+        setDoorPosition(open);
+        this.root().getAllParts().forEach(modelPart -> {
+            modelPart.visible = true;
+        });
+        this.portal.visible = false;
+        this.root().render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    }
+
+    @Override
+    public void renderPortalMask(GlobalDoorBlockEntity doorBlockEntity, boolean open, boolean isBaseModel, PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+
+        if (ModCompatChecker.immersivePortals()) {
+            if (ImmersivePortalsClient.shouldStopRenderingInPortal()) {
+                return;
+            }
+        }
+
+        this.root().getAllParts().forEach(ModelPart::resetPose);
+        setDoorPosition(open);
+        this.root().getAllParts().forEach(modelPart -> modelPart.visible = false);
+        this.portal.visible = true;
+        portal.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
     }
 
     @Override

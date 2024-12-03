@@ -1,6 +1,5 @@
 package whocraft.tardis_refined.neoforge;
 
-import whocraft.tardis_refined.client.model.pallidium.ModelLayerManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
@@ -16,6 +15,7 @@ import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import whocraft.tardis_refined.TardisRefined;
 import whocraft.tardis_refined.client.*;
+import whocraft.tardis_refined.client.model.pallidium.ModelLayerManager;
 import whocraft.tardis_refined.client.neoforge.ModelRegistryImpl;
 import whocraft.tardis_refined.client.renderer.blockentity.RootPlantRenderer;
 import whocraft.tardis_refined.client.renderer.blockentity.console.GlobalConsoleRenderer;

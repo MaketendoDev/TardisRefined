@@ -24,10 +24,10 @@ import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.WorldData;
 import whocraft.tardis_refined.common.dimension.DimensionHandler;
-import whocraft.tardis_refined.common.mixin.MappedRegistryAccessor;
 import whocraft.tardis_refined.common.network.messages.sync.SyncLevelListMessage;
 import whocraft.tardis_refined.compat.ModCompatChecker;
 import whocraft.tardis_refined.compat.portals.ImmersivePortals;
+import whocraft.tardis_refined.mixin.MappedRegistryAccessor;
 
 import java.util.concurrent.Executor;
 import java.util.function.BiFunction;
