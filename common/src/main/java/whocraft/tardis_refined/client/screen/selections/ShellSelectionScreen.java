@@ -14,6 +14,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -37,8 +38,9 @@ import whocraft.tardis_refined.patterns.ShellPattern;
 import whocraft.tardis_refined.patterns.ShellPatterns;
 import whocraft.tardis_refined.registry.TRBlockRegistry;
 
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class ShellSelectionScreen extends SelectionScreen {
 
@@ -114,7 +116,6 @@ public class ShellSelectionScreen extends SelectionScreen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderBackground(guiGraphics);
         PoseStack poseStack = guiGraphics.pose();
         Minecraft mc = Minecraft.getInstance();
         ClientLevel lvl = mc.level;
@@ -194,6 +195,7 @@ public class ShellSelectionScreen extends SelectionScreen {
         super.render(guiGraphics, i, j, f);
     }
 
+
     private void renderShell(GuiGraphics guiGraphics, int x, int y, float scale) {
         ShellModel model = ShellModelCollection.getInstance().getShellEntry(this.currentShellTheme).getShellModel(pattern);
         model.setDoorPosition(false);
@@ -226,12 +228,7 @@ public class ShellSelectionScreen extends SelectionScreen {
 
         selectionList.setRenderBackground(false);
 
-
-        Set<Map.Entry<ResourceKey<ShellTheme>, ShellTheme>> allShells = ShellTheme.SHELL_THEME_DEFERRED_REGISTRY.entrySet();
-
-        Stream<Map.Entry<ResourceKey<ShellTheme>, ShellTheme>> sortedShells = allShells.stream().sorted(Comparator.comparing(o -> o.getValue().getDisplayName().toString()));
-
-        for (Map.Entry<ResourceKey<ShellTheme>, ShellTheme> shellTheme : sortedShells.toList()) {
+        for (Map.Entry<ResourceKey<ShellTheme>, ShellTheme> shellTheme : ShellTheme.SHELL_THEME_DEFERRED_REGISTRY.entrySet()) {
             ShellTheme theme = shellTheme.getValue();
             ResourceLocation shellThemeId = shellTheme.getKey().location();
 
