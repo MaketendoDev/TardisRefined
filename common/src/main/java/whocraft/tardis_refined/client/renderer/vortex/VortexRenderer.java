@@ -14,6 +14,7 @@ import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
 import whocraft.tardis_refined.TardisRefined;
 import whocraft.tardis_refined.client.renderer.RenderHelper;
+import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -269,8 +270,13 @@ public class VortexRenderer {
             if (lightning && System.currentTimeMillis() % 5 == 0) if (lightning && Math.random() > 0.95f) {
                 lightning_a = 3;
                 if (tO > 0) lightning_strike = (opacity * (1 - Mth.abs(tO * tO)));
-                assert Minecraft.getInstance().player != null;
-                Minecraft.getInstance().player.playSound(RAND.nextBoolean() ? SoundEvents.LIGHTNING_BOLT_IMPACT : SoundEvents.LIGHTNING_BOLT_THUNDER, (opacity * (1 - Mth.abs(tO * tO))) * 0.5F, (float) (Math.random() * (1 - Mth.abs(tO))));
+                TardisPlayerInfo.get(Minecraft.getInstance().player).ifPresent(tardisPlayerInfo -> {
+                    if (!tardisPlayerInfo.isViewingTardis()) return;
+                    if (!tardisPlayerInfo.isRenderVortex()) return;
+                    assert Minecraft.getInstance().player != null;
+                    Minecraft.getInstance().player.playSound(RAND.nextBoolean() ? SoundEvents.LIGHTNING_BOLT_IMPACT : SoundEvents.LIGHTNING_BOLT_THUNDER, (opacity * (1 - Mth.abs(tO * tO))) * 0.5F, (float) (Math.random() * (1 - Mth.abs(tO))));
+                });
+
                 rndUV();
             }
 

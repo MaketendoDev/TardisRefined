@@ -143,7 +143,7 @@ public class ShellSelectionScreen extends SelectionScreen {
         RenderSystem.setProjectionMatrix(perspective, VertexSorting.DISTANCE_TO_ORIGIN);
         poseStack.pushPose();
         poseStack.mulPose(Axis.YP.rotationDegrees(20));
-        VortexOverlay.VORTEX.time.speed = 0.75;
+        VortexOverlay.VORTEX.time.speed = 0.3;
         VortexOverlay.VORTEX.renderVortex(guiGraphics, 1, false);
         RenderSystem.restoreProjectionMatrix();
         poseStack.popPose();
@@ -167,6 +167,7 @@ public class ShellSelectionScreen extends SelectionScreen {
         int l = leftPos + 3, t = topPos + 3, b = height - t, r = width - l;
         int l1 = leftPos + imageWidth / 4, l2 = leftPos + imageWidth / 2;
 
+        guiGraphics.fill(l, t, r, b, 0x40000000);
         guiGraphics.fill(l2, t, r, b, -1072689136);
 
         poseStack.mulPose(Axis.ZP.rotationDegrees(-90));
