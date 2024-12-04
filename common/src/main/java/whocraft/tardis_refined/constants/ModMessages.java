@@ -17,6 +17,7 @@ public class ModMessages {
     public static final String UI_SHELL_SELECTION = ui("shell_selection");
     public static final String UI_DESKTOP_SELECTION = ui("desktop_selection");
     public static final String UI_MONITOR_GPS = ui("monitor.main.gps");
+    public static final String UI_MONITOR_VORTEX = ui("monitor.main.vortex");
     public static final String UI_MONITOR_DESTINATION = ui("monitor.main.destination");
     public static final String UI_MONITOR_MAIN_TITLE = ui("monitor.main_title");
     public static final String UI_MONITOR_WAYPOINTS = ui("monitor.waypoints");

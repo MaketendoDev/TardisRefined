@@ -38,7 +38,7 @@ public class VortexSelectionScreen extends SelectionScreen {
 
 
     public VortexSelectionScreen(ResourceLocation currentShellTheme) {
-        super(Component.translatable(ModMessages.UI_SHELL_SELECTION));
+        super(Component.translatable(ModMessages.UI_MONITOR_VORTEX));
         this.vortexList = VortexRegistry.VORTEX_REGISTRY.keySet().stream().toList();
         this.currentVortex = currentShellTheme;
     }
