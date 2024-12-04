@@ -60,7 +60,7 @@ public class ModelRegistry {
 
     public static ModelLayerLocation ROOT_SHELL_DOOR;
     public static ModelLayerLocation FACTORY_DOOR = new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "factory_door"), "shell");
-    public static ModelLayerLocation POLICE_BOX_DOOR;
+    public static ModelLayerLocation POLICE_BOX_DOOR = new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "police_box_door"), "shell");
     public static ModelLayerLocation PHONE_BOOTH_DOOR;
     public static ModelLayerLocation MYSTIC_DOOR;
     public static ModelLayerLocation DRIFTER_DOOR;
@@ -122,7 +122,6 @@ public class ModelRegistry {
 
 
         ROOT_SHELL_DOOR = register(new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "root_shell_door"), "root_shell_door"), RootShellDoorModel::createBodyLayer);
-        POLICE_BOX_DOOR = register(new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "police_box_door"), "police_box_door"), PoliceBoxDoorModel::createBodyLayer);
         PHONE_BOOTH_DOOR = register(new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "phone_booth_door"), "phone_booth_door"), PhoneBoothDoorModel::createBodyLayer);
         MYSTIC_DOOR = register(new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "mystic_door"), "mystic_door"), MysticDoorModel::createBodyLayer);
         DRIFTER_DOOR = register(new ModelLayerLocation(new ResourceLocation(TardisRefined.MODID, "drifter_door"), "drifter_door"), DrifterDoorModel::createBodyLayer);

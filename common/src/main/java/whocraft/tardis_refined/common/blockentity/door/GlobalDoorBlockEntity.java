@@ -125,7 +125,7 @@ public class GlobalDoorBlockEntity extends InternalDoorBlockEntity {
                         cap.setDoorClosed(true); //Tell the Tardis that the door should be closed only if the door is being locked
                     return;
                 }
-                if (!cap.getPilotingManager().isInFlight() && !door.locked()) {
+                if (!door.locked()) {
                     cap.setDoorClosed(door.isOpen()); //Tell the Tardis that the door should be closed if currently open, and should be open if currently closed.
                 }
             });

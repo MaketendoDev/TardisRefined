@@ -61,6 +61,7 @@ public class LangProviderEnglish extends LanguageProvider {
         addSound(TRSoundRegistry.LOW_FUEL.get(), "Low fuel warning");
         addSound(TRSoundRegistry.CLOISTER_BELL.get(), "Cloister Bell");
         addSound(TRSoundRegistry.MALLET.get(), "Mallet Hit");
+        addSound(TRSoundRegistry.ALARM.get(), "Alarm");
 
         //Hum Sounds
         TardisHums.registerDefaultHums();
