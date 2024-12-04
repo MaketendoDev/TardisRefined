@@ -22,6 +22,7 @@ public class ExteriorViewOverlay {
 
     public static final ResourceLocation BAR_TEXTURE = new ResourceLocation(TardisRefined.MODID, "textures/gui/bar_texture.png");
     public static boolean shouldRender = true;
+    private static final RenderHelper.CustomProgressBar PROGRESS_BAR = new RenderHelper.CustomProgressBar(BAR_TEXTURE, 256, 5, 182, 60);
 
     public static void renderOverlay(GuiGraphics guiGraphics) {
         Minecraft mc = Minecraft.getInstance();
@@ -119,6 +120,7 @@ public class ExteriorViewOverlay {
 
         // Clamp journey progress between 0.0 and 1.0
         float clampedProgress = Mth.clamp(journeyProgress, 0.0F, 1.0F);
+        clampedProgress = 0.75f;
 
         // Bar dimensions
         int barWidth = 182;
@@ -127,9 +129,7 @@ public class ExteriorViewOverlay {
         int barY = screenHeight - 25;
 
         // Bind the texture and render the bar
-        guiGraphics.blit(BAR_TEXTURE, barX, barY, 0, 0, barWidth, barHeight); // Background bar
-        guiGraphics.blit(BAR_TEXTURE, barX, barY, 0, 5, (int) (barWidth * clampedProgress), barHeight); // Progress bar
-
+        PROGRESS_BAR.blit(guiGraphics, barX, barY, clampedProgress);
 
         // Render journey progress as a percentage above the bar
         String progressText = String.format("Journey: %.0f%%", clampedProgress * 100);
