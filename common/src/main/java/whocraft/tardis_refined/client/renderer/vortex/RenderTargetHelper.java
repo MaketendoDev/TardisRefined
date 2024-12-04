@@ -2,11 +2,10 @@ package whocraft.tardis_refined.client.renderer.vortex;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.fabricmc.api.EnvType;
@@ -23,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.lwjgl.opengl.GL11;
 import whocraft.tardis_refined.client.model.blockentity.door.interior.ShellDoorModel;
 import whocraft.tardis_refined.client.model.blockentity.shell.ShellModelCollection;
+import whocraft.tardis_refined.client.overlays.VortexOverlay;
 import whocraft.tardis_refined.common.block.door.InternalDoorBlock;
 import whocraft.tardis_refined.common.blockentity.door.GlobalDoorBlockEntity;
 
@@ -35,6 +35,98 @@ import static whocraft.tardis_refined.client.renderer.blockentity.door.GlobalDoo
 public class RenderTargetHelper {
 
     public RenderTarget renderTarget;
+    private static final RenderTargetHelper RENDER_TARGET_HELPER = new RenderTargetHelper();
+    public static StencilBufferStorage stencilBufferStorage = new StencilBufferStorage();
+
+    public static void renderVortex(GlobalDoorBlockEntity blockEntity, float partialTick, PoseStack stack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+
+        BlockState blockstate = blockEntity.getBlockState();
+        ResourceLocation theme = blockEntity.theme();
+
+        float rotation = blockstate.getValue(InternalDoorBlock.FACING).toYRot();
+        boolean isOpen = blockstate.getValue(InternalDoorBlock.OPEN);
+
+        ShellDoorModel currentModel = ShellModelCollection.getInstance().getShellEntry(theme).getShellDoorModel(blockEntity.pattern());
+
+        stack.pushPose();
+        //Fix transform
+        {
+            stack.translate(0.5F, 1.5F, 0.5F);
+            stack.mulPose(Axis.ZP.rotationDegrees(180F));
+            stack.mulPose(Axis.YP.rotationDegrees(rotation));
+            stack.translate(0, 0, -0.01);
+        }
+        //Unbind RenderTarget
+        Minecraft.getInstance().getMainRenderTarget().unbindWrite();
+        RENDER_TARGET_HELPER.start();
+
+        //Render Door Frame
+        MultiBufferSource.BufferSource imBuffer = stencilBufferStorage.getVertexConsumer();
+        currentModel.setDoorPosition(isOpen);
+        currentModel.renderFrame(blockEntity, isOpen, true, stack, imBuffer.getBuffer(RenderType.entityCutout(currentModel.getInteriorDoorTexture(blockEntity))), packedLight, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+        imBuffer.endBatch();
+
+        GL11.glEnable(GL11.GL_STENCIL_TEST);
+        GL11.glClear(GL11.GL_STENCIL_BUFFER_BIT);
+        GL11.glStencilFunc(GL11.GL_ALWAYS, 1, 0xFF);
+        GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE);
+        GL11.glStencilMask(0xFF);
+
+        RenderSystem.depthMask(false);
+        stack.pushPose();
+        currentModel.renderPortalMask(blockEntity, isOpen, true, stack, imBuffer.getBuffer(RenderType.entityTranslucentCull(currentModel.getInteriorDoorTexture(blockEntity))), packedLight, OverlayTexture.NO_OVERLAY, 0f, 0f, 0f, 1f);
+        imBuffer.endBatch();
+        stack.popPose();
+        RenderSystem.depthMask(true);
+
+        GL11.glStencilMask(0x00);
+        GL11.glStencilFunc(GL11.GL_EQUAL, 1, 0xFF);
+
+        GL11.glColorMask(true, true, true, false);
+        stack.pushPose();
+        stack.scale(10, 10, 10);
+        VortexOverlay.VORTEX.time.speed = 0.3;
+        VortexOverlay.VORTEX.renderVortex(stack, 1, false);
+        stack.popPose();
+        GL11.glColorMask(false, false, false, true);
+
+        Minecraft.getInstance().getMainRenderTarget().bindWrite(true);
+        //Put rendertarget on screen;
+        {
+            RenderSystem.enableBlend();
+            RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            RENDER_TARGET_HELPER.renderTarget.blitToScreen(Minecraft.getInstance().getWindow().getWidth(), Minecraft.getInstance().getWindow().getHeight(), false);
+            RENDER_TARGET_HELPER.end();
+            RenderSystem.disableBlend();
+            RenderSystem.defaultBlendFunc();
+        }
+        stack.popPose();
+        GL11.glDisable(GL11.GL_STENCIL_TEST);
+        //Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
+
+        GL11.glColorMask(true, true, true, true);
+    }
+
+    public void start() {
+        Window window = Minecraft.getInstance().getWindow();
+        int width = window.getWidth();
+        int height = window.getHeight();
+
+        if (renderTarget == null || renderTarget.width != width || renderTarget.height != height)
+            renderTarget = new TextureTarget(width, height, true, Minecraft.ON_OSX);
+
+        renderTarget.bindWrite(false);
+        renderTarget.checkStatus();
+        if (!getIsStencilEnabled(renderTarget))
+            setIsStencilEnabled(renderTarget, true);
+    }
+
+
+    public void end() {
+        renderTarget.clear(Minecraft.ON_OSX);
+        renderTarget.unbindWrite();
+    }
+
 
     @Environment(EnvType.CLIENT)
     public static boolean getIsStencilEnabled(RenderTarget renderTarget) {
@@ -44,128 +136,6 @@ public class RenderTargetHelper {
     @Environment(EnvType.CLIENT)
     public static void setIsStencilEnabled(RenderTarget renderTarget, boolean cond) {
         ((RenderTargetStencil) renderTarget).tr$setisStencilEnabledAndReload(cond);
-    }
-
-    private static final RenderTargetHelper RENDER_TARGET_HELPER = new RenderTargetHelper();
-    public static StencilBufferStorage stencilBufferStorage = new StencilBufferStorage();
-
-    public static void renderVortex(GlobalDoorBlockEntity blockEntity, float partialTick, PoseStack stack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-
-        stack.pushPose();
-        stack.translate(0.5F, 1.5F, 0.5F);
-        stack.mulPose(Axis.ZP.rotationDegrees(180F));
-
-        Minecraft.getInstance().getMainRenderTarget().unbindWrite();
-        RENDER_TARGET_HELPER.start();
-        MultiBufferSource.BufferSource imBuffer = stencilBufferStorage.getVertexConsumer();
-
-        BlockState blockstate = blockEntity.getBlockState();
-        float rotation = blockstate.getValue(InternalDoorBlock.FACING).toYRot();
-        stack.mulPose(Axis.YP.rotationDegrees(rotation));
-        ResourceLocation theme = blockEntity.theme();
-        boolean isOpen = blockstate.getValue(InternalDoorBlock.OPEN);
-        stack.translate(0, 0, -0.01);
-
-        ShellDoorModel currentModel = ShellModelCollection.getInstance().getShellEntry(theme).getShellDoorModel(blockEntity.pattern());
-        currentModel.setDoorPosition(isOpen);
-
-        currentModel.renderFrame(blockEntity, isOpen, true, stack, imBuffer.getBuffer(RenderType.entityCutout(currentModel.getInteriorDoorTexture(blockEntity))), packedLight, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
-        imBuffer.endBatch();
-
-        GL11.glClear(GL11.GL_STENCIL_BUFFER_BIT);
-        GL11.glEnable(GL11.GL_STENCIL_TEST);
-        GL11.glStencilFunc(GL11.GL_ALWAYS, 0, 0xFF);
-        GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE);
-        GL11.glStencilMask(0xFF);
-
-        GL11.glColorMask(true, true, true, false);
-
-        //RENDER HERE
-
-        stack.pushPose();
-        Direction facing = blockstate.getValue(InternalDoorBlock.FACING);
-
-        float offsetX = 0.0f, offsetY = 0.0f, offsetZ = 0.0f;
-
-        switch (facing) {
-            case NORTH:
-                offsetZ = 1.0f;
-                break;
-            case SOUTH:
-                offsetZ = -1.0f;
-                break;
-            case EAST:
-                offsetX = -1.0f;
-                break;
-            case WEST:
-                offsetX = 1.0f;
-                break;
-            case UP:
-                offsetY = -1.0f;
-                break;
-            case DOWN:
-                offsetY = 1.0f;
-                break;
-        }
-
-        stack.pushPose();
-        stack.translate(offsetX, offsetY, offsetZ);
-
-        renderDoor(blockEntity, stack, imBuffer, packedLight);
-
-        stack.popPose();
-        stack.popPose();
-
-
-        GL11.glColorMask(false, false, false, true);
-
-        GL11.glStencilFunc(GL11.GL_EQUAL, 0, 0xFF);
-        GL11.glStencilMask(0xFF);
-        GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
-
-        GL11.glEnable(GL11.GL_STENCIL_TEST);
-        stack.pushPose();
-        currentModel.renderPortalMask(blockEntity, isOpen, true, stack, imBuffer.getBuffer(RenderType.entityTranslucentCull(currentModel.getInteriorDoorTexture(blockEntity))), packedLight, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
-        imBuffer.endBatch();
-        stack.popPose();
-        GL11.glDisable(GL11.GL_STENCIL_TEST);
-
-        Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
-
-        RenderSystem.enableBlend();
-        RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        RENDER_TARGET_HELPER.renderTarget.blitToScreen(Minecraft.getInstance().getWindow().getWidth(), Minecraft.getInstance().getWindow().getHeight(), false);
-        RenderSystem.disableBlend();
-        RenderSystem.defaultBlendFunc();
-
-        RENDER_TARGET_HELPER.end();
-        Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
-        stack.popPose();
-    }
-
-
-    public void start() {
-        Window window = Minecraft.getInstance().getWindow();
-
-        if (renderTarget != null && (renderTarget.width != window.getWidth() || renderTarget.height != window.getHeight())) {
-            renderTarget = null;
-        }
-
-        if (renderTarget == null) {
-            renderTarget = new TextureTarget(window.getWidth(), window.getHeight(), true, Minecraft.ON_OSX);
-        }
-
-        renderTarget.bindWrite(false);
-        renderTarget.checkStatus();
-
-        if (!getIsStencilEnabled(renderTarget)) {
-            setIsStencilEnabled(renderTarget, true);
-        }
-    }
-
-    public void end() {
-        renderTarget.clear(Minecraft.ON_OSX);
-        renderTarget.unbindWrite();
     }
 
 

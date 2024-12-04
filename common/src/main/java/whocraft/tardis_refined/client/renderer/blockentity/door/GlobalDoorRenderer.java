@@ -30,7 +30,7 @@ public class GlobalDoorRenderer implements BlockEntityRenderer<GlobalDoorBlockEn
     public static boolean renderDoor(GlobalDoorBlockEntity blockEntity, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, int packedLight) {
         BlockState blockstate = blockEntity.getBlockState();
         float rotation = blockstate.getValue(InternalDoorBlock.FACING).toYRot();
-        poseStack.mulPose(Axis.YP.rotationDegrees(rotation));
+        //poseStack.mulPose(Axis.YP.rotationDegrees(rotation));
         ResourceLocation theme = blockEntity.theme();
         boolean isOpen = blockstate.getValue(InternalDoorBlock.OPEN);
         poseStack.translate(0, 0, -0.01);
@@ -80,7 +80,7 @@ public class GlobalDoorRenderer implements BlockEntityRenderer<GlobalDoorBlockEn
         }
 
         poseStack.pushPose();
-        poseStack.translate(offsetX, offsetY, offsetZ);
+        //poseStack.translate(offsetX, offsetY, offsetZ);
 
         renderDoor(blockEntity, poseStack, bufferSource, packedLight);
 
