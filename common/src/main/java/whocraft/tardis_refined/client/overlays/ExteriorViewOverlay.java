@@ -120,7 +120,7 @@ public class ExteriorViewOverlay {
 
         // Clamp journey progress between 0.0 and 1.0
         float clampedProgress = Mth.clamp(journeyProgress, 0.0F, 1.0F);
-        clampedProgress = 0.75f;
+        //clampedProgress = 0.75f;
 
         // Bar dimensions
         int barWidth = 182;
