@@ -13,6 +13,7 @@ import org.joml.Matrix4f;
 import whocraft.tardis_refined.client.TardisClientData;
 import whocraft.tardis_refined.client.renderer.vortex.VortexRenderer;
 import whocraft.tardis_refined.client.screen.selections.ShellSelectionScreen;
+import whocraft.tardis_refined.common.VortexRegistry;
 import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
 
 import java.util.Objects;
@@ -22,7 +23,7 @@ import static whocraft.tardis_refined.client.screen.selections.ShellSelectionScr
 
 public class VortexOverlay {
 
-    public static final VortexRenderer VORTEX = new VortexRenderer(VortexRenderer.VortexTypes.FLOW);
+    public static final VortexRenderer VORTEX = new VortexRenderer(VortexRegistry.CLOUDS.get());
 
     private static double tardisX = 0.0D;
     private static double tardisY = 0.0D;
@@ -103,6 +104,8 @@ public class VortexOverlay {
             PoseStack pose = gg.pose();
             float width = gg.guiWidth();
             float height = gg.guiHeight();
+
+            VORTEX.vortexType = VortexRegistry.VORTEX_DEFERRED_REGISTRY.get(tardisClientData.getVortex());
 
             /*
                 Needs tweaking, but am not quite sure how to fix.

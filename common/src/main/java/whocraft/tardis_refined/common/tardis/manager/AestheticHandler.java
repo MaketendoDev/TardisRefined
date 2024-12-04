@@ -3,9 +3,11 @@ package whocraft.tardis_refined.common.tardis.manager;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import whocraft.tardis_refined.common.VortexRegistry;
 import whocraft.tardis_refined.common.blockentity.door.GlobalDoorBlockEntity;
 import whocraft.tardis_refined.common.blockentity.shell.GlobalShellBlockEntity;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
@@ -22,6 +24,7 @@ public class AestheticHandler extends BaseHandler {
 
     // Shell
     private ResourceLocation shellTheme = ShellTheme.HALF_BAKED.getId();
+    private ResourceLocation vortex = VortexRegistry.FLOW.getId();
     private ShellPattern shellPattern = ShellPatterns.DEFAULT;
 
 
@@ -39,6 +42,8 @@ public class AestheticHandler extends BaseHandler {
         this.shellPattern = shellPattern;
     }
 
+
+
     public ResourceLocation getShellTheme() {
         if (shellTheme.getNamespace().contains("minecraft")) {
             return ShellTheme.HALF_BAKED.getId();
@@ -46,6 +51,13 @@ public class AestheticHandler extends BaseHandler {
         return shellTheme;
     }
 
+    public ResourceLocation getVortex() {
+        return vortex;
+    }
+
+    public void setVortex(ResourceLocation vortex) {
+        this.vortex = vortex;
+    }
 
     /**
      * Sets the shell theme ID for the Exterior Shell Block
@@ -109,6 +121,7 @@ public class AestheticHandler extends BaseHandler {
 
 
         aestheticTag.put("shell", shellInfo);
+        shellInfo.putString("vortex", vortex.toString());
         baseTag.put("aesthetic", aestheticTag);
 
         return baseTag;
@@ -118,6 +131,11 @@ public class AestheticHandler extends BaseHandler {
     public void loadData(CompoundTag tag) {
         if (tag.contains("aesthetic", NbtType.COMPOUND)) {
             CompoundTag aestheticTag = tag.getCompound("aesthetic");
+
+            if(aestheticTag.contains("vortex")){
+                ResourceLocation vortexLoc = new ResourceLocation(aestheticTag.getString("vortex"));
+                this.vortex = vortexLoc;
+            }
 
             // Shell
             if (aestheticTag.contains("shell", NbtType.COMPOUND)) {

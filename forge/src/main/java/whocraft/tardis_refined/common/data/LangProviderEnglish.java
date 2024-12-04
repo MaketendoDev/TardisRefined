@@ -9,6 +9,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageType;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import whocraft.tardis_refined.TardisRefined;
+import whocraft.tardis_refined.common.VortexRegistry;
 import whocraft.tardis_refined.common.capability.tardis.upgrades.Upgrade;
 import whocraft.tardis_refined.common.hum.HumEntry;
 import whocraft.tardis_refined.common.hum.TardisHums;
@@ -27,6 +28,13 @@ public class LangProviderEnglish extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
+
+        /*Vortex*/
+        add(VortexRegistry.CLOUDS.get().getTranslationKey(), "Clouds");
+        add(VortexRegistry.FLOW.get().getTranslationKey(), "Flow");
+        add(VortexRegistry.SPACE.get().getTranslationKey(), "Space");
+        add(VortexRegistry.WAVES.get().getTranslationKey(), "Waves");
+        add(VortexRegistry.STARS.get().getTranslationKey(), "Stars");
 
         /*Sounds*/
         addSound(TRSoundRegistry.TARDIS_LAND.get(), "TARDIS lands");

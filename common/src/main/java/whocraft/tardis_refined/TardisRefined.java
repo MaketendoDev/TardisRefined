@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.util.LowerCaseEnumTypeAdapterFactory;
 import org.slf4j.Logger;
 import whocraft.tardis_refined.client.TRParticles;
+import whocraft.tardis_refined.common.VortexRegistry;
 import whocraft.tardis_refined.registry.TRUpgrades;
 import whocraft.tardis_refined.common.hum.TardisHums;
 import whocraft.tardis_refined.common.network.TardisNetwork;
@@ -39,6 +40,8 @@ public class TardisRefined {
             .registerTypeAdapterFactory(new LowerCaseEnumTypeAdapterFactory()).create();
 
     public static void init() {
+
+        VortexRegistry.VORTEX_DEFERRED_REGISTRY.registerToModBus();
 
         TRItemRegistry.TABS.registerToModBus();
         TRBlockRegistry.BLOCKS.registerToModBus();

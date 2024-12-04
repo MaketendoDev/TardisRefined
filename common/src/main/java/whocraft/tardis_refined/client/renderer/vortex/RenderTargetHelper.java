@@ -20,9 +20,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 import org.lwjgl.opengl.GL11;
+import whocraft.tardis_refined.client.TardisClientData;
 import whocraft.tardis_refined.client.model.blockentity.door.interior.ShellDoorModel;
 import whocraft.tardis_refined.client.model.blockentity.shell.ShellModelCollection;
 import whocraft.tardis_refined.client.overlays.VortexOverlay;
+import whocraft.tardis_refined.common.VortexRegistry;
 import whocraft.tardis_refined.common.block.door.InternalDoorBlock;
 import whocraft.tardis_refined.common.blockentity.door.GlobalDoorBlockEntity;
 
@@ -48,6 +50,9 @@ public class RenderTargetHelper {
 
         ShellDoorModel currentModel = ShellModelCollection.getInstance().getShellEntry(theme).getShellDoorModel(blockEntity.pattern());
 
+        TardisClientData tardisClientData = TardisClientData.getInstance(blockEntity.getLevel().dimension());
+
+        VortexOverlay.VORTEX.vortexType = VortexRegistry.VORTEX_DEFERRED_REGISTRY.get(tardisClientData.getVortex());
         stack.pushPose();
         //Fix transform
         {

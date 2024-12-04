@@ -13,6 +13,8 @@ import whocraft.tardis_refined.client.screen.components.SelectionListEntry;
 import whocraft.tardis_refined.client.screen.selections.DesktopSelectionScreen;
 import whocraft.tardis_refined.client.screen.selections.HumSelectionScreen;
 import whocraft.tardis_refined.client.screen.selections.SelectionScreen;
+import whocraft.tardis_refined.client.screen.selections.VortexSelectionScreen;
+import whocraft.tardis_refined.common.VortexRegistry;
 import whocraft.tardis_refined.common.capability.tardis.upgrades.UpgradeHandler;
 import whocraft.tardis_refined.common.network.messages.EjectPlayerFromConsoleMessage;
 import whocraft.tardis_refined.common.network.messages.player.StartVortexSessionMessage;
@@ -72,6 +74,7 @@ public class MonitorScreen extends SelectionScreen {
 
         selectionList.children().add(new SelectionListEntry(Component.translatable(ModMessages.UI_MONITOR_WAYPOINTS), entry -> new RequestWaypointsMessage().send(), leftPos, TRUpgrades.WAYPOINTS.get().isUnlocked(upgradeHandler)));
         selectionList.children().add(new SelectionListEntry(Component.translatable(ModMessages.UI_MONITOR_SHELL_VIEW), entry -> new StartVortexSessionMessage().send(), leftPos, TRUpgrades.WAYPOINTS.get().isUnlocked(upgradeHandler)));
+        selectionList.children().add(new SelectionListEntry(Component.translatable(ModMessages.UI_MONITOR_SHELL_VIEW), entry -> Minecraft.getInstance().setScreen(new VortexSelectionScreen(VortexRegistry.VORTEX_REGISTRY.getKey(VortexRegistry.FLOW.get()))), leftPos, TRUpgrades.WAYPOINTS.get().isUnlocked(upgradeHandler)));
 
 
         selectionList.children().add(new SelectionListEntry(Component.translatable(ModMessages.UI_MONITOR_SELECT_HUM), entry -> Minecraft.getInstance().setScreen(new HumSelectionScreen()), leftPos));

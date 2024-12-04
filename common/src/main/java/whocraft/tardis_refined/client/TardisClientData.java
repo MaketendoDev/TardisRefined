@@ -7,6 +7,7 @@ import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
+import whocraft.tardis_refined.common.VortexRegistry;
 import whocraft.tardis_refined.common.hum.HumEntry;
 import whocraft.tardis_refined.common.hum.TardisHums;
 import whocraft.tardis_refined.common.network.messages.sync.SyncTardisClientDataMessage;
@@ -47,6 +48,7 @@ public class TardisClientData {
     private int recoveryTicks = 0;
     private float journeyProgress = 0;
     private ResourceLocation shellTheme = ShellTheme.HALF_BAKED.getId();
+    private ResourceLocation vortex = VortexRegistry.FLOW.getId();
     private ResourceLocation shellPattern = ShellPatterns.DEFAULT.id();
     private HumEntry humEntry = TardisHums.getDefaultHum();
     public TardisClientData(ResourceKey<Level> resourceKey) {
@@ -55,6 +57,14 @@ public class TardisClientData {
 
     public static void add(TardisClientData tardisClientData) {
         DATA.add(tardisClientData);
+    }
+
+    public ResourceLocation getVortex() {
+        return vortex;
+    }
+
+    public void setVortex(ResourceLocation vortex) {
+        this.vortex = vortex;
     }
 
     /**
@@ -205,6 +215,7 @@ public class TardisClientData {
         compoundTag.putBoolean("isOnCooldown", this.isOnCooldown);
         // Save shellTheme and shellPattern
         compoundTag.putString("shellTheme", shellTheme.toString());
+        compoundTag.putString("vortex", vortex.toString());
         compoundTag.putString("shellPattern", shellPattern.toString());
 
         compoundTag.putString(NbtConstants.TARDIS_CURRENT_HUM, humEntry.getIdentifier().toString());
@@ -234,6 +245,7 @@ public class TardisClientData {
         // Load shellTheme and shellPattern
         shellTheme = new ResourceLocation(compoundTag.getString("shellTheme"));
         shellPattern = new ResourceLocation(compoundTag.getString("shellPattern"));
+        vortex = new ResourceLocation(compoundTag.getString("vortex"));
 
         setHumEntry(TardisHums.getHumById(new ResourceLocation(compoundTag.getString(NbtConstants.TARDIS_CURRENT_HUM))));
 
