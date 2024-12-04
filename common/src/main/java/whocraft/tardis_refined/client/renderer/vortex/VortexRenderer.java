@@ -93,11 +93,11 @@ public class VortexRenderer {
         if (this.vortexType.decals) {
             Tesselator tesselator = beginTextureColor(Mode.QUADS);
             for (int i = 0; i < this.vortexType.rows / 2f; i++) {
-                pose.pushPose();
                 if (vortex_quads.size() < i + 1) {
                     vortex_quads.add(new VortexQuad(this.vortexType, this.time));
                     break;
                 }
+                pose.pushPose();
                 vortex_quads.get(i).renderQuad(pose, i / (this.vortexType.rows / 2f), this.opacity);
                 this.lightning_strike += vortex_quads.get(i).lightning_strike * vortex_quads.get(i).lightning_strike / (this.vortexType.rows / 2f);
                 pose.popPose();
