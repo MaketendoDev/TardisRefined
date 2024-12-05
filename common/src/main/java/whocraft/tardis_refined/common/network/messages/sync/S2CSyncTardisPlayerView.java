@@ -1,4 +1,4 @@
-package whocraft.tardis_refined.common.network.messages.player;
+package whocraft.tardis_refined.common.network.messages.sync;
 
 
 import net.minecraft.client.Minecraft;
@@ -6,7 +6,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
@@ -15,16 +14,16 @@ import whocraft.tardis_refined.common.network.MessageS2C;
 import whocraft.tardis_refined.common.network.MessageType;
 import whocraft.tardis_refined.common.network.TardisNetwork;
 
-public class SyncTardisPlayerInfoMessage extends MessageS2C {
+public class S2CSyncTardisPlayerView extends MessageS2C {
     public int entityID;
     public CompoundTag nbt;
 
-    public SyncTardisPlayerInfoMessage(int entityID, CompoundTag nbt) {
+    public S2CSyncTardisPlayerView(int entityID, CompoundTag nbt) {
         this.entityID = entityID;
         this.nbt = nbt;
     }
 
-    public SyncTardisPlayerInfoMessage(FriendlyByteBuf buf) {
+    public S2CSyncTardisPlayerView(FriendlyByteBuf buf) {
         this.entityID = buf.readInt();
         this.nbt = buf.readNbt();
     }

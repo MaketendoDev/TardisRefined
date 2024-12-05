@@ -31,7 +31,6 @@ import whocraft.tardis_refined.client.TardisClientData;
 import whocraft.tardis_refined.common.blockentity.console.GlobalConsoleBlockEntity;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.capability.tardis.upgrades.UpgradeHandler;
-import whocraft.tardis_refined.common.tardis.control.Control;
 import whocraft.tardis_refined.common.tardis.control.ControlSpecification;
 import whocraft.tardis_refined.common.tardis.control.ship.MonitorControl;
 import whocraft.tardis_refined.common.tardis.manager.FlightDanceManager;
@@ -44,27 +43,27 @@ import whocraft.tardis_refined.constants.NbtConstants;
 import whocraft.tardis_refined.patterns.sound.ConfiguredSound;
 import whocraft.tardis_refined.registry.*;
 
-public class ControlEntity extends Entity {
+public class Control extends Entity {
 
     /**
      * Flag to determine if this Control can continue to become more mis-aligned and thus lose "health".
      * <br> This name comes from a time when the terminology wasn't finalised, and a more traditional "health" system was being used.
      * <br> True - if able to keep being mis-aligned, False if cannot be further mis-aligned
      */
-    private static final EntityDataAccessor<Boolean> TICKING_DOWN = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> TICKING_DOWN = SynchedEntityData.defineId(Control.class, EntityDataSerializers.BOOLEAN);
     /**
      * Flag to determine if this Control is far too mis-aligned and is considered "dead".
      * <br> This name comes from a time when the terminology wasn't finalised, and a more traditional "health" system was being used.
      */
-    private static final EntityDataAccessor<Boolean> IS_DEAD = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> IS_DEAD = SynchedEntityData.defineId(Control.class, EntityDataSerializers.BOOLEAN);
     /**
      * Attribute to determine how far this Control is mis-aligned.
      * <br> This name comes from a time when the terminology wasn't finalised, and a more traditional "health" system was being used.
      */
-    private static final EntityDataAccessor<Integer> CONTROL_HEALTH = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Boolean> SHOW_PARTICLE = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Float> SIZE_WIDTH = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Float> SIZE_HEIGHT = SynchedEntityData.defineId(ControlEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Integer> CONTROL_HEALTH = SynchedEntityData.defineId(Control.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> SHOW_PARTICLE = SynchedEntityData.defineId(Control.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Float> SIZE_WIDTH = SynchedEntityData.defineId(Control.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> SIZE_HEIGHT = SynchedEntityData.defineId(Control.class, EntityDataSerializers.FLOAT);
     /**
      * The total amount of control alignment health points before a control will start causing the Tardis to crash.
      * <br> This name comes from a time when the terminology wasn't finalised, and a more traditional "health" system was being used.
@@ -75,11 +74,11 @@ public class ControlEntity extends Entity {
     private BlockPos consoleBlockPos;
     private FlightDanceManager flightDanceManager;
     private Vector3f offset;
-    public ControlEntity(EntityType<?> entityTypeIn, Level level) {
+    public Control(EntityType<?> entityTypeIn, Level level) {
         super(entityTypeIn, level);
     }
 
-    public ControlEntity(Level level) {
+    public Control(Level level) {
         super(TREntityRegistry.CONTROL_ENTITY.get(), level);
     }
 
@@ -490,7 +489,7 @@ public class ControlEntity extends Entity {
                 return false;
             }
 
-            Control control = this.controlSpecification.control();
+            whocraft.tardis_refined.common.tardis.control.Control control = this.controlSpecification.control();
 
             boolean successfulUse = control.onLeftClick(cap, this.consoleTheme, this, player);
             ConfiguredSound playedSound = successfulUse ? control.getSuccessSound(cap, this.consoleTheme, true) : control.getFailSound(cap, this.consoleTheme, true);
@@ -524,7 +523,7 @@ public class ControlEntity extends Entity {
                 return false;
             }
 
-            Control control = this.controlSpecification.control();
+            whocraft.tardis_refined.common.tardis.control.Control control = this.controlSpecification.control();
             boolean successfulUse = control.onRightClick(cap, consoleTheme, this, player);
             ConfiguredSound playedSound = successfulUse ? control.getSuccessSound(cap, this.consoleTheme, false) : control.getFailSound(cap, this.consoleTheme, false);
             control.playControlConfiguredSound(cap, this, playedSound);

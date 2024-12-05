@@ -14,13 +14,13 @@ import whocraft.tardis_refined.common.network.TardisNetwork;
 import whocraft.tardis_refined.common.tardis.TardisNavLocation;
 
 
-public class OpenMonitorMessage extends MessageS2C {
+public class S2COpenMonitor extends MessageS2C {
 
     private final boolean desktopGenerating;
     private TardisNavLocation currentLocation, targetLocation;
     private CompoundTag upgradeHandlerNbt;
 
-    public OpenMonitorMessage(boolean desktopGenerating, TardisNavLocation currentLocation, TardisNavLocation targetLocation, UpgradeHandler upgradeHandler) {
+    public S2COpenMonitor(boolean desktopGenerating, TardisNavLocation currentLocation, TardisNavLocation targetLocation, UpgradeHandler upgradeHandler) {
         this.desktopGenerating = desktopGenerating;
         this.currentLocation = currentLocation;
         this.targetLocation = targetLocation;
@@ -28,7 +28,7 @@ public class OpenMonitorMessage extends MessageS2C {
 
     }
 
-    public OpenMonitorMessage(FriendlyByteBuf friendlyByteBuf) {
+    public S2COpenMonitor(FriendlyByteBuf friendlyByteBuf) {
         this.desktopGenerating = friendlyByteBuf.readBoolean();
         this.currentLocation = TardisNavLocation.deserialize(friendlyByteBuf.readNbt());
         this.targetLocation = TardisNavLocation.deserialize(friendlyByteBuf.readNbt());

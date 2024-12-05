@@ -4,13 +4,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
-import whocraft.tardis_refined.common.entity.ControlEntity;
-import whocraft.tardis_refined.common.tardis.control.Control;
+import whocraft.tardis_refined.common.entity.Control;
 import whocraft.tardis_refined.common.tardis.themes.ConsoleTheme;
 import whocraft.tardis_refined.common.util.PlayerUtil;
 import whocraft.tardis_refined.constants.ModMessages;
 
-public class HandbrakeControl extends Control {
+public class HandbrakeControl extends whocraft.tardis_refined.common.tardis.control.Control {
     public HandbrakeControl(ResourceLocation id) {
         super(id, true);
     }
@@ -20,7 +19,7 @@ public class HandbrakeControl extends Control {
     }
 
     @Override
-    public boolean onLeftClick(TardisLevelOperator operator, ConsoleTheme theme, ControlEntity controlEntity, Player player) {
+    public boolean onLeftClick(TardisLevelOperator operator, ConsoleTheme theme, Control control, Player player) {
 
         if (operator.getPilotingManager().isInFlight()) {
 
@@ -38,7 +37,7 @@ public class HandbrakeControl extends Control {
     }
 
     @Override
-    public boolean onRightClick(TardisLevelOperator operator, ConsoleTheme theme, ControlEntity controlEntity, Player player) {
+    public boolean onRightClick(TardisLevelOperator operator, ConsoleTheme theme, Control control, Player player) {
         if (operator.getPilotingManager().isInFlight()) {
 
             PlayerUtil.sendMessage(player, Component.translatable(ModMessages.HANDBRAKE_WARNING), true);

@@ -26,7 +26,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import whocraft.tardis_refined.client.TardisClientData;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
-import whocraft.tardis_refined.common.entity.ControlEntity;
+import whocraft.tardis_refined.common.entity.Control;
 import whocraft.tardis_refined.common.tardis.TardisNavLocation;
 import whocraft.tardis_refined.common.util.Platform;
 import whocraft.tardis_refined.common.util.PlayerUtil;
@@ -145,7 +145,7 @@ public class KeyItem extends Item {
         return super.use(level, player, interactionHand);
     }
 
-    public boolean interactMonitor(ItemStack itemStack, Player player, ControlEntity control, InteractionHand interactionHand) {
+    public boolean interactMonitor(ItemStack itemStack, Player player, Control control, InteractionHand interactionHand) {
 
         if (control.level() instanceof ServerLevel serverLevel) {
             ResourceKey<Level> tardis = serverLevel.dimension();

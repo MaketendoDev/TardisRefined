@@ -6,7 +6,7 @@ import net.minecraft.world.level.Level;
 
 import java.util.Set;
 
-public class ClientPacketHandler {
+public class HandleSyncDimensions {
 
     public static void handleDimSyncPacket(ResourceKey<Level> level, boolean add) {
         if (Minecraft.getInstance().player == null || Minecraft.getInstance().player.connection.levels() == null) {

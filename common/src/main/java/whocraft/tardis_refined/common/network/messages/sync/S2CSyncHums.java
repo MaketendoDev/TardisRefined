@@ -15,7 +15,7 @@ import whocraft.tardis_refined.common.network.TardisNetwork;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SyncHumsMessage extends MessageS2C {
+public class S2CSyncHums extends MessageS2C {
 
     //We use an unboundedMapCodec. However it is limited in that it can only parse objects whose keys can be serialised to a string, such as ResourceLocation
     //E.g. If you used an int as a key, the unboundedMapCodec will not parse it and will error.
@@ -23,11 +23,11 @@ public class SyncHumsMessage extends MessageS2C {
     private Map<ResourceLocation, HumEntry> tardisHums = new HashMap<>();
 
 
-    public SyncHumsMessage(Map<ResourceLocation, HumEntry> tardisHums) {
+    public S2CSyncHums(Map<ResourceLocation, HumEntry> tardisHums) {
         this.tardisHums = tardisHums;
     }
 
-    public SyncHumsMessage(FriendlyByteBuf buf) {
+    public S2CSyncHums(FriendlyByteBuf buf) {
         //Parse our Map Codec and send the nbt data over. If there's any errors, populate with default Tardis Refined console rooms
         this.tardisHums = MAPPER.parse(NbtOps.INSTANCE, buf.readNbt()).result().orElse(TardisHums.registerDefaultHums());
     }

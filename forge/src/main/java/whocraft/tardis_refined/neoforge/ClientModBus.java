@@ -48,16 +48,6 @@ public class ClientModBus {
         item.register(TRItemColouring.SCREWDRIVER_COLORS, TRItemRegistry.SCREWDRIVER.get());
     }
 
-    @SubscribeEvent
-    public static void onPunchBlock(PlayerInteractEvent.LeftClickBlock e) {
-        if (e.getEntity().level().isClientSide) return;
-
-        TardisPlayerInfo.get(e.getEntity()).ifPresent(tardisPlayerInfo -> {
-            e.setCanceled(tardisPlayerInfo.isViewingTardis());
-        });
-
-    }
-
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void onRegisterClientReloadListeners(RegisterClientReloadListenersEvent event) {

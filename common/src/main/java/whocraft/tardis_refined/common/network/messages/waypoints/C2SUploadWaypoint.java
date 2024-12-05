@@ -15,18 +15,18 @@ import whocraft.tardis_refined.common.tardis.TardisNavLocation;
 import whocraft.tardis_refined.common.tardis.manager.TardisPilotingManager;
 import whocraft.tardis_refined.common.tardis.manager.TardisWaypointManager;
 
-public class UploadWaypointMessage extends MessageC2S {
+public class C2SUploadWaypoint extends MessageC2S {
 
     TardisNavLocation tardisNavLocation;
     CoordInputType coordInputType;
 
-    public UploadWaypointMessage(TardisNavLocation tardisNavLocation, CoordInputType coordInputType) {
+    public C2SUploadWaypoint(TardisNavLocation tardisNavLocation, CoordInputType coordInputType) {
         this.tardisNavLocation = tardisNavLocation;
         this.coordInputType = coordInputType;
     }
 
 
-    public UploadWaypointMessage(FriendlyByteBuf buf) {
+    public C2SUploadWaypoint(FriendlyByteBuf buf) {
         CompoundTag tardisNav = buf.readNbt();
         this.tardisNavLocation = TardisNavLocation.deserialize(tardisNav);
         this.coordInputType = CoordInputType.valueOf(buf.readUtf());

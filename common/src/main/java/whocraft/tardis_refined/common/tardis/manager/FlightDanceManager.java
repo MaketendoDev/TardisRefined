@@ -2,11 +2,9 @@ package whocraft.tardis_refined.common.tardis.manager;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import whocraft.tardis_refined.common.block.console.GlobalConsoleBlock;
 import whocraft.tardis_refined.common.blockentity.console.GlobalConsoleBlockEntity;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
-import whocraft.tardis_refined.common.entity.ControlEntity;
-import whocraft.tardis_refined.registry.TRBlockRegistry;
+import whocraft.tardis_refined.common.entity.Control;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +14,7 @@ public class FlightDanceManager extends TickableHandler {
 
     private TardisLevelOperator operator;
     private TardisPilotingManager pilotingManager;
-    private List<ControlEntity> controlEntityList = new ArrayList<>();
+    private List<Control> controlList = new ArrayList<>();
     private int damagedControlCount = 0;
 
     private boolean weAreDancing = false;
@@ -34,12 +32,12 @@ public class FlightDanceManager extends TickableHandler {
         return this.weAreDancing;
     }
 
-    private List<ControlEntity> getNonCriticalControls(GlobalConsoleBlockEntity controllerConsole) {
+    private List<Control> getNonCriticalControls(GlobalConsoleBlockEntity controllerConsole) {
         var allControlsOnConsole = controllerConsole.getControlEntityList();
-        List<ControlEntity> updatedList = new ArrayList<>(allControlsOnConsole); //Copy over all entries to a new which we can manipulate
-        for (ControlEntity controlEntity : allControlsOnConsole) { //Out of all controls in the original control list, remove any from our copy which are considered critical for normal operations.
-            if (controlEntity.controlSpecification().control().isCriticalForTardisOperation()) {
-                updatedList.remove(controlEntity); //Remove entries from our copy
+        List<Control> updatedList = new ArrayList<>(allControlsOnConsole); //Copy over all entries to a new which we can manipulate
+        for (Control control : allControlsOnConsole) { //Out of all controls in the original control list, remove any from our copy which are considered critical for normal operations.
+            if (control.controlSpecification().control().isCriticalForTardisOperation()) {
+                updatedList.remove(control); //Remove entries from our copy
             }
         }
         return updatedList;
@@ -47,7 +45,7 @@ public class FlightDanceManager extends TickableHandler {
 
     public void startFlightDance(GlobalConsoleBlockEntity controllerConsole) {
         if (controllerConsole == null) return;
-        this.controlEntityList = getNonCriticalControls(controllerConsole);
+        this.controlList = getNonCriticalControls(controllerConsole);
         this.weAreDancing = true;
     }
 
@@ -75,7 +73,7 @@ public class FlightDanceManager extends TickableHandler {
 
     public void stopDancing() {
         this.updateControlsAfterDance();
-        this.controlEntityList = new ArrayList<>();
+        this.controlList = new ArrayList<>();
         this.damagedControlCount = 0;
         this.weAreDancing = false;
     }
@@ -97,7 +95,7 @@ public class FlightDanceManager extends TickableHandler {
     }
 
     private void triggerNextEvent() {
-        if (controlEntityList.isEmpty()) {
+        if (controlList.isEmpty()) {
             GlobalConsoleBlockEntity console = operator.getPilotingManager().getCurrentConsole();
             // Someone logged out during flight / a desync happened - we will just nicely end the flight
             if (console == null) {
@@ -107,11 +105,11 @@ public class FlightDanceManager extends TickableHandler {
             } else {
                 console.killControls(); // Just incase
                 console.spawnControlEntities();
-                controlEntityList.addAll(console.getControlEntityList());
+                controlList.addAll(console.getControlEntityList());
 
             }
         }
-        ControlEntity randomControl = controlEntityList.get(this.operator.getLevel().random.nextInt(controlEntityList.size() - 1));
+        Control randomControl = controlList.get(this.operator.getLevel().random.nextInt(controlList.size() - 1));
         randomControl.setTickingDown(this);
     }
 

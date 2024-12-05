@@ -15,15 +15,15 @@ import whocraft.tardis_refined.common.network.TardisNetwork;
 
 import java.util.Objects;
 
-public class UnlockUpgradeMessage extends MessageC2S {
+public class C2SUnlockUpgrade extends MessageC2S {
 
     private final Upgrade upgrade;
 
-    public UnlockUpgradeMessage(Upgrade upgrade) {
+    public C2SUnlockUpgrade(Upgrade upgrade) {
         this.upgrade = upgrade;
     }
 
-    public UnlockUpgradeMessage(FriendlyByteBuf buf) {
+    public C2SUnlockUpgrade(FriendlyByteBuf buf) {
         this.upgrade = TRUpgrades.UPGRADE_REGISTRY.get(buf.readResourceLocation());
     }
 

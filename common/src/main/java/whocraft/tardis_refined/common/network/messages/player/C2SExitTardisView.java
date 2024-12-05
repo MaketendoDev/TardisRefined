@@ -17,12 +17,12 @@ import whocraft.tardis_refined.common.network.MessageType;
 import whocraft.tardis_refined.common.network.TardisNetwork;
 import whocraft.tardis_refined.common.util.Platform;
 
-public class ExitTardisViewMessage extends MessageC2S {
+public class C2SExitTardisView extends MessageC2S {
 
-    public ExitTardisViewMessage() {
+    public C2SExitTardisView() {
     }
 
-    public ExitTardisViewMessage(FriendlyByteBuf buf) {
+    public C2SExitTardisView(FriendlyByteBuf buf) {
     }
 
     @Override

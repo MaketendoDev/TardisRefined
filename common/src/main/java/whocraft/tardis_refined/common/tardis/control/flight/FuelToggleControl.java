@@ -4,15 +4,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
-import whocraft.tardis_refined.common.entity.ControlEntity;
-import whocraft.tardis_refined.common.tardis.control.Control;
+import whocraft.tardis_refined.common.entity.Control;
 import whocraft.tardis_refined.common.tardis.control.ControlSpecification;
 import whocraft.tardis_refined.common.tardis.manager.TardisPilotingManager;
 import whocraft.tardis_refined.common.tardis.themes.ConsoleTheme;
 import whocraft.tardis_refined.common.util.PlayerUtil;
 import whocraft.tardis_refined.constants.ModMessages;
 
-public class FuelToggleControl extends Control {
+public class FuelToggleControl extends whocraft.tardis_refined.common.tardis.control.Control {
 
     public FuelToggleControl(ResourceLocation id) {
         super(id);
@@ -23,7 +22,7 @@ public class FuelToggleControl extends Control {
     }
 
     @Override
-    public boolean onRightClick(TardisLevelOperator operator, ConsoleTheme theme, ControlEntity controlEntity, Player player) {
+    public boolean onRightClick(TardisLevelOperator operator, ConsoleTheme theme, Control control, Player player) {
         if (!operator.getLevel().isClientSide()) {
             if (operator.getTardisState() != TardisLevelOperator.STATE_EYE_OF_HARMONY) {
                 return false;
@@ -43,7 +42,7 @@ public class FuelToggleControl extends Control {
     }
 
     @Override
-    public boolean onLeftClick(TardisLevelOperator operator, ConsoleTheme theme, ControlEntity controlEntity, Player player) {
+    public boolean onLeftClick(TardisLevelOperator operator, ConsoleTheme theme, Control control, Player player) {
         return false;
     }
 
@@ -53,7 +52,7 @@ public class FuelToggleControl extends Control {
     }
 
     @Override
-    public Component getCustomControlName(TardisLevelOperator operator, ControlEntity entity, ControlSpecification controlSpecification) {
+    public Component getCustomControlName(TardisLevelOperator operator, Control entity, ControlSpecification controlSpecification) {
         if (operator == null) {
             return super.getCustomControlName(operator, entity, controlSpecification);
         }

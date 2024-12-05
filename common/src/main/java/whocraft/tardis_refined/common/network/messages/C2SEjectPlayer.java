@@ -15,13 +15,13 @@ import whocraft.tardis_refined.common.network.TardisNetwork;
 import whocraft.tardis_refined.common.util.PlayerUtil;
 import whocraft.tardis_refined.constants.ModMessages;
 
-public class EjectPlayerFromConsoleMessage extends MessageC2S {
+public class C2SEjectPlayer extends MessageC2S {
 
-    public EjectPlayerFromConsoleMessage() {
+    public C2SEjectPlayer() {
 
     }
 
-    public EjectPlayerFromConsoleMessage(FriendlyByteBuf buffer) {
+    public C2SEjectPlayer(FriendlyByteBuf buffer) {
 
     }
 

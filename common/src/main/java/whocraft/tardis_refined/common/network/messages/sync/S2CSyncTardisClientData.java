@@ -13,17 +13,17 @@ import whocraft.tardis_refined.common.network.MessageS2C;
 import whocraft.tardis_refined.common.network.MessageType;
 import whocraft.tardis_refined.common.network.TardisNetwork;
 
-public class SyncTardisClientDataMessage extends MessageS2C {
+public class S2CSyncTardisClientData extends MessageS2C {
 
     public ResourceKey<Level> level;
     public CompoundTag compoundTag;
 
-    public SyncTardisClientDataMessage(ResourceKey<Level> level, CompoundTag compoundTag) {
+    public S2CSyncTardisClientData(ResourceKey<Level> level, CompoundTag compoundTag) {
         this.level = level;
         this.compoundTag = compoundTag;
     }
 
-    public SyncTardisClientDataMessage(FriendlyByteBuf friendlyByteBuf) {
+    public S2CSyncTardisClientData(FriendlyByteBuf friendlyByteBuf) {
         this.level = friendlyByteBuf.readResourceKey(Registries.DIMENSION);
         this.compoundTag = friendlyByteBuf.readNbt();
     }

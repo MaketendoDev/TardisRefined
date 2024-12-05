@@ -1,6 +1,5 @@
 package whocraft.tardis_refined.common.network.messages.waypoints;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -10,42 +9,44 @@ import whocraft.tardis_refined.common.network.MessageC2S;
 import whocraft.tardis_refined.common.network.MessageContext;
 import whocraft.tardis_refined.common.network.MessageType;
 import whocraft.tardis_refined.common.network.TardisNetwork;
-import whocraft.tardis_refined.common.tardis.TardisWaypoint;
 import whocraft.tardis_refined.common.tardis.manager.TardisWaypointManager;
 
-public class EditWaypointMessage extends MessageC2S {
+import java.util.UUID;
 
-    TardisWaypoint waypoint;
+public class C2SRemoveWaypointEntry extends MessageC2S {
 
-    public EditWaypointMessage(TardisWaypoint waypoint) {
-        this.waypoint = waypoint;
+    UUID waypointId;
+
+    public C2SRemoveWaypointEntry(UUID waypointId) {
+        this.waypointId = waypointId;
     }
 
-    public EditWaypointMessage(FriendlyByteBuf buf) {
-        CompoundTag tardisNav = buf.readNbt();
-        this.waypoint = TardisWaypoint.deserialise(tardisNav);
+
+    public C2SRemoveWaypointEntry(FriendlyByteBuf buf) {
+        waypointId = buf.readUUID();
     }
+
 
     @NotNull
     @Override
     public MessageType getType() {
-        return TardisNetwork.EDIT_WAYPOINT;
+        return TardisNetwork.DEL_WAYPOINT;
     }
 
     @Override
     public void toBytes(FriendlyByteBuf buf) {
-        buf.writeNbt(waypoint.serialise());
+        buf.writeUUID(waypointId);
     }
 
     @Override
     public void handle(MessageContext context) {
-
         ServerPlayer player = context.getPlayer();
         ServerLevel serverLevel = player.serverLevel();
 
         TardisLevelOperator.get(serverLevel).ifPresent(tardisLevelOperator -> {
             TardisWaypointManager tardisWaypointManager = tardisLevelOperator.getTardisWaypointManager();
-            tardisWaypointManager.editWaypoint(waypoint);
+            tardisWaypointManager.deleteWaypoint(waypointId);
+            new S2CWaypointsListScreen(tardisWaypointManager.getWaypoints()).send(player);
         });
     }
 }

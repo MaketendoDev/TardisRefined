@@ -10,29 +10,29 @@ import whocraft.tardis_refined.common.network.MessageContext;
 import whocraft.tardis_refined.common.network.MessageS2C;
 import whocraft.tardis_refined.common.network.MessageType;
 import whocraft.tardis_refined.common.network.TardisNetwork;
-import whocraft.tardis_refined.patterns.ShellPattern;
-import whocraft.tardis_refined.patterns.ShellPatterns;
+import whocraft.tardis_refined.patterns.ConsolePattern;
+import whocraft.tardis_refined.patterns.ConsolePatterns;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SyncShellPatternsMessage extends MessageS2C {
+public class S2CSyncConsolePatterns extends MessageS2C {
 
-    protected final UnboundedMapCodec<ResourceLocation, List<ShellPattern>> MAPPER = Codec.unboundedMap(ResourceLocation.CODEC, ShellPattern.CODEC.listOf().xmap(List::copyOf, List::copyOf));
-    protected Map<ResourceLocation, List<ShellPattern>> patterns = new HashMap<>();
+    protected final UnboundedMapCodec<ResourceLocation, List<ConsolePattern>> MAPPER = Codec.unboundedMap(ResourceLocation.CODEC, ConsolePattern.CODEC.listOf().xmap(List::copyOf, List::copyOf));
+    protected Map<ResourceLocation, List<ConsolePattern>> patterns = new HashMap<>();
 
-    public SyncShellPatternsMessage(Map<ResourceLocation, List<ShellPattern>> patterns) {
+    public S2CSyncConsolePatterns(Map<ResourceLocation, List<ConsolePattern>> patterns) {
         this.patterns = patterns;
     }
 
-    public SyncShellPatternsMessage(FriendlyByteBuf buf) {
-        this.patterns = MAPPER.parse(NbtOps.INSTANCE, buf.readNbt()).result().orElse(ShellPatterns.registerDefaultPatterns());
+    public S2CSyncConsolePatterns(FriendlyByteBuf buf) {
+        this.patterns = MAPPER.parse(NbtOps.INSTANCE, buf.readNbt()).result().orElse(ConsolePatterns.registerDefaultPatterns());
     }
 
     @Override
     public MessageType getType() {
-        return TardisNetwork.SYNC_SHELL_PATTERNS;
+        return TardisNetwork.SYNC_CONSOLE_PATTERNS;
     }
 
     @Override
@@ -42,6 +42,7 @@ public class SyncShellPatternsMessage extends MessageS2C {
 
     @Override
     public void handle(MessageContext context) {
-        ShellPatterns.getReloadListener().setData(this.patterns);
+        ConsolePatterns.getReloadListener().setData(this.patterns);
     }
+
 }

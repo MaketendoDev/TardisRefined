@@ -3,6 +3,7 @@ package whocraft.tardis_refined.common.network.messages;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -14,40 +15,39 @@ import whocraft.tardis_refined.common.network.TardisNetwork;
 
 import java.util.Optional;
 
-
-public class CancelDesktopChangeMessage extends MessageC2S {
+public class C2SChangeVortex extends MessageC2S {
 
     private final ResourceKey<Level> resourceKey;
+    private final ResourceLocation vortex;
 
-    public CancelDesktopChangeMessage(ResourceKey<Level> tardisLevel) {
+    public C2SChangeVortex(ResourceKey<Level> tardisLevel, ResourceLocation theme) {
         this.resourceKey = tardisLevel;
+        this.vortex = theme;
     }
 
-    public CancelDesktopChangeMessage(FriendlyByteBuf friendlyByteBuf) {
-        resourceKey = friendlyByteBuf.readResourceKey(Registries.DIMENSION);
+    public C2SChangeVortex(FriendlyByteBuf buffer) {
+        resourceKey = buffer.readResourceKey(Registries.DIMENSION);
+        this.vortex = buffer.readResourceLocation();
     }
 
     @NotNull
     @Override
     public MessageType getType() {
-        return TardisNetwork.CANCEL_CHANGE_DESKTOP;
+        return TardisNetwork.CHANGE_VORTEX;
     }
 
     @Override
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeResourceKey(this.resourceKey);
+        buf.writeResourceLocation(this.vortex);
     }
-
 
     @Override
     public void handle(MessageContext context) {
         Optional<ServerLevel> level = Optional.ofNullable(context.getPlayer().getServer().levels.get(resourceKey));
-        level.ifPresent(x -> {
-            TardisLevelOperator.get(x).ifPresent(y -> {
-                y.getInteriorManager().cancelDesktopChange();
-            });
-        });
-
+        level.flatMap(TardisLevelOperator::get).ifPresent(y -> y.getAestheticHandler().setVortex(this.vortex));
 
     }
+
+
 }

@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import whocraft.tardis_refined.client.TRKeybinds;
 import whocraft.tardis_refined.client.overlays.ExteriorViewOverlay;
 import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
-import whocraft.tardis_refined.common.network.messages.player.ExitTardisViewMessage;
+import whocraft.tardis_refined.common.network.messages.player.C2SExitTardisView;
 
 @Mixin(LocalPlayer.class)
 public class LocalPlayerMixin {
@@ -40,7 +40,7 @@ public class LocalPlayerMixin {
         // Set all movement-related fields to false or 0.0F to block movement
 
         if (TRKeybinds.EXIT_EXTERIOR_VIEW.isDown()) {
-            new ExitTardisViewMessage().send();
+            new C2SExitTardisView().send();
             return;
         }
 

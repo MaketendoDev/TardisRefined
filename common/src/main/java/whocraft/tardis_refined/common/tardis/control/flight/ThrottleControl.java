@@ -1,19 +1,15 @@
 package whocraft.tardis_refined.common.tardis.control.flight;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import whocraft.tardis_refined.client.TardisClientData;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
-import whocraft.tardis_refined.common.entity.ControlEntity;
-import whocraft.tardis_refined.common.tardis.control.Control;
+import whocraft.tardis_refined.common.entity.Control;
 import whocraft.tardis_refined.common.tardis.control.ControlSpecification;
 import whocraft.tardis_refined.common.tardis.manager.TardisPilotingManager;
 import whocraft.tardis_refined.common.tardis.themes.ConsoleTheme;
 
-public class ThrottleControl extends Control {
+public class ThrottleControl extends whocraft.tardis_refined.common.tardis.control.Control {
     public ThrottleControl(ResourceLocation id) {
         super(id, true);
     }
@@ -23,7 +19,7 @@ public class ThrottleControl extends Control {
     }
 
     @Override
-    public boolean onRightClick(TardisLevelOperator operator, ConsoleTheme theme, ControlEntity controlEntity, Player player) {
+    public boolean onRightClick(TardisLevelOperator operator, ConsoleTheme theme, Control control, Player player) {
 
         if (player.isCrouching()) {
             operator.getPilotingManager().setThrottleStage(TardisPilotingManager.MAX_THROTTLE_STAGE);
@@ -41,7 +37,7 @@ public class ThrottleControl extends Control {
     }
 
     @Override
-    public boolean onLeftClick(TardisLevelOperator operator, ConsoleTheme theme, ControlEntity controlEntity, Player player) {
+    public boolean onLeftClick(TardisLevelOperator operator, ConsoleTheme theme, Control control, Player player) {
 
         if (player.isCrouching()) {
             operator.getPilotingManager().setThrottleStage(0);
@@ -61,7 +57,7 @@ public class ThrottleControl extends Control {
     }
 
     @Override
-    public Component getCustomControlName(TardisLevelOperator operator, ControlEntity entity, ControlSpecification controlSpecification) {
+    public Component getCustomControlName(TardisLevelOperator operator, Control entity, ControlSpecification controlSpecification) {
         if (operator.getPilotingManager().isInFlight()) {
 
             int throttleStage = operator.getPilotingManager().getThrottleStage();

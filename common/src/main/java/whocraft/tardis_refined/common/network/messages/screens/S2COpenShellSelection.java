@@ -12,15 +12,15 @@ import whocraft.tardis_refined.common.network.MessageType;
 import whocraft.tardis_refined.common.network.TardisNetwork;
 
 
-public class OpenShellSelectionScreen extends MessageS2C {
+public class S2COpenShellSelection extends MessageS2C {
 
     private ResourceLocation currentShell;
 
-    public OpenShellSelectionScreen(ResourceLocation currentShell) {
+    public S2COpenShellSelection(ResourceLocation currentShell) {
         this.currentShell = currentShell;
     }
 
-    public OpenShellSelectionScreen(FriendlyByteBuf friendlyByteBuf) {
+    public S2COpenShellSelection(FriendlyByteBuf friendlyByteBuf) {
         this.currentShell = friendlyByteBuf.readResourceLocation();
     }
 

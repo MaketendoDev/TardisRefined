@@ -18,17 +18,17 @@ import whocraft.tardis_refined.common.tardis.manager.TardisInteriorManager;
 
 import java.util.Optional;
 
-public class ChangeHumMessage extends MessageC2S {
+public class C2SChangeHum extends MessageC2S {
 
     private final ResourceKey<Level> resourceKey;
     private final HumEntry humEntry;
 
-    public ChangeHumMessage(ResourceKey<Level> tardisLevel, HumEntry humEntry) {
+    public C2SChangeHum(ResourceKey<Level> tardisLevel, HumEntry humEntry) {
         this.resourceKey = tardisLevel;
         this.humEntry = humEntry;
     }
 
-    public ChangeHumMessage(FriendlyByteBuf buffer) {
+    public C2SChangeHum(FriendlyByteBuf buffer) {
         this.resourceKey = buffer.readResourceKey(Registries.DIMENSION);
         this.humEntry = TardisHums.getHumById(buffer.readResourceLocation());
     }

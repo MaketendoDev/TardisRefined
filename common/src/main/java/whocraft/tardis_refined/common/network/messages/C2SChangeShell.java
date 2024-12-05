@@ -21,19 +21,19 @@ import whocraft.tardis_refined.patterns.ShellPatterns;
 
 import java.util.Optional;
 
-public class ChangeShellMessage extends MessageC2S {
+public class C2SChangeShell extends MessageC2S {
 
     private final ResourceKey<Level> resourceKey;
     private final ResourceLocation shellTheme;
     private final ShellPattern pattern;
 
-    public ChangeShellMessage(ResourceKey<Level> tardisLevel, ResourceLocation theme, ShellPattern pattern) {
+    public C2SChangeShell(ResourceKey<Level> tardisLevel, ResourceLocation theme, ShellPattern pattern) {
         this.resourceKey = tardisLevel;
         this.shellTheme = theme;
         this.pattern = pattern;
     }
 
-    public ChangeShellMessage(FriendlyByteBuf buffer) {
+    public C2SChangeShell(FriendlyByteBuf buffer) {
         resourceKey = buffer.readResourceKey(Registries.DIMENSION);
         this.shellTheme = buffer.readResourceLocation();
         this.pattern = ShellPatterns.getPatternOrDefault(shellTheme, buffer.readResourceLocation());

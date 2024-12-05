@@ -16,10 +16,10 @@ import whocraft.tardis_refined.client.screen.selections.SelectionScreen;
 import whocraft.tardis_refined.client.screen.selections.VortexSelectionScreen;
 import whocraft.tardis_refined.common.VortexRegistry;
 import whocraft.tardis_refined.common.capability.tardis.upgrades.UpgradeHandler;
-import whocraft.tardis_refined.common.network.messages.EjectPlayerFromConsoleMessage;
-import whocraft.tardis_refined.common.network.messages.player.StartVortexSessionMessage;
+import whocraft.tardis_refined.common.network.messages.C2SEjectPlayer;
+import whocraft.tardis_refined.common.network.messages.player.C2SBeginShellView;
 import whocraft.tardis_refined.common.network.messages.screens.C2SRequestShellSelection;
-import whocraft.tardis_refined.common.network.messages.waypoints.RequestWaypointsMessage;
+import whocraft.tardis_refined.common.network.messages.waypoints.C2SRequestWaypoints;
 import whocraft.tardis_refined.common.tardis.TardisNavLocation;
 import whocraft.tardis_refined.common.util.MiscHelper;
 import whocraft.tardis_refined.constants.ModMessages;
@@ -72,14 +72,14 @@ public class MonitorScreen extends SelectionScreen {
 
         selectionList.children().add(new SelectionListEntry(Component.translatable(ModMessages.UI_DESKTOP_CONFIGURATION), entry -> Minecraft.getInstance().setScreen(new DesktopSelectionScreen()), leftPos, TRUpgrades.INSIDE_ARCHITECTURE.get().isUnlocked(upgradeHandler)));
 
-        selectionList.children().add(new SelectionListEntry(Component.translatable(ModMessages.UI_MONITOR_WAYPOINTS), entry -> new RequestWaypointsMessage().send(), leftPos, TRUpgrades.WAYPOINTS.get().isUnlocked(upgradeHandler)));
-        selectionList.children().add(new SelectionListEntry(Component.translatable(ModMessages.UI_MONITOR_SHELL_VIEW), entry -> new StartVortexSessionMessage().send(), leftPos, TRUpgrades.WAYPOINTS.get().isUnlocked(upgradeHandler)));
+        selectionList.children().add(new SelectionListEntry(Component.translatable(ModMessages.UI_MONITOR_WAYPOINTS), entry -> new C2SRequestWaypoints().send(), leftPos, TRUpgrades.WAYPOINTS.get().isUnlocked(upgradeHandler)));
+        selectionList.children().add(new SelectionListEntry(Component.translatable(ModMessages.UI_MONITOR_SHELL_VIEW), entry -> new C2SBeginShellView().send(), leftPos, TRUpgrades.WAYPOINTS.get().isUnlocked(upgradeHandler)));
         selectionList.children().add(new SelectionListEntry(Component.translatable(ModMessages.UI_MONITOR_VORTEX), entry -> Minecraft.getInstance().setScreen(new VortexSelectionScreen(VortexRegistry.VORTEX_REGISTRY.getKey(VortexRegistry.FLOW.get()))), leftPos, TRUpgrades.WAYPOINTS.get().isUnlocked(upgradeHandler)));
 
 
         selectionList.children().add(new SelectionListEntry(Component.translatable(ModMessages.UI_MONITOR_SELECT_HUM), entry -> Minecraft.getInstance().setScreen(new HumSelectionScreen()), leftPos));
         selectionList.children().add(new SelectionListEntry(Component.translatable(ModMessages.UI_MONITOR_EJECT), entry -> {
-            new EjectPlayerFromConsoleMessage().send();
+            new C2SEjectPlayer().send();
             Minecraft.getInstance().setScreen(null);
         }, leftPos));
 

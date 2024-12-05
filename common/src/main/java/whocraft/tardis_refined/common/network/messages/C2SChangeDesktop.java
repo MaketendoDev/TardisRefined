@@ -22,17 +22,17 @@ import whocraft.tardis_refined.registry.TRSoundRegistry;
 
 import java.util.Optional;
 
-public class ChangeDesktopMessage extends MessageC2S {
+public class C2SChangeDesktop extends MessageC2S {
 
     private final ResourceKey<Level> resourceKey;
     private final DesktopTheme desktopTheme;
 
-    public ChangeDesktopMessage(ResourceKey<Level> tardisLevel, DesktopTheme theme) {
+    public C2SChangeDesktop(ResourceKey<Level> tardisLevel, DesktopTheme theme) {
         this.resourceKey = tardisLevel;
         this.desktopTheme = theme;
     }
 
-    public ChangeDesktopMessage(FriendlyByteBuf buffer) {
+    public C2SChangeDesktop(FriendlyByteBuf buffer) {
         this.resourceKey = buffer.readResourceKey(Registries.DIMENSION);
         this.desktopTheme = TardisDesktops.getDesktopById(buffer.readResourceLocation());
     }

@@ -9,8 +9,7 @@ import net.minecraft.world.level.Level;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.capability.tardis.upgrades.UpgradeHandler;
 import whocraft.tardis_refined.registry.TRUpgrades;
-import whocraft.tardis_refined.common.entity.ControlEntity;
-import whocraft.tardis_refined.common.tardis.control.Control;
+import whocraft.tardis_refined.common.entity.Control;
 import whocraft.tardis_refined.common.tardis.manager.TardisPilotingManager;
 import whocraft.tardis_refined.common.tardis.themes.ConsoleTheme;
 import whocraft.tardis_refined.common.util.DimensionUtil;
@@ -24,7 +23,7 @@ import java.util.List;
 
 import static net.minecraft.world.level.Level.OVERWORLD;
 
-public class DimensionalControl extends Control {
+public class DimensionalControl extends whocraft.tardis_refined.common.tardis.control.Control {
     public DimensionalControl(ResourceLocation id) {
         super(id);
     }
@@ -47,16 +46,16 @@ public class DimensionalControl extends Control {
     }
 
     @Override
-    public boolean onLeftClick(TardisLevelOperator operator, ConsoleTheme theme, ControlEntity controlEntity, Player player) {
-        return changeDim(operator, theme, controlEntity, player, false);
+    public boolean onLeftClick(TardisLevelOperator operator, ConsoleTheme theme, Control control, Player player) {
+        return changeDim(operator, theme, control, player, false);
     }
 
     @Override
-    public boolean onRightClick(TardisLevelOperator operator, ConsoleTheme theme, ControlEntity controlEntity, Player player) {
-        return changeDim(operator, theme, controlEntity, player, true);
+    public boolean onRightClick(TardisLevelOperator operator, ConsoleTheme theme, Control control, Player player) {
+        return changeDim(operator, theme, control, player, true);
     }
 
-    private boolean changeDim(TardisLevelOperator operator, ConsoleTheme theme, ControlEntity controlEntity, Player player, boolean forward) {
+    private boolean changeDim(TardisLevelOperator operator, ConsoleTheme theme, Control control, Player player, boolean forward) {
         if (!operator.getLevel().isClientSide()) {
 
             TardisPilotingManager pilotManager = operator.getPilotingManager();

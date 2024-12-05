@@ -49,6 +49,8 @@ public class GlobalShellRenderer implements BlockEntityRenderer<GlobalShellBlock
 
         var currentModel = ShellModelCollection.getInstance().getShellEntry(theme).getShellModel(pattern);
 
+        System.out.println(theme);
+
         currentModel.renderShell(blockEntity, isOpen, true, poseStack, bufferSource.getBuffer(RenderType.entityTranslucent(currentModel.getShellTexture(pattern, false))), packedLight, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
 
         /*Emmissive*/

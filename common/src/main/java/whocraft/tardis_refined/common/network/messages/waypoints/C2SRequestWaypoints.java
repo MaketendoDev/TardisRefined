@@ -14,13 +14,13 @@ import whocraft.tardis_refined.common.tardis.manager.TardisWaypointManager;
 
 import java.util.Collection;
 
-public class RequestWaypointsMessage extends MessageC2S {
+public class C2SRequestWaypoints extends MessageC2S {
 
 
-    public RequestWaypointsMessage(FriendlyByteBuf friendlyByteBuf) {
+    public C2SRequestWaypoints(FriendlyByteBuf friendlyByteBuf) {
     }
 
-    public RequestWaypointsMessage() {
+    public C2SRequestWaypoints() {
     }
 
     @NotNull
@@ -41,7 +41,7 @@ public class RequestWaypointsMessage extends MessageC2S {
         TardisLevelOperator.get(level).ifPresent(tardisLevelOperator -> {
             TardisWaypointManager waypointManager = tardisLevelOperator.getTardisWaypointManager();
             Collection<TardisWaypoint> waypoints = waypointManager.getWaypoints();
-            new WaypointsListScreenMessage(waypoints).send(player);
+            new S2CWaypointsListScreen(waypoints).send(player);
         });
 
     }

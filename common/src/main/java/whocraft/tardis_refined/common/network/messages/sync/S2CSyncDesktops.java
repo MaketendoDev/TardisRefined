@@ -15,7 +15,7 @@ import whocraft.tardis_refined.common.tardis.themes.DesktopTheme;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SyncDesktopsMessage extends MessageS2C {
+public class S2CSyncDesktops extends MessageS2C {
 
     //We use an unboundedMapCodec. However it is limited in that it can only parse objects whose keys can be serialised to a string, such as ResourceLocation
     //E.g. If you used an int as a key, the unboundedMapCodec will not parse it and will error.
@@ -23,11 +23,11 @@ public class SyncDesktopsMessage extends MessageS2C {
     private Map<ResourceLocation, DesktopTheme> desktops = new HashMap<>();
 
 
-    public SyncDesktopsMessage(Map<ResourceLocation, DesktopTheme> desktops) {
+    public S2CSyncDesktops(Map<ResourceLocation, DesktopTheme> desktops) {
         this.desktops = desktops;
     }
 
-    public SyncDesktopsMessage(FriendlyByteBuf buf) {
+    public S2CSyncDesktops(FriendlyByteBuf buf) {
         //Parse our Map Codec and send the nbt data over. If there's any errors, populate with default Tardis Refined console rooms
         this.desktops = MAPPER.parse(NbtOps.INSTANCE, buf.readNbt()).result().orElse(TardisDesktops.registerDefaultDesktops());
     }

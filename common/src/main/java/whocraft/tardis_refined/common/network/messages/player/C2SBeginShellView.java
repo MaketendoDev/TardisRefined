@@ -12,12 +12,12 @@ import whocraft.tardis_refined.common.network.MessageContext;
 import whocraft.tardis_refined.common.network.MessageType;
 import whocraft.tardis_refined.common.network.TardisNetwork;
 
-public class StartVortexSessionMessage extends MessageC2S {
+public class C2SBeginShellView extends MessageC2S {
 
-    public StartVortexSessionMessage() {
+    public C2SBeginShellView() {
     }
 
-    public StartVortexSessionMessage(FriendlyByteBuf buf) {
+    public C2SBeginShellView(FriendlyByteBuf buf) {
     }
 
 

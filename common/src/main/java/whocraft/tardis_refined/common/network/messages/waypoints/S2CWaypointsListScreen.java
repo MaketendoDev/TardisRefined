@@ -10,21 +10,20 @@ import whocraft.tardis_refined.common.network.MessageContext;
 import whocraft.tardis_refined.common.network.MessageS2C;
 import whocraft.tardis_refined.common.network.MessageType;
 import whocraft.tardis_refined.common.network.TardisNetwork;
-import whocraft.tardis_refined.common.tardis.TardisNavLocation;
 import whocraft.tardis_refined.common.tardis.TardisWaypoint;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class WaypointsListScreenMessage extends MessageS2C {
+public class S2CWaypointsListScreen extends MessageS2C {
 
     private Collection<TardisWaypoint> waypoints;
 
-    public WaypointsListScreenMessage(Collection<TardisWaypoint> waypoints) {
+    public S2CWaypointsListScreen(Collection<TardisWaypoint> waypoints) {
         this.waypoints = waypoints;
     }
 
-    public WaypointsListScreenMessage(FriendlyByteBuf friendlyByteBuf) {
+    public S2CWaypointsListScreen(FriendlyByteBuf friendlyByteBuf) {
         waypoints = new ArrayList<>();
         int size = friendlyByteBuf.readInt();
         for (int i = 0; i < size; i++) {
