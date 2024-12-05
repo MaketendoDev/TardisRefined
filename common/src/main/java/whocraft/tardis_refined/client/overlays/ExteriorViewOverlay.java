@@ -20,9 +20,11 @@ import whocraft.tardis_refined.constants.ModMessages;
 
 public class ExteriorViewOverlay {
 
-    public static final ResourceLocation BAR_TEXTURE = new ResourceLocation(TardisRefined.MODID, "textures/gui/bar_texture.png");
+    public static final ResourceLocation BAR_TEXTURE = new ResourceLocation(TardisRefined.MODID, "textures/gui/journey_bar.png");
+    public static final ResourceLocation FUEL_BAR_TEXTURE = new ResourceLocation(TardisRefined.MODID, "textures/gui/fuel_bar.png");
     public static boolean shouldRender = true;
-    private static final RenderHelper.CustomProgressBar PROGRESS_BAR = new RenderHelper.CustomProgressBar(BAR_TEXTURE, 256, 5, 182, 60);
+    private static final RenderHelper.CustomProgressBar PROGRESS_BAR = new RenderHelper.CustomProgressBar(BAR_TEXTURE, 256, 256, 5, 182, 60);
+    private static final RenderHelper.CustomProgressBar FUEL_BAR = new RenderHelper.CustomProgressBar(FUEL_BAR_TEXTURE, 256, 256, 11, 127, 60);
 
     public static void renderOverlay(GuiGraphics guiGraphics) {
         Minecraft mc = Minecraft.getInstance();
@@ -41,9 +43,7 @@ public class ExteriorViewOverlay {
                 return;
             }
 
-            TardisClientData tardisClientData = TardisClientData.getInstance(
-                    tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey()
-            );
+            TardisClientData tardisClientData = TardisClientData.getInstance(tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey());
 
             int x = 10; // X position for text
             int y = 10; // Initial Y position for text
@@ -60,28 +60,26 @@ public class ExteriorViewOverlay {
 
             // Create a translatable component for the exit keybind
             Component exitKey = TRKeybinds.EXIT_EXTERIOR_VIEW.key.getDisplayName();
-            MutableComponent message = Component.translatable(ModMessages.EXIT_EXTERNAL_VIEW).append(exitKey)
-                    .withStyle(ChatFormatting.BOLD, ChatFormatting.WHITE);
+            MutableComponent message = Component.translatable(ModMessages.EXIT_EXTERNAL_VIEW).append(exitKey).withStyle(ChatFormatting.BOLD, ChatFormatting.WHITE);
 
             int throttleStage = tardisClientData.getThrottleStage();
             int maxThrottleStage = TardisPilotingManager.MAX_THROTTLE_STAGE;
-            int throttlePercentage = maxThrottleStage != 0
-                    ? (int) ((double) throttleStage / maxThrottleStage * 100)
-                    : 0;
+            int throttlePercentage = maxThrottleStage != 0 ? (int) ((double) throttleStage / maxThrottleStage * 100) : 0;
 
             // Display throttle percentage
-            MutableComponent throttleMessage = Component.literal("Throttle: " + throttlePercentage + "%")
-                    .withStyle(ChatFormatting.WHITE);
+            MutableComponent throttleMessage = Component.literal("Throttle: " + throttlePercentage + "%").withStyle(ChatFormatting.WHITE);
 
             renderPlayerHeads(guiGraphics, mc, x, y + 45);
 
             // Display fuel percentage
-            MutableComponent fuelMessage = Component.translatable(ModMessages.FUEL, fuelPercentage).append("%")
-                    .withStyle(ChatFormatting.WHITE);
+            MutableComponent fuelMessage = Component.translatable(ModMessages.FUEL, fuelPercentage).append("%").withStyle(ChatFormatting.WHITE);
+            FUEL_BAR.animate = tardisClientData.isFlying();
+            FUEL_BAR.blit(guiGraphics, x - 3, y + 28, (double) remainingFuel / maxFuel);
 
             guiGraphics.drawString(mc.font, message.getString(), x, y, 0xFFFFFF, false); // White text
             guiGraphics.drawString(mc.font, throttleMessage.getString(), x, y + 15, 0xFFFFFF, false); // White text
-            guiGraphics.drawString(mc.font, fuelMessage.getString(), x, y + 30, 0xFFFFFF, false); // White text
+            guiGraphics.drawString(mc.font, fuelMessage.getString(), x, y + 30, 0x572200, false); // White text
+
 
             float journeyProgress = tardisClientData.getJourneyProgress() / 100;
 

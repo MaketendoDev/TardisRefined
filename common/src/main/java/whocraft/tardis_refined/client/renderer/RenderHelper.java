@@ -95,18 +95,20 @@ public class RenderHelper {
     public static class CustomProgressBar {
         private final ResourceLocation texture;
 
-        private final int height, maxWidth;
-        private final int maxFrames, mspf;
+        private final int height, width;
+        private final int framesU, framesV, mspf;
         private int anim = 1;
         private long last_frame;
         private boolean started = false;
+        public boolean animate = true;
 
-        public CustomProgressBar(ResourceLocation texture, int texHeight, int height, int maxWidth, int fps) {
+        public CustomProgressBar(ResourceLocation texture, int texWidth, int texHeight, int height, int width, int fps) {
             this.texture = texture;
             this.height = height;
-            this.maxWidth = maxWidth;
+            this.width = width;
             this.mspf = 1000 / fps;
-            this.maxFrames = (texHeight / height) - 1;
+            this.framesU = texHeight / height;
+            this.framesV = texWidth / width;
         }
 
         public void blit(GuiGraphics gg, int x, int y, double progress) {
@@ -115,14 +117,17 @@ public class RenderHelper {
                 last_frame = System.currentTimeMillis();
             }
 
-            gg.blit(texture, x, y, 0, 0, maxWidth, height);
-            gg.blit(texture, x, y, 0, anim * height, (int) (maxWidth * progress), height);
+            int u = anim / framesU;
+            int v = anim % framesU;
+
+            gg.blit(texture, x, y, 0, 0, width, height);
+            gg.blit(texture, x, y, width * u, height * v, (int) (width * progress), height);
 
             if (System.currentTimeMillis() - last_frame > mspf) {
                 anim++;
                 last_frame = System.currentTimeMillis();
             }
-            if (anim > maxFrames) anim = 1;
+            if (anim >= framesU * framesV || !animate) anim = 1;
         }
     }
 
