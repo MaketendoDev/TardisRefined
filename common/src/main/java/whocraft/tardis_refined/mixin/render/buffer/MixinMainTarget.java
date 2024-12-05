@@ -1,4 +1,4 @@
-package whocraft.tardis_refined.mixin.render;
+package whocraft.tardis_refined.mixin.render.buffer;
 
 import com.mojang.blaze3d.pipeline.MainTarget;
 import com.mojang.blaze3d.pipeline.RenderTarget;

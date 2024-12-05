@@ -12,14 +12,14 @@
     "VillagerMixin"
   ],
   "client": [
-    "FogRendererMixin",
-    "GuiMixin",
+    "render.FogRendererMixin",
+    "render.ui.GuiMixin",
     "LocalPlayerMixin",
     "MultiplayerGameModeMixin",
-    "PlayerRenderMixin",
-    "SpectatorGuiMixin",
-    "render.MixinMainTarget",
-    "render.MixinRenderTarget"
+    "render.PlayerRenderMixin",
+    "render.ui.SpectatorGuiMixin",
+    "render.buffer.MixinMainTarget",
+    "render.buffer.MixinRenderTarget"
   ],
   "injectors": {
     "defaultRequire": 1
