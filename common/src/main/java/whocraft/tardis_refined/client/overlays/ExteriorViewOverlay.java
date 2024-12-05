@@ -28,66 +28,72 @@ public class ExteriorViewOverlay {
 
     public static void renderOverlay(GuiGraphics guiGraphics) {
         Minecraft mc = Minecraft.getInstance();
-
-        if (!shouldRender) {
+        if (!shouldRender)
             return;
-        }
-
         TardisPlayerInfo.get(mc.player).ifPresent(tardisPlayerInfo -> {
-            PoseStack poseStack = guiGraphics.pose();
-            poseStack.pushPose();
-
             // Exit if the player is not viewing the TARDIS or the debug screen is active
-            if (!tardisPlayerInfo.isViewingTardis()) {
-                poseStack.popPose();
+            if (!tardisPlayerInfo.isViewingTardis())
                 return;
-            }
-
             TardisClientData tardisClientData = TardisClientData.getInstance(tardisPlayerInfo.getPlayerPreviousPos().getDimensionKey());
+
+            PoseStack poseStack = guiGraphics.pose();
+            int screenWidth = mc.getWindow().getGuiScaledWidth();
+            int screenHeight = mc.getWindow().getGuiScaledHeight();
 
             int x = 10; // X position for text
             int y = 10; // Initial Y position for text
+
+            // Background for text
+            int textBackdropWidth = 150; // Width of the backdrop box
+            int textBackdropHeight = 70; // Total height for the text backdrop box
 
             int remainingFuel = (int) tardisClientData.getFuel();
             int maxFuel = (int) tardisClientData.getMaximumFuel();
             int fuelPercentage = maxFuel != 0 ? (int) ((double) remainingFuel / maxFuel * 100) : 0;
 
-
-            // Background for text
-            int textBackdropWidth = 150; // Width of the backdrop box
-            int textBackdropHeight = 70; // Total height for the text backdrop box
-            guiGraphics.fill(x - 5, y - 5, x + textBackdropWidth, y + textBackdropHeight, 0x88000000);
-
-            // Create a translatable component for the exit keybind
-            Component exitKey = TRKeybinds.EXIT_EXTERIOR_VIEW.key.getDisplayName();
-            MutableComponent message = Component.translatable(ModMessages.EXIT_EXTERNAL_VIEW).append(exitKey).withStyle(ChatFormatting.BOLD, ChatFormatting.WHITE);
-
             int throttleStage = tardisClientData.getThrottleStage();
             int maxThrottleStage = TardisPilotingManager.MAX_THROTTLE_STAGE;
             int throttlePercentage = maxThrottleStage != 0 ? (int) ((double) throttleStage / maxThrottleStage * 100) : 0;
 
+            // Create a translatable component for the exit keybind
+            Component exitKey = TRKeybinds.EXIT_EXTERIOR_VIEW.key.getDisplayName();
+            MutableComponent message = Component.translatable(ModMessages.EXIT_EXTERNAL_VIEW).append(exitKey).withStyle(ChatFormatting.BOLD, ChatFormatting.WHITE);
             // Display throttle percentage
             MutableComponent throttleMessage = Component.literal("Throttle: " + throttlePercentage + "%").withStyle(ChatFormatting.WHITE);
-
-            renderPlayerHeads(guiGraphics, mc, x, y + 45);
-
             // Display fuel percentage
             MutableComponent fuelMessage = Component.translatable(ModMessages.FUEL, fuelPercentage).append("%").withStyle(ChatFormatting.WHITE);
-            FUEL_BAR.animate = tardisClientData.isFlying();
-            FUEL_BAR.blit(guiGraphics, x - 3, y + 28, (double) remainingFuel / maxFuel);
 
-            guiGraphics.drawString(mc.font, message.getString(), x, y, 0xFFFFFF, false); // White text
-            guiGraphics.drawString(mc.font, throttleMessage.getString(), x, y + 15, 0xFFFFFF, false); // White text
-            guiGraphics.drawString(mc.font, fuelMessage.getString(), x, y + 30, 0x572200, false); // White text
+            int messageWidth = mc.font.width(message);
 
+            poseStack.pushPose();
 
-            float journeyProgress = tardisClientData.getJourneyProgress() / 100;
+            if (mc.screen == null) {
+                poseStack.pushPose();
+                poseStack.translate(5 + messageWidth / 2f, -3 + screenHeight - mc.font.lineHeight / 2f, 0);
+                guiGraphics.fill(-messageWidth / 2, -3 - mc.font.lineHeight / 2, messageWidth / 2, 2 + mc.font.lineHeight / 2, 0x88000000);
+                guiGraphics.drawString(mc.font, message.getString(), 8 - messageWidth / 2, -mc.font.lineHeight / 2, 0xFFFFFF, false); // White text
+                poseStack.popPose();
+            }
+
+            renderPlayerHeads(guiGraphics, mc, screenWidth-100, 20);
+
+            {
+                poseStack.pushPose();
+                FUEL_BAR.animate = tardisClientData.isFlying();
+                poseStack.translate(20, 20, 0);
+                FUEL_BAR.blit(guiGraphics, 0, 0, (double) remainingFuel / maxFuel);
+                guiGraphics.drawString(mc.font, fuelMessage.getString(), 3, 2, 0x572200, false); // White text
+                poseStack.popPose();
+            }
+
+            guiGraphics.drawString(mc.font, throttleMessage.getString(), 20, 35, 0xFFFFFF, false); // White text
+
+            float journeyProgress = tardisClientData.getJourneyProgress() / 100.0f;
 
             poseStack.popPose();
 
-            if (tardisClientData.isFlying()) {
+            if (tardisClientData.isFlying())
                 renderJourneyProgressBar(guiGraphics, journeyProgress);
-            }
 
         });
     }
@@ -95,19 +101,14 @@ public class ExteriorViewOverlay {
     private static void renderPlayerHeads(GuiGraphics guiGraphics, Minecraft mc, int x, int y) {
         // Render player's face and name
         LocalPlayer player = mc.player;
-        if (player != null) {
-            // Render the player's face
-            int faceX = x;
-            int faceY = y + 1; // Position below fuel
-            int faceSize = 10;
+        if (player == null) return;
 
-            RenderHelper.renderPlayerFace(guiGraphics, x, y, faceSize, player.getUUID());
-
-            // Render the player's name
-            String playerName = player.getName().getString();
-
-            guiGraphics.drawString(mc.font, playerName, faceX + faceSize + 5, faceY, 0xFFFFFF, false); // White text
-        }
+        // Render the player's face
+        int faceSize = 10;
+        RenderHelper.renderPlayerFace(guiGraphics, x, y, faceSize, player.getUUID());
+        // Render the player's name
+        String playerName = player.getName().getString();
+        guiGraphics.drawString(mc.font, playerName, x + faceSize + 5, y + 1, 0xFFFFFF, false); // White text
     }
 
     public static void renderJourneyProgressBar(GuiGraphics guiGraphics, float journeyProgress) {
