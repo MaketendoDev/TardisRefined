@@ -40,7 +40,7 @@ public class LocalPlayerMixin {
         // Set all movement-related fields to false or 0.0F to block movement
 
         if (TRKeybinds.EXIT_EXTERIOR_VIEW.isDown()) {
-            new C2SExitTardisView().send();
+            TardisPlayerInfo.onExitKeybindPressed();
             return;
         }
 

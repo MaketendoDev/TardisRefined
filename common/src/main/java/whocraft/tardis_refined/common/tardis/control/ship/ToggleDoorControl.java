@@ -8,13 +8,14 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import whocraft.tardis_refined.common.blockentity.door.GlobalDoorBlockEntity;
 import whocraft.tardis_refined.common.blockentity.door.TardisInternalDoor;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
-import whocraft.tardis_refined.common.entity.Control;
+import whocraft.tardis_refined.common.entity.ControlEntity;
+import whocraft.tardis_refined.common.tardis.control.Control;
 import whocraft.tardis_refined.common.tardis.themes.ConsoleTheme;
 import whocraft.tardis_refined.common.util.PlayerUtil;
 import whocraft.tardis_refined.constants.ModMessages;
 import whocraft.tardis_refined.patterns.sound.ConfiguredSound;
 
-public class ToggleDoorControl extends whocraft.tardis_refined.common.tardis.control.Control {
+public class ToggleDoorControl extends Control {
     public ToggleDoorControl(ResourceLocation id) {
         super(id);
     }
@@ -24,7 +25,7 @@ public class ToggleDoorControl extends whocraft.tardis_refined.common.tardis.con
     }
 
     @Override
-    public boolean onRightClick(TardisLevelOperator operator, ConsoleTheme theme, Control control, Player player) {
+    public boolean onRightClick(TardisLevelOperator operator, ConsoleTheme theme, ControlEntity controlEntity, Player player) {
         if (!operator.getLevel().isClientSide()) {
             if (operator.getInternalDoor() != null) {
                 if (operator.getExteriorManager().locked()) {
@@ -45,7 +46,7 @@ public class ToggleDoorControl extends whocraft.tardis_refined.common.tardis.con
     }
 
     @Override
-    public boolean onLeftClick(TardisLevelOperator operator, ConsoleTheme theme, Control control, Player player) {
+    public boolean onLeftClick(TardisLevelOperator operator, ConsoleTheme theme, ControlEntity controlEntity, Player player) {
         if (!operator.getLevel().isClientSide()) {
             //Update both internal and exterior shell doors with the value from the exterior manager, which is the Tardis' current data
             if (operator.getExteriorManager() != null)
