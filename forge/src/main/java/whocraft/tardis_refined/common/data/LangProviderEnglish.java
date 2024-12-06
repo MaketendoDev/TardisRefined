@@ -35,6 +35,25 @@ public class LangProviderEnglish extends LanguageProvider {
         add(VortexRegistry.SPACE.get().getTranslationKey(), "Space");
         add(VortexRegistry.WAVES.get().getTranslationKey(), "Waves");
         add(VortexRegistry.STARS.get().getTranslationKey(), "Stars");
+        add(VortexRegistry.TWILIGHT_GLOW.get().getTranslationKey(), "Twilight Glow");
+        add(VortexRegistry.AURORA_DREAMS.get().getTranslationKey(), "Aurora Dreams");
+        add(VortexRegistry.DESERT_MIRAGE.get().getTranslationKey(), "Desert Mirage");
+        add(VortexRegistry.NEON_PULSE.get().getTranslationKey(), "Neon Pulse");
+        add(VortexRegistry.OCEAN_BREEZE.get().getTranslationKey(), "Ocean Breeze");
+        add(VortexRegistry.SOLAR_FLARE.get().getTranslationKey(), "Solar Flare");
+        add(VortexRegistry.CRYSTAL_LAGOON.get().getTranslationKey(), "Crystal Lagoon");
+        add(VortexRegistry.VELVET_NIGHT.get().getTranslationKey(), "Velvet Night");
+        add(VortexRegistry.CANDY_POP.get().getTranslationKey(), "Candy Pop");
+        add(VortexRegistry.EMERALD_FOREST.get().getTranslationKey(), "Emerald Forest");
+        /*Vortex*/
+        add(VortexRegistry.LGBT_RAINBOW.get().getTranslationKey(), "LGBT Rainbow");
+        add(VortexRegistry.TRANSGENDER_FLAG.get().getTranslationKey(), "Transgender Flag");
+        add(VortexRegistry.BISEXUAL_FLAG.get().getTranslationKey(), "Bisexual Flag");
+        add(VortexRegistry.LESBIAN_FLAG.get().getTranslationKey(), "Lesbian Flag");
+        add(VortexRegistry.NON_BINARY_FLAG.get().getTranslationKey(), "Non-Binary Flag");
+        add(VortexRegistry.AGENDER_FLAG.get().getTranslationKey(), "Agender Flag");
+        add(VortexRegistry.GAY_FLAG.get().getTranslationKey(), "Agender Flag");
+
 
         /*Sounds*/
         addSound(TRSoundRegistry.TARDIS_LAND.get(), "TARDIS lands");

@@ -14,16 +14,16 @@ import whocraft.tardis_refined.constants.NbtConstants;
 import java.util.Optional;
 import java.util.UUID;
 
-public class BOTIPortalEntity extends Portal {
+public class BotiPortalEntity extends Portal {
 
-    private static final EntityDataAccessor<Optional<UUID>> TARDIS_ID = SynchedEntityData.defineId(BOTIPortalEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Optional<UUID>> TARDIS_ID = SynchedEntityData.defineId(BotiPortalEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
 
     // We don't save this as the portals die on server stop, we just need it in RAM
     ShellTheme shellTheme = ShellTheme.FACTORY.get();
     private boolean isValid = false;
 
-    public BOTIPortalEntity(EntityType<?> entityType, Level world) {
+    public BotiPortalEntity(EntityType<?> entityType, Level world) {
         super(entityType, world);
     }
 

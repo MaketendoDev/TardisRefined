@@ -7,20 +7,16 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
-import whocraft.tardis_refined.TardisRefined;
 import whocraft.tardis_refined.client.renderer.RenderHelper;
 import whocraft.tardis_refined.common.VortexRegistry;
 import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Custom Time Vortex Renderer
@@ -31,29 +27,6 @@ import java.util.Map;
 public class VortexRenderer {
 
     private static final RandomSource RAND = RandomSource.create();
-
-    public static final VortexGradientTint BlueOrngGradient = new VortexGradientTint()
-            .add(1f, 0, 46, 128)
-            .add(0f, 8, 109, 196)
-            .add(-0.5f, 193, 111, 20)
-            .add(-1f, 234, 204, 77);
-
-    public static final VortexGradientTint ModernVortex = new VortexGradientTint()
-            .add(-1.0f, 238, 164, 107)
-            .add(-0.5f, 199, 92, 159)
-            .add(0.0f, 238, 164, 107)
-            .add(0.5f, 199, 92, 159)
-            .add(1.0f, 238, 164, 107);
-
-    public static final VortexGradientTint PastelGradient = new VortexGradientTint()
-            .add(1f, 223, 190, 223)
-            .add(0.75f, 190, 210, 255)
-            .add(0.5f, 243, 209, 215)
-            .add(0f, 247, 223, 209)
-            .add(-0.75f, 190, 210, 255)
-            .add(-0.5f, 228, 190, 207)
-            .add(-1f, 223, 190, 223);
-
 
     public VortexRegistry vortexType;
 
@@ -286,65 +259,4 @@ public class VortexRenderer {
         }
     }
 
-    public static class VortexGradientTint {
-        private final Map<Float, float[]> gradient_map = new HashMap<>();
-        public float offset = 0;
-
-        public VortexGradientTint() {
-        }
-
-        /**
-         * Adds a color to the gradient map
-         *
-         * @param pos position in the gradient the color should go in. can be from -1 to 1
-         * @param r   RED 0 to 1
-         * @param g   GREEN 0 to 1
-         * @param b   BLUE 0 to 1
-         * @return The VortexGradient with the color added
-         */
-        public VortexGradientTint add(float pos, float r, float g, float b) {
-            this.gradient_map.put(pos, new float[]{r, g, b});
-            return this;
-        }
-
-        public VortexGradientTint add(float pos, int r, int g, int b) {
-            return add(pos, r / 255.0f, g / 255.0f, b / 255.0f);
-        }
-
-        public float[] getRGBf(float pos_original) {
-            float r = 1, g = 1, b = 1;
-            float[] out = new float[]{r, g, b};
-            if (gradient_map.isEmpty()) return out;
-            if (gradient_map.size() == 1) {
-                for (float p : gradient_map.keySet()) {
-                    out = gradient_map.get(p);
-                }
-                return out;
-            }
-
-            float pos = pos_original + offset;
-            while (pos > 1) pos -= 2;
-            while (pos < -1) pos += 2;
-
-            float first = 0, second = 0, smallest_dist = 9999, second_smallest_dist = 1000;
-
-            for (float p : gradient_map.keySet()) {
-                float dist = Mth.abs(pos - p);
-                if (dist < smallest_dist) {
-                    second_smallest_dist = smallest_dist;
-                    smallest_dist = dist;
-                    second = first;
-                    first = p;
-                }
-            }
-
-            if (gradient_map.get(first) == null || gradient_map.get(second) == null) return out;
-
-            r = Mth.lerp(smallest_dist / (smallest_dist + second_smallest_dist), gradient_map.get(first)[0], gradient_map.get(second)[0]);
-            g = Mth.lerp(smallest_dist / (smallest_dist + second_smallest_dist), gradient_map.get(first)[1], gradient_map.get(second)[1]);
-            b = Mth.lerp(smallest_dist / (smallest_dist + second_smallest_dist), gradient_map.get(first)[2], gradient_map.get(second)[2]);
-
-            return new float[]{r, g, b};
-        }
-    }
 }

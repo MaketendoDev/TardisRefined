@@ -5,11 +5,12 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import whocraft.tardis_refined.TardisRefined;
 import whocraft.tardis_refined.client.TRKeybinds;
 import whocraft.tardis_refined.client.TardisClientData;
@@ -17,6 +18,10 @@ import whocraft.tardis_refined.client.renderer.RenderHelper;
 import whocraft.tardis_refined.common.capability.player.TardisPlayerInfo;
 import whocraft.tardis_refined.common.tardis.manager.TardisPilotingManager;
 import whocraft.tardis_refined.constants.ModMessages;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.UUID;
 
 public class ExteriorViewOverlay {
 
@@ -75,8 +80,6 @@ public class ExteriorViewOverlay {
                 poseStack.popPose();
             }
 
-            renderPlayerHeads(guiGraphics, mc, screenWidth-100, 20);
-
             {
                 poseStack.pushPose();
                 FUEL_BAR.animate = tardisClientData.isFlying();
@@ -98,17 +101,15 @@ public class ExteriorViewOverlay {
         });
     }
 
-    private static void renderPlayerHeads(GuiGraphics guiGraphics, Minecraft mc, int x, int y) {
+    private static void renderPlayerHeads(PlayerInfo player, GuiGraphics guiGraphics, Minecraft mc, int x, int y) {
         // Render player's face and name
-        LocalPlayer player = mc.player;
         if (player == null) return;
 
         // Render the player's face
         int faceSize = 10;
-        RenderHelper.renderPlayerFace(guiGraphics, x, y, faceSize, player.getUUID());
+        RenderHelper.renderPlayerFace(guiGraphics, x, y, faceSize, player.getProfile().getId());
         // Render the player's name
-        String playerName = player.getName().getString();
-        guiGraphics.drawString(mc.font, playerName, x + faceSize + 5, y + 1, 0xFFFFFF, false); // White text
+        guiGraphics.drawString(mc.font, player.getProfile().getName(), x + faceSize + 5, y + 1, 0xFFFFFF, false); // White text
     }
 
     public static void renderJourneyProgressBar(GuiGraphics guiGraphics, float journeyProgress) {

@@ -56,7 +56,6 @@ public class FuelToggleControl extends whocraft.tardis_refined.common.tardis.con
         if (operator == null) {
             return super.getCustomControlName(operator, entity, controlSpecification);
         }
-
         boolean offline = operator.getTardisState() != TardisLevelOperator.STATE_EYE_OF_HARMONY;
         if (offline) {
             return Component.translatable(ModMessages.FUEL_OFFLINE);
