@@ -233,10 +233,6 @@ public class ShellSelectionScreen extends SelectionScreen {
             ShellTheme theme = shellTheme.value();
             ResourceLocation shellThemeId = shellTheme.key().location();
 
-            if (theme == ShellTheme.HALF_BAKED.get()) {
-                continue;
-            }
-
             SelectionListEntry selectionListEntry = new SelectionListEntry(theme.getDisplayName(), (entry) -> {
                 this.currentShellTheme = shellThemeId;
 

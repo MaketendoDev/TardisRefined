@@ -28,6 +28,7 @@
 ## Additions
 - Added Item: Mallet 
 - Added Villager: Pilot  (POI: Console)
+- "Added" Shell: Half Baked
 - Added Vortex: Clouds
 - Added Vortex: Flow
 - Added Vortex: Space
