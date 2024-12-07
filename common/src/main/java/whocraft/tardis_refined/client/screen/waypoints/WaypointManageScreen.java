@@ -12,9 +12,9 @@ import net.minecraft.world.level.Level;
 import whocraft.tardis_refined.TardisRefined;
 import whocraft.tardis_refined.client.screen.ScreenHelper;
 import whocraft.tardis_refined.client.screen.components.CommonTRWidgets;
-import whocraft.tardis_refined.common.network.messages.waypoints.EditWaypointMessage;
-import whocraft.tardis_refined.common.network.messages.waypoints.RequestWaypointsMessage;
-import whocraft.tardis_refined.common.network.messages.waypoints.UploadWaypointMessage;
+import whocraft.tardis_refined.common.network.messages.waypoints.C2SEditWaypoint;
+import whocraft.tardis_refined.common.network.messages.waypoints.C2SRequestWaypoints;
+import whocraft.tardis_refined.common.network.messages.waypoints.C2SUploadWaypoint;
 import whocraft.tardis_refined.common.tardis.TardisNavLocation;
 import whocraft.tardis_refined.common.tardis.TardisWaypoint;
 import whocraft.tardis_refined.common.util.MiscHelper;
@@ -77,11 +77,11 @@ public class WaypointManageScreen extends Screen {
             if (preExistingWaypoint != null) {
                 tardisNavLocation.setName(this.waypointName.getValue());
                 preExistingWaypoint.setLocation(tardisNavLocation);
-                new EditWaypointMessage(preExistingWaypoint).send();
-                new RequestWaypointsMessage().send();
+                new C2SEditWaypoint(preExistingWaypoint).send();
+                new C2SRequestWaypoints().send();
             } else {
-                new UploadWaypointMessage(tardisNavLocation, coordInputType).send();
-                new RequestWaypointsMessage().send();
+                new C2SUploadWaypoint(tardisNavLocation, coordInputType).send();
+                new C2SRequestWaypoints().send();
             }
 
 

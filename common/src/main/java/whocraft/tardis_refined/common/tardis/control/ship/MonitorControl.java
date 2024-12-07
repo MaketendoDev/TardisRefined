@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.entity.ControlEntity;
 import whocraft.tardis_refined.common.items.KeyItem;
-import whocraft.tardis_refined.common.network.messages.screens.OpenMonitorMessage;
+import whocraft.tardis_refined.common.network.messages.screens.S2COpenMonitor;
 import whocraft.tardis_refined.common.tardis.control.Control;
 import whocraft.tardis_refined.common.tardis.control.ControlSpecification;
 import whocraft.tardis_refined.common.tardis.themes.ConsoleTheme;
@@ -41,7 +41,7 @@ public class MonitorControl extends Control {
                     isSyncingKey = true;
             }
             if (!isSyncingKey)
-                new OpenMonitorMessage(operator.getInteriorManager().isWaitingToGenerate(), operator.getPilotingManager().getCurrentLocation(), operator.getPilotingManager().getTargetLocation(), operator.getUpgradeHandler()).send((ServerPlayer) player);
+                new S2COpenMonitor(operator.getInteriorManager().isWaitingToGenerate(), operator.getPilotingManager().getCurrentLocation(), operator.getPilotingManager().getTargetLocation(), operator.getUpgradeHandler()).send((ServerPlayer) player);
             return true;
         }
         return false;

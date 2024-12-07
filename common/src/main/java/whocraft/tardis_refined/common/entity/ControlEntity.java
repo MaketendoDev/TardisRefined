@@ -35,6 +35,7 @@ import whocraft.tardis_refined.common.tardis.control.Control;
 import whocraft.tardis_refined.common.tardis.control.ControlSpecification;
 import whocraft.tardis_refined.common.tardis.control.ship.MonitorControl;
 import whocraft.tardis_refined.common.tardis.manager.FlightDanceManager;
+import whocraft.tardis_refined.common.tardis.manager.TardisPilotingManager;
 import whocraft.tardis_refined.common.tardis.themes.ConsoleTheme;
 import whocraft.tardis_refined.common.util.ClientHelper;
 import whocraft.tardis_refined.common.util.LevelHelper;
@@ -137,7 +138,7 @@ public class ControlEntity extends Entity {
 
     @Override
     public EntityDimensions getDimensions(Pose pose) {
-        if (this.getEntityData().get(SIZE_WIDTH) != null && this.getEntityData().get(SIZE_HEIGHT) != null) {
+        if (this.getEntityData().hasItem(SIZE_WIDTH) && this.getEntityData().hasItem(SIZE_HEIGHT)) {
             return EntityDimensions.scalable(this.getEntityData().get(SIZE_WIDTH), this.getEntityData().get(SIZE_HEIGHT));
         }
         return super.getDimensions(pose);
@@ -145,7 +146,6 @@ public class ControlEntity extends Entity {
 
     @Override
     public Component getName() {
-
 
         TardisClientData tardisClientData = TardisClientData.getInstance(level().dimension());
         if (tardisClientData.isInRecovery()) {
@@ -167,12 +167,11 @@ public class ControlEntity extends Entity {
      * Tell the Tardis that the control is currently continuing to be misaligned
      *
      * @param manager
-     * @return true if can continue to become more misaligned, false if already too misaligned.
      */
-    public boolean setTickingDown(FlightDanceManager manager) {
+    public void setTickingDown(FlightDanceManager manager) {
 
         if (this.getEntityData().get(IS_DEAD)) {
-            return false;
+            return;
         }
 
         this.entityData.set(TICKING_DOWN, true);
@@ -180,7 +179,6 @@ public class ControlEntity extends Entity {
         this.level().playSound(null, this.blockPosition(), SoundEvents.ARROW_HIT, SoundSource.BLOCKS, 0.5f, 2f);
 
         this.setCustomName(Component.translatable("!"));
-        return true;
     }
 
     @Override
@@ -212,10 +210,8 @@ public class ControlEntity extends Entity {
 
     @Override
     public void readAdditionalSaveData(CompoundTag compound) {
-        var consolePos = (CompoundTag) compound.get(NbtConstants.CONSOLE_POS);
-        if (consolePos != null) {
-            this.consoleBlockPos = NbtUtils.readBlockPos(consolePos);
-        }
+        var consolePos = compound.getCompound(NbtConstants.CONSOLE_POS);
+        this.consoleBlockPos = NbtUtils.readBlockPos(consolePos);
 
         float width = compound.getFloat(NbtConstants.CONTROL_SIZE_WIDTH);
         float height = compound.getFloat(NbtConstants.CONTROL_SIZE_HEIGHT);
@@ -504,13 +500,13 @@ public class ControlEntity extends Entity {
             return false;
         } else {
             TardisLevelOperator cap = TardisLevelOperator.get(serverLevel).get();
+            TardisPilotingManager pilotingManager = cap.getPilotingManager();
 
-            if (cap.getPilotingManager().getCurrentConsole() == null || cap.getPilotingManager().getCurrentConsole() != getConsoleBlockEntity()) {
-                cap.getPilotingManager().setCurrentConsole(getConsoleBlockEntity());
+            if (pilotingManager.getCurrentConsole() == null || pilotingManager.getCurrentConsole() != getConsoleBlockEntity()) {
+                pilotingManager.setCurrentConsole(getConsoleBlockEntity());
             }
 
-
-            if (!cap.getPilotingManager().canUseControls() && !(controlSpecification.control().equals(TRControlRegistry.MONITOR.get()))) {
+            if (!cap.getPilotingManager().canUseControls() && !controlSpecification.control().canBeUsedPostCrash()) {
                 if (player.isCreative()) {
                     serverLevel.playSound(null, this.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 100, (float) (0.1 + (serverLevel.getRandom().nextFloat() * 0.5)));
                 } else {
@@ -524,7 +520,7 @@ public class ControlEntity extends Entity {
                 return false;
             }
 
-            Control control = this.controlSpecification.control();
+            whocraft.tardis_refined.common.tardis.control.Control control = this.controlSpecification.control();
             boolean successfulUse = control.onRightClick(cap, consoleTheme, this, player);
             ConfiguredSound playedSound = successfulUse ? control.getSuccessSound(cap, this.consoleTheme, false) : control.getFailSound(cap, this.consoleTheme, false);
             control.playControlConfiguredSound(cap, this, playedSound);

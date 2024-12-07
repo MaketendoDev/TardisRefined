@@ -92,6 +92,46 @@ public class RenderHelper {
         tesselator.getBuilder().vertex(pose.last().pose(), x, y, z).uv(u, v).color(r, g, b, a).endVertex();
     }
 
+    public static class CustomProgressBar {
+        private final ResourceLocation texture;
+
+        private final int height, width;
+        private final int framesU, framesV, mspf;
+        private int anim = 1;
+        private long last_frame;
+        private boolean started = false;
+        public boolean animate = true;
+
+        public CustomProgressBar(ResourceLocation texture, int texWidth, int texHeight, int height, int width, int fps) {
+            this.texture = texture;
+            this.height = height;
+            this.width = width;
+            this.mspf = 1000 / fps;
+            this.framesU = texHeight / height;
+            this.framesV = texWidth / width;
+        }
+
+        public void blit(GuiGraphics gg, int x, int y, double progress) {
+            if (!started) {
+                started = true;
+                last_frame = System.currentTimeMillis();
+            }
+
+            int u = anim / framesU;
+            int v = anim % framesU;
+
+            gg.blit(texture, x, y, 0, 0, width, height);
+            gg.blit(texture, x, y, width * u, height * v, (int) (width * progress), height);
+
+            if (System.currentTimeMillis() - last_frame > mspf) {
+                anim++;
+                last_frame = System.currentTimeMillis();
+            }
+            if (anim >= framesU * framesV || !animate) anim = 1;
+        }
+    }
+
+
     public static class DynamicTimeKeep {
         public double speed = 1f;
         private long time = Long.MIN_VALUE;

@@ -192,6 +192,7 @@ public class TardisLevelOperator {
             tardisClientData.setIsLanding(exteriorManager.isLanding());
             tardisClientData.setIsTakingOff(exteriorManager.isTakingOff());
             tardisClientData.setIsCrashing(pilotingManager.isCrashing());
+            tardisClientData.setVortex(aestheticHandler.getVortex());
 
             float percentageCompleted = (getPilotingManager().getFlightPercentageCovered() * 100f);
             if (percentageCompleted > 100) {
@@ -209,6 +210,8 @@ public class TardisLevelOperator {
             tardisClientData.setIsTakingOff(exteriorManager.isTakingOff());
             tardisClientData.setThrottleStage(pilotingManager.getThrottleStage());
             tardisClientData.setHandbrakeEngaged(pilotingManager.isHandbrakeOn());
+            tardisClientData.setVortex(aestheticHandler.getVortex());
+
             tardisClientData.sync();
         }
     }

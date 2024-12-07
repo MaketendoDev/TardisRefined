@@ -151,7 +151,6 @@ public class ScrewdriverItem extends Item implements DyeableLeatherItem {
                 }
 
             }
-
         }
     }
 

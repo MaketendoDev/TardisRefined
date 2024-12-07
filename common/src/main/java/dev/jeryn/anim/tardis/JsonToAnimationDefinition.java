@@ -122,7 +122,6 @@ public class JsonToAnimationDefinition {
         if(transformationData == null) return keyframes;
 
         JsonObject jsonObject = transformationData.getAsJsonObject();
-        TardisRefined.LOGGER.info("Keyframe Info: {}", jsonObject);
 
         if (!jsonObject.has("keyframes") || !jsonObject.get("keyframes").isJsonArray()) {
             return keyframes;
@@ -156,9 +155,8 @@ public class JsonToAnimationDefinition {
             Keyframe keyframe = new Keyframe(timestamp, Objects.requireNonNull(targetToVector(targetType, vector3f)), interpolation);
             keyframes.add(keyframe);
         }
-
         // Log the total number of keyframes parsed
-        TardisRefined.LOGGER.info("Total keyframes parsed for target {}: {}", targetToString(targetType), keyframes.size());
+        TardisRefined.LOGGER.debug("({} + {}) Total keyframes parsed: {}", targetToString(targetType), jsonObject.get("bone").getAsString(),  keyframes.size());
 
         return keyframes;
     }

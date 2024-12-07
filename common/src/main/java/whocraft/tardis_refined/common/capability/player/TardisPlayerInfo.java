@@ -11,8 +11,9 @@ import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import whocraft.tardis_refined.common.capability.tardis.TardisLevelOperator;
 import whocraft.tardis_refined.common.dimension.TardisTeleportData;
-import whocraft.tardis_refined.common.network.messages.player.EndPlayerVortexSessionMessage;
-import whocraft.tardis_refined.common.network.messages.player.SyncTardisPlayerInfoMessage;
+import whocraft.tardis_refined.common.network.messages.player.C2SExitTardisView;
+import whocraft.tardis_refined.common.network.messages.player.S2CResetPostShellView;
+import whocraft.tardis_refined.common.network.messages.sync.S2CSyncTardisPlayerView;
 import whocraft.tardis_refined.common.tardis.TardisNavLocation;
 import whocraft.tardis_refined.common.tardis.manager.TardisPilotingManager;
 import whocraft.tardis_refined.common.util.Platform;
@@ -126,13 +127,13 @@ public class TardisPlayerInfo implements TardisPilot {
 
     @Override
     public void endPlayerForInspection(ServerPlayer serverPlayer) {
-        if(!isViewingTardis()) return;
+        if (!isViewingTardis()) return;
         BlockPos targetPosition = getPlayerPreviousPos().getPosition();
 
         TardisTeleportData.scheduleEntityTeleport(serverPlayer, getPlayerPreviousPos().getDimensionKey(), targetPosition.getX(), targetPosition.getY(), targetPosition.getZ(), playerPreviousYaw, playerPreviousRot);
         updatePlayerAbilities(serverPlayer, serverPlayer.getAbilities(), false);
         serverPlayer.onUpdateAbilities();
-        new EndPlayerVortexSessionMessage().send(serverPlayer);
+        new S2CResetPostShellView().send(serverPlayer);
 
         setPlayerPreviousPos(TardisNavLocation.ORIGIN);
         setRenderVortex(false);
@@ -217,12 +218,16 @@ public class TardisPlayerInfo implements TardisPilot {
 
         CompoundTag nbt = saveData();
 
-        SyncTardisPlayerInfoMessage message = new SyncTardisPlayerInfoMessage(this.player.getId(), nbt);
+        S2CSyncTardisPlayerView message = new S2CSyncTardisPlayerView(this.player.getId(), nbt);
         if (serverPlayerEntity == null) {
             message.sendToAll();
         } else {
             message.send(serverPlayerEntity);
         }
+    }
+
+    public static void onExitKeybindPressed(){
+        new C2SExitTardisView().send();
     }
 
     @Override
