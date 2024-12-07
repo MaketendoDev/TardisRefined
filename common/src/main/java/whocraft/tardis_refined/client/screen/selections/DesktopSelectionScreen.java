@@ -10,9 +10,11 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 import whocraft.tardis_refined.TardisRefined;
 import whocraft.tardis_refined.client.screen.components.GenericMonitorSelectionList;
 import whocraft.tardis_refined.client.screen.components.SelectionListEntry;
+import whocraft.tardis_refined.client.screen.main.MonitorOS;
 import whocraft.tardis_refined.common.network.messages.C2SChangeDesktop;
 import whocraft.tardis_refined.common.tardis.TardisDesktops;
 import whocraft.tardis_refined.common.tardis.themes.DesktopTheme;
@@ -20,9 +22,7 @@ import whocraft.tardis_refined.common.util.MiscHelper;
 import whocraft.tardis_refined.constants.ModMessages;
 import whocraft.tardis_refined.registry.TRSoundRegistry;
 
-import static whocraft.tardis_refined.client.screen.selections.ShellSelectionScreen.NOISE;
-
-public class DesktopSelectionScreen extends SelectionScreen {
+public class DesktopSelectionScreen extends MonitorOS {
 
     public static ResourceLocation MONITOR_TEXTURE = new ResourceLocation(TardisRefined.MODID, "textures/gui/desktop.png");
     public static ResourceLocation MONITOR_TEXTURE_OVERLAY = new ResourceLocation(TardisRefined.MODID, "textures/gui/desktop_overlay.png");
@@ -67,7 +67,7 @@ public class DesktopSelectionScreen extends SelectionScreen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.renderTransparentBackground(guiGraphics);
 
         PoseStack poseStack = guiGraphics.pose();
@@ -94,7 +94,7 @@ public class DesktopSelectionScreen extends SelectionScreen {
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, (float) alpha);
         RenderSystem.setShaderTexture(0, NOISE);
-        guiGraphics.blit(NOISE, 0, 0, this.noiseX, this.noiseY, 400, 400);
+        guiGraphics.blit(NOISE, 0, 0, this.shakeX, this.shakeY, 400, 400);
         RenderSystem.disableBlend();
         poseStack.popPose();
 
@@ -103,19 +103,14 @@ public class DesktopSelectionScreen extends SelectionScreen {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         guiGraphics.blit(MONITOR_TEXTURE_OVERLAY, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 
-        super.render(guiGraphics, i, j, f);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
 
 
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void renderBackground(@NotNull GuiGraphics guiGraphics, int i, int j, float f) {
 
-    }
-
-    @Override
-    public Component getSelectedDisplayName() {
-        return Component.Serializer.fromJson(currentDesktopTheme.getName());
     }
 
     @Override

@@ -11,19 +11,21 @@ import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import whocraft.tardis_refined.TardisRefined;
 import whocraft.tardis_refined.client.TardisClientData;
 import whocraft.tardis_refined.client.renderer.vortex.VortexRenderer;
 import whocraft.tardis_refined.client.screen.components.GenericMonitorSelectionList;
 import whocraft.tardis_refined.client.screen.components.SelectionListEntry;
+import whocraft.tardis_refined.client.screen.main.MonitorOS;
 import whocraft.tardis_refined.common.VortexRegistry;
 import whocraft.tardis_refined.common.network.messages.C2SChangeVortex;
 import whocraft.tardis_refined.constants.ModMessages;
 
 import java.util.List;
 
-public class VortexSelectionScreen extends SelectionScreen {
+public class VortexSelectionScreen extends MonitorOS {
 
     public static ResourceLocation MONITOR_TEXTURE = new ResourceLocation(TardisRefined.MODID, "textures/gui/shell.png");
     public static ResourceLocation NOISE = new ResourceLocation(TardisRefined.MODID, "textures/gui/noise.png");
@@ -75,7 +77,7 @@ public class VortexSelectionScreen extends SelectionScreen {
 
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         PoseStack poseStack = guiGraphics.pose();
         Minecraft mc = Minecraft.getInstance();
         ClientLevel lvl = mc.level;
@@ -140,30 +142,24 @@ public class VortexSelectionScreen extends SelectionScreen {
         /*Render Back drop*/
         //RenderSystem.setShader(GameRenderer::getPositionTexShader); //REDUNDANT
         //RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        guiGraphics.blit(MONITOR_TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+        //guiGraphics.blit(MONITOR_TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 
 
         double alpha = (100.0D - this.age * 3.0D) / 100.0D;
         if (isCrashed) {
             RenderSystem.enableBlend();
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, (float) alpha);
-            guiGraphics.blit(NOISE, leftPos, topPos, this.noiseX, this.noiseY, imageWidth, imageHeight);
+            guiGraphics.blit(NOISE, leftPos, topPos, this.shakeX, this.shakeY, imageWidth, imageHeight);
             RenderSystem.disableBlend();
         }
-        super.render(guiGraphics, i, j, f);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void renderBackground(@NotNull GuiGraphics guiGraphics, int i, int j, float f) {
         // super.renderBackground(guiGraphics, i, j, f);
     }
 
-
-    @Override
-    public Component getSelectedDisplayName() {
-        VortexRegistry theme = VortexRegistry.VORTEX_DEFERRED_REGISTRY.get(this.currentVortex);
-        return theme.getDisplayName();
-    }
 
     @Override
     public GenericMonitorSelectionList createSelectionList() {

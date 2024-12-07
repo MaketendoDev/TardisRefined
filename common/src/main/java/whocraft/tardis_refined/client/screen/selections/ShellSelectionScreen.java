@@ -1,231 +1,96 @@
 package whocraft.tardis_refined.client.screen.selections;
 
-import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexSorting;
 import com.mojang.brigadier.StringReader;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.Level;
-import org.joml.Matrix4f;
-import whocraft.tardis_refined.TardisRefined;
-import whocraft.tardis_refined.client.TardisClientData;
-import whocraft.tardis_refined.client.model.blockentity.shell.ShellModel;
-import whocraft.tardis_refined.client.model.blockentity.shell.ShellModelCollection;
-import whocraft.tardis_refined.client.overlays.VortexOverlay;
+import org.jetbrains.annotations.NotNull;
 import whocraft.tardis_refined.client.screen.components.GenericMonitorSelectionList;
 import whocraft.tardis_refined.client.screen.components.SelectionListEntry;
-import whocraft.tardis_refined.common.blockentity.shell.GlobalShellBlockEntity;
+import whocraft.tardis_refined.client.screen.main.MonitorOS;
 import whocraft.tardis_refined.common.network.messages.C2SChangeShell;
+import whocraft.tardis_refined.common.network.messages.screens.C2SRequestShellSelection;
 import whocraft.tardis_refined.common.tardis.themes.ShellTheme;
 import whocraft.tardis_refined.constants.ModMessages;
-import whocraft.tardis_refined.patterns.ShellPattern;
 import whocraft.tardis_refined.patterns.ShellPatterns;
-import whocraft.tardis_refined.registry.TRBlockRegistry;
 
-import java.util.List;
-import java.util.UUID;
+public class ShellSelectionScreen extends MonitorOS.MonitorOSExtension {
 
-public class ShellSelectionScreen extends SelectionScreen {
-
-    public static ResourceLocation MONITOR_TEXTURE = new ResourceLocation(TardisRefined.MODID, "textures/gui/shell.png");
-    public static ResourceLocation NOISE = new ResourceLocation(TardisRefined.MODID, "textures/gui/noise.png");
-    public static GlobalShellBlockEntity globalShellBlockEntity;
-    private final List<ResourceLocation> themeList;
-    protected int imageWidth = 256;
-    protected int imageHeight = 173;
-    private ResourceLocation currentShellTheme;
-    private int leftPos, topPos;
-    private ShellPattern pattern;
-    private List<ShellPattern> patternCollection;
     private Button patternButton;
 
     public ShellSelectionScreen(ResourceLocation currentShellTheme) {
-        super(Component.translatable(ModMessages.UI_SHELL_SELECTION));
-        this.themeList = ShellTheme.SHELL_THEME_REGISTRY.keySet().stream().toList();
-        generateDummyGlobalShell();
-        this.currentShellTheme = currentShellTheme;
-
-    }
-
-    public static void generateDummyGlobalShell() {
-        globalShellBlockEntity = new GlobalShellBlockEntity(BlockPos.ZERO, TRBlockRegistry.GLOBAL_SHELL_BLOCK.get().defaultBlockState());
-        assert Minecraft.getInstance().level != null;
-        globalShellBlockEntity.setLevel(Minecraft.getInstance().level);
-        ResourceKey<Level> generatedLevelKey = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(TardisRefined.MODID, UUID.randomUUID().toString()));
-        globalShellBlockEntity.setTardisId(generatedLevelKey);
-        globalShellBlockEntity.setShellTheme(ShellTheme.POLICE_BOX.getId());
-        globalShellBlockEntity.setPattern(ShellPatterns.DEFAULT);
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
+        super(Component.translatable(ModMessages.UI_SHELL_SELECTION), currentShellTheme);
     }
 
     @Override
     protected void init() {
-        this.setEvents(() -> {
-            selectShell(this.currentShellTheme);
-        }, () -> {
-            Minecraft.getInstance().setScreen(null);
-        });
-        if (currentShellTheme == null) {
-            this.currentShellTheme = this.themeList.get(0);
-        }
-        this.patternCollection = ShellPatterns.getPatternCollectionForTheme(this.currentShellTheme);
-        this.pattern = this.patternCollection.get(0);
+        this.setEvents(
+                () -> {
+                    selectShell(this.currentShellTheme);
+                },
+                () -> {
+                    Minecraft.getInstance().setScreen(PREVIOUS);
+                }
+        );
 
-        this.leftPos = (this.width - this.imageWidth) / 2;
-        this.topPos = (this.height - this.imageHeight) / 2;
+        int vPos = (height - monitorHeight) / 2;
 
-        addSubmitButton(width / 2 + 90, (height) / 2 + 34);
-        addCancelButton(width / 2 - 11, (height) / 2 + 34);
+        addSubmitButton(width / 2 - 11, height - vPos - 25);
+        addCancelButton(width / 2 + 90, height - vPos - 25);
 
         patternButton = addRenderableWidget(Button.builder(Component.literal(""), button -> {
             pattern = ShellPatterns.next(this.patternCollection, this.pattern);
             button.setMessage(Component.Serializer.fromJson(new StringReader(this.pattern.name())));
-        }).pos(width / 2 + 14, (height) / 2 + 34).size(70, 20).build());
+        }).pos(width / 2 + 14, height - vPos - 25).size(70, 20).build());
 
         patternButton.visible = false; //Hide when initialised. We will only show it when there are more than 1 pattern for a shell (via its {@link PatternCollection} )
 
         super.init();
     }
 
-    public void selectShell(ResourceLocation themeId) {
-        new C2SChangeShell(Minecraft.getInstance().player.level().dimension(), themeId, pattern).send();
-        Minecraft.getInstance().setScreen(null);
-    }
-
-
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void renderBackdrop(@NotNull GuiGraphics guiGraphics) {
+        super.renderBackdrop(guiGraphics);
+
         PoseStack poseStack = guiGraphics.pose();
-        Minecraft mc = Minecraft.getInstance();
-        ClientLevel lvl = mc.level;
-        assert lvl != null;
-        RandomSource rand = lvl.random;
 
-        boolean isCrashed = TardisClientData.getInstance(lvl.dimension()).isCrashing();
-
-        if (isCrashed) {
-            if (rand.nextInt(10) == 1) {
-                for (int i1 = 0; i1 < 3; i1++) {
-                    poseStack.translate(rand.nextInt(3) / 100F, rand.nextInt(3) / 100.0f, rand.nextInt(3) / 100.0f);
-                }
-            }
-            if (rand.nextInt(20) == 1) {
-                poseStack.scale(1, 1 + rand.nextInt(5) / 100F, 1);
-            }
-        }
-
-
-        guiGraphics.enableScissor(leftPos + 3, topPos + 3, width - leftPos - 3, height - topPos - 3);
-        RenderSystem.backupProjectionMatrix();
-        Matrix4f perspective = new Matrix4f();
-        perspective.perspective((float) Math.toRadians(mc.options.fov().get()), (float) width / (float) height, 0.01f, 9999, false, perspective);
-        perspective.translate(0, 0, 11000f);
-        RenderSystem.setProjectionMatrix(perspective, VertexSorting.DISTANCE_TO_ORIGIN);
-        poseStack.pushPose();
-        poseStack.mulPose(Axis.YP.rotationDegrees(20));
-        VortexOverlay.VORTEX.time.speed = 0.3;
-        VortexOverlay.VORTEX.renderVortex(guiGraphics, 1, false);
-        RenderSystem.restoreProjectionMatrix();
-        poseStack.popPose();
-        guiGraphics.disableScissor();
-
-        guiGraphics.enableScissor(0, 0, width + 3, topPos + 3);
-        this.renderTransparentBackground(guiGraphics);
-        guiGraphics.disableScissor();
-        guiGraphics.enableScissor(0, topPos + 3, leftPos + 3, height - topPos - 3);
-        this.renderTransparentBackground(guiGraphics);
-        guiGraphics.disableScissor();
-        guiGraphics.enableScissor(width - leftPos - 3, topPos + 3, width, height - topPos - 3);
-        this.renderTransparentBackground(guiGraphics);
-        guiGraphics.disableScissor();
-        guiGraphics.enableScissor(0, height - topPos - 3, width, height);
-        this.renderTransparentBackground(guiGraphics);
-        guiGraphics.disableScissor();
+        int hPos = (width - monitorWidth) / 2;
+        int vPos = (height - monitorHeight) / 2;
 
         poseStack.pushPose();
-        int c = -1072689136;
-        int l = leftPos + 3, t = topPos + 3, b = height - t, r = width - l;
-        int l1 = leftPos + imageWidth / 4, l2 = leftPos + imageWidth / 2;
 
-        guiGraphics.fill(l, t, r, b, 0x40000000);
-        guiGraphics.fill(l2, t, r, b, -1072689136);
+        int b = height - vPos, r = width - hPos;
+        int l1 = hPos + monitorWidth / 4, l2 = hPos + monitorWidth / 2;
+
+        guiGraphics.fill(l2, vPos, r, b, -1072689136);
 
         poseStack.mulPose(Axis.ZP.rotationDegrees(-90));
         poseStack.translate(-height, 0, 0);
-        guiGraphics.fillGradient(t, l1, b, l2, 0x00000000, -1072689136);
+        guiGraphics.fillGradient(vPos, l1, b, l2, 0x00000000, -1072689136);
         poseStack.popPose();
-
-        /*Render Back drop*/
-        //RenderSystem.setShader(GameRenderer::getPositionTexShader); //REDUNDANT
-        //RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        guiGraphics.blit(MONITOR_TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
-
-        /*Model*/
-        renderShell(guiGraphics, width / 2 - 75, height / 2 - 20, 25F);
-        //renderShell(guiGraphics, width / 2, height / 2, 25F);
-
-        double alpha = (100.0D - this.age * 3.0D) / 100.0D;
-        if (isCrashed) {
-            RenderSystem.enableBlend();
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, (float) alpha);
-            guiGraphics.blit(NOISE, leftPos, topPos, this.noiseX, this.noiseY, imageWidth, imageHeight);
-            RenderSystem.disableBlend();
-        }
-        super.render(guiGraphics, i, j, f);
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        // super.renderBackground(guiGraphics, i, j, f);
-    }
-
-    private void renderShell(GuiGraphics guiGraphics, int x, int y, float scale) {
-        ShellModel model = ShellModelCollection.getInstance().getShellEntry(this.currentShellTheme).getShellModel(pattern);
-        model.setDoorPosition(false);
-        Lighting.setupForEntityInInventory();
-        PoseStack pose = guiGraphics.pose();
-        pose.pushPose();
-        pose.translate((float) x, y, 100.0F);
-        pose.scale(-scale, scale, scale);
-        pose.mulPose(Axis.XP.rotationDegrees(-15F));
-        pose.mulPose(Axis.YP.rotationDegrees((float) (System.currentTimeMillis() % 5400L) / 15L));
-
-        VertexConsumer vertexConsumer = guiGraphics.bufferSource().getBuffer(model.renderType(model.getShellTexture(pattern, false)));
-        model.renderShell(globalShellBlockEntity, false, false, pose, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
-        guiGraphics.flush();
-        pose.popPose();
-        Lighting.setupFor3DItems();
-    }
-
-
-    @Override
-    public Component getSelectedDisplayName() {
-        ShellTheme theme = ShellTheme.SHELL_THEME_REGISTRY.get(this.currentShellTheme);
-        return theme.getDisplayName();
+    public void doRender(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        renderShell(guiGraphics, width / 2 - 70, height / 2 - 5, 25F);
     }
 
     @Override
-    public GenericMonitorSelectionList createSelectionList() {
-        int leftPos = width / 2 - 5;
-        GenericMonitorSelectionList<SelectionListEntry> selectionList = new GenericMonitorSelectionList<>(this.minecraft, 100, 80, leftPos, this.topPos + 30, this.topPos + this.imageHeight - 60, 12);
+    public void switchToScreen(MonitorOS previous) {
+        C2SRequestShellSelection p = new C2SRequestShellSelection();
+        p.send();
+    }
+
+    @Override
+    public GenericMonitorSelectionList<SelectionListEntry> createSelectionList() {
+        int leftPos = width / 2;
+        int topPos = (height - monitorHeight) / 2;
+        GenericMonitorSelectionList<SelectionListEntry> selectionList = new GenericMonitorSelectionList<>(this.minecraft, 100, 80, leftPos, topPos + 15, topPos + monitorHeight - 30, 12);
 
         selectionList.setRenderBackground(false);
 
@@ -269,4 +134,11 @@ public class ShellSelectionScreen extends SelectionScreen {
 
         return selectionList;
     }
+
+    public void selectShell(ResourceLocation themeId) {
+        assert Minecraft.getInstance().player != null;
+        new C2SChangeShell(Minecraft.getInstance().player.level().dimension(), themeId, pattern).send();
+        Minecraft.getInstance().setScreen(null);
+    }
+
 }

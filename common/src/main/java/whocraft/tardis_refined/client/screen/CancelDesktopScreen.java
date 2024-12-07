@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import whocraft.tardis_refined.client.screen.main.MonitorScreen;
 import whocraft.tardis_refined.common.network.messages.C2SCancelDesktopChange;
 import whocraft.tardis_refined.constants.ModMessages;
 
@@ -53,7 +54,7 @@ public class CancelDesktopScreen extends Screen {
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        guiGraphics.blit(MonitorScreen.MONITOR_TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+        guiGraphics.blit(MonitorScreen.FRAME, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 
         ScreenHelper.renderWidthScaledText(Component.translatable(ModMessages.UI_DESKTOP_CANCEL_TITLE).getString(), guiGraphics, Minecraft.getInstance().font, width / 2, height / 2 - 30, Color.LIGHT_GRAY.getRGB(), 300, true);
         ScreenHelper.renderWidthScaledText(Component.translatable(ModMessages.UI_DESKTOP_CANCEL_DESCRIPTION).getString(), guiGraphics, Minecraft.getInstance().font, width / 2, this.height / 2 - 20, Color.WHITE.getRGB(), 210, true);

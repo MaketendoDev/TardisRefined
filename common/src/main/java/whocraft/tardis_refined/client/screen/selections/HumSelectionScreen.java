@@ -8,9 +8,11 @@ import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 import whocraft.tardis_refined.TardisRefined;
 import whocraft.tardis_refined.client.screen.components.GenericMonitorSelectionList;
 import whocraft.tardis_refined.client.screen.components.SelectionListEntry;
+import whocraft.tardis_refined.client.screen.main.MonitorOS;
 import whocraft.tardis_refined.common.hum.HumEntry;
 import whocraft.tardis_refined.common.hum.TardisHums;
 import whocraft.tardis_refined.common.network.messages.hums.C2SChangeHum;
@@ -19,31 +21,18 @@ import whocraft.tardis_refined.common.util.MiscHelper;
 import java.util.Collection;
 import java.util.Comparator;
 
-public class HumSelectionScreen extends SelectionScreen {
-    public static ResourceLocation MONITOR_TEXTURE = new ResourceLocation(TardisRefined.MODID, "textures/gui/monitor.png");
-    protected int imageWidth = 256;
-    protected int imageHeight = 173;
-    private HumEntry currentHumEntry;
-    private int leftPos, topPos;
+public class HumSelectionScreen extends MonitorOS {
 
+    private HumEntry currentHumEntry;
 
     public HumSelectionScreen() {
         super(Component.translatable(""));
     }
 
     public static void selectHum(HumEntry theme) {
+        assert Minecraft.getInstance().player != null;
         new C2SChangeHum(Minecraft.getInstance().player.level().dimension(), theme).send();
         Minecraft.getInstance().setScreen(null);
-    }
-
-    @Override
-    public void addSubmitButton(int x, int y) {
-        super.addSubmitButton(x, y);
-    }
-
-    @Override
-    public boolean isPauseScreen() {
-        return false;
     }
 
     @Override
@@ -55,20 +44,12 @@ public class HumSelectionScreen extends SelectionScreen {
         });
         this.currentHumEntry = grabHum();
 
-        this.leftPos = (this.width - this.imageWidth) / 2;
-        this.topPos = (this.height - this.imageHeight) / 2;
-
-        //Super method already creates the list, we don't need to create it a second time.
         super.init();
 
         addSubmitButton(width / 2 + 85, (height) / 2 + 35);
         addCancelButton(width / 2 - 105, (height) / 2 + 35);
     }
 
-    @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        return super.mouseClicked(d, e, i);
-    }
 
     private HumEntry grabHum() {
         for (HumEntry humEntry : TardisHums.getRegistry().values()) {
@@ -78,33 +59,10 @@ public class HumSelectionScreen extends SelectionScreen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        this.renderTransparentBackground(guiGraphics);
-
-
-        /*Render Back drop*/
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        guiGraphics.blit(MONITOR_TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
-
-
-        super.render(guiGraphics, i, j, f);
-
-    }
-
-    @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-
-    }
-
-    @Override
-    public Component getSelectedDisplayName() {
-        return Component.Serializer.fromJson(currentHumEntry.getNameComponent());
-    }
-
-    @Override
-    public ObjectSelectionList createSelectionList() {
+    public ObjectSelectionList<SelectionListEntry> createSelectionList() {
+        int vPos = (height - monitorHeight) / 2;
         int leftPos = this.width / 2 - 75;
-        GenericMonitorSelectionList<SelectionListEntry> selectionList = new GenericMonitorSelectionList<>(this.minecraft, 150, 80, leftPos, this.topPos + 30, this.topPos + this.imageHeight - 60, 12);
+        GenericMonitorSelectionList<SelectionListEntry> selectionList = new GenericMonitorSelectionList<>(this.minecraft, 150, 80, leftPos, vPos + 30, vPos + monitorHeight - 60, 12);
         selectionList.setRenderBackground(false);
 
         Collection<HumEntry> knownHums = TardisHums.getRegistry().values();

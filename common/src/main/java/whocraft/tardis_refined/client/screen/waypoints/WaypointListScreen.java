@@ -6,12 +6,13 @@ import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 import whocraft.tardis_refined.TardisRefined;
 import whocraft.tardis_refined.client.screen.ScreenHelper;
 import whocraft.tardis_refined.client.screen.components.CommonTRWidgets;
 import whocraft.tardis_refined.client.screen.components.GenericMonitorSelectionList;
 import whocraft.tardis_refined.client.screen.components.SelectionListEntry;
-import whocraft.tardis_refined.client.screen.selections.SelectionScreen;
+import whocraft.tardis_refined.client.screen.main.MonitorOS;
 import whocraft.tardis_refined.common.network.messages.waypoints.C2SOpenCoordinatesDisplayMessage;
 import whocraft.tardis_refined.common.network.messages.waypoints.C2SOpenEditCoordinatesDisplayMessage;
 import whocraft.tardis_refined.common.network.messages.waypoints.C2SRemoveWaypointEntry;
@@ -24,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 
-public class WaypointListScreen extends SelectionScreen {
+public class WaypointListScreen extends MonitorOS {
 
     public static final ResourceLocation TRASH_LOCATION = new ResourceLocation(TardisRefined.MODID, "trash");
     public static final ResourceLocation OKAY_TEXTURE = new ResourceLocation(TardisRefined.MODID, "okay");
@@ -66,7 +67,7 @@ public class WaypointListScreen extends SelectionScreen {
                 Minecraft.getInstance().setScreen(null);
             }
             Minecraft.getInstance().setScreen(null);
-        }, new SelectionScreenRun() {
+        }, new MonitorOSRun() {
             @Override
             public void onPress() {
                 if (waypoint != null) {
@@ -147,12 +148,12 @@ public class WaypointListScreen extends SelectionScreen {
 
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void renderBackground(@NotNull GuiGraphics guiGraphics, int i, int j, float f) {
         // super.renderBackground(guiGraphics, i, j, f);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
 
         int textOffset = height / 2 - 60;
         int textScale = 40;
@@ -167,7 +168,7 @@ public class WaypointListScreen extends SelectionScreen {
             ScreenHelper.renderWidthScaledText(noWaypointsLabel.getString(), guiGraphics, Minecraft.getInstance().font, width / 2 - 96, textOffset + 15, Color.LIGHT_GRAY.getRGB(), textScale * 2, 1F, false);
         }
 
-        super.render(guiGraphics, i, j, f);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
 
     }
 }

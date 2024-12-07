@@ -8,7 +8,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import whocraft.tardis_refined.client.screen.CancelDesktopScreen;
-import whocraft.tardis_refined.client.screen.MonitorScreen;
+import whocraft.tardis_refined.client.screen.main.MonitorOS;
+import whocraft.tardis_refined.client.screen.main.MonitorScreen;
 import whocraft.tardis_refined.client.screen.selections.ShellSelectionScreen;
 import whocraft.tardis_refined.client.screen.upgrades.UpgradesScreen;
 import whocraft.tardis_refined.client.screen.waypoints.CoordInputType;
@@ -42,13 +43,13 @@ public class ScreenHandler {
     }
 
     @Environment(EnvType.CLIENT)
-    public static void openMonitorScreen(boolean desktopGenerating, CompoundTag upgradeHandlerNbt, TardisNavLocation currentLocation, TardisNavLocation targetLocation) {
+    public static void openMonitorScreen(boolean desktopGenerating, CompoundTag upgradeHandlerNbt, TardisNavLocation currentLocation, TardisNavLocation targetLocation, ResourceLocation currentShellTheme) {
         if (desktopGenerating) {
             Minecraft.getInstance().setScreen(new CancelDesktopScreen());
         } else {
             UpgradeHandler upgradeHandlerClient = new UpgradeHandler(new TardisLevelOperator(Minecraft.getInstance().level));
             upgradeHandlerClient.loadData(upgradeHandlerNbt);
-            Minecraft.getInstance().setScreen(new MonitorScreen(currentLocation, targetLocation, upgradeHandlerClient));
+            Minecraft.getInstance().setScreen(new MonitorScreen(currentLocation, targetLocation, upgradeHandlerClient, currentShellTheme));
         }
     }
 
@@ -76,6 +77,11 @@ public class ScreenHandler {
 
     @Environment(EnvType.CLIENT)
     public static void openShellSelection(ResourceLocation currentShell) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof MonitorOS) {
+            ((MonitorOS) mc.screen).switchScreenToLeft(new ShellSelectionScreen(currentShell));
+            return;
+        }
         Minecraft.getInstance().setScreen(new ShellSelectionScreen(currentShell));
     }
 }

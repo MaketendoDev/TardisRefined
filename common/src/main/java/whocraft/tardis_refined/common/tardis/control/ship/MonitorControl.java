@@ -40,7 +40,7 @@ public class MonitorControl extends whocraft.tardis_refined.common.tardis.contro
                     isSyncingKey = true;
             }
             if (!isSyncingKey)
-                new S2COpenMonitor(operator.getInteriorManager().isWaitingToGenerate(), operator.getPilotingManager().getCurrentLocation(), operator.getPilotingManager().getTargetLocation(), operator.getUpgradeHandler()).send((ServerPlayer) player);
+                new S2COpenMonitor(operator.getInteriorManager().isWaitingToGenerate(), operator.getPilotingManager().getCurrentLocation(), operator.getPilotingManager().getTargetLocation(), operator.getUpgradeHandler(), operator.getAestheticHandler().getShellTheme()).send((ServerPlayer) player);
             return true;
         }
         return false;

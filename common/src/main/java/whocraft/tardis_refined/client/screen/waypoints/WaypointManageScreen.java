@@ -23,7 +23,7 @@ import whocraft.tardis_refined.constants.ModMessages;
 import java.awt.*;
 import java.util.List;
 
-import static whocraft.tardis_refined.client.screen.selections.SelectionScreen.BUTTON_LOCATION;
+import static whocraft.tardis_refined.client.screen.main.MonitorOS.BUTTON_LOCATION;
 
 public class WaypointManageScreen extends Screen {
 

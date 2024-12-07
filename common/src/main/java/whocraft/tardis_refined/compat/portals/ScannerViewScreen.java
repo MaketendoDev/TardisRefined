@@ -28,7 +28,7 @@ import qouteall.imm_ptl.core.render.MyRenderHelper;
 import qouteall.imm_ptl.core.render.context_management.WorldRenderInfo;
 import qouteall.q_misc_util.api.McRemoteProcedureCall;
 import qouteall.q_misc_util.my_util.DQuaternion;
-import whocraft.tardis_refined.client.screen.MonitorScreen;
+import whocraft.tardis_refined.client.screen.main.MonitorScreen;
 
 import java.util.WeakHashMap;
 
@@ -164,7 +164,7 @@ public class ScannerViewScreen {
 
             /*Render Back drop*/
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            guiGraphics.blit(MonitorScreen.MONITOR_TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+            guiGraphics.blit(MonitorScreen.FRAME, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 
             double t1 = CHelper.getSmoothCycles(503);
             double t2 = 0;
