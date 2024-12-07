@@ -28,6 +28,7 @@
 ## Additions
 - Added Item: Mallet 
 - Added Villager: Pilot  (POI: Console)
+- Added Interior: Useable Terraformed 
 - "Added" Shell: Half Baked
 - Added Vortex: Clouds
 - Added Vortex: Flow
@@ -57,6 +58,8 @@
 - Model: Updated Coral Console Model
 - Model: Updated Victorian Console Model
 - Model: Updated Factory Console Model
+- Model: Updated Big Ben Interior Model
+- Model: Updated Pathfinder Interior Model
 - Animation: Updated Factory Console Flight Animation
 - Animation: Updated Factory Console Idle Animation
 - Animation: Added Factory Console Crash Animation

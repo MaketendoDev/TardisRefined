@@ -54,7 +54,7 @@ public class RenderTargetHelper {
 
         VORTEX.vortexType = VortexRegistry.VORTEX_DEFERRED_REGISTRY.get(tardisClientData.getVortex());
 
-        if (true) {
+        if (tardisClientData.isFlying() && isOpen) {
             renderDoorOpen(blockEntity, stack, packedLight, rotation, currentModel, isOpen, tardisClientData);
         } else {
             renderNoVortex(blockEntity, stack, bufferSource, packedLight, rotation, currentModel, isOpen);
@@ -120,7 +120,6 @@ public class RenderTargetHelper {
 
         Minecraft.getInstance().getMainRenderTarget().bindWrite(true);
         copyRenderTarget(RENDER_TARGET_HELPER.renderTarget, Minecraft.getInstance().getMainRenderTarget());
-
         GL11.glDisable(GL11.GL_STENCIL_TEST); // Disable stencil test
         GL11.glColorMask(true, true, true, true);
 
